@@ -97,16 +97,18 @@ describe("sendEmail", () => {
     }) as unknown as typeof fetch;
 
     expect(await sendEmail(mail())).toBe(true);
-    expect(calls).toHaveLength(1);
-    expect(calls[0]!.url).toBe("https://api.resend.com/emails");
-    expect(calls[0]!.auth).toBe("Bearer re_test_123");
-    expect(calls[0]!.body).toMatchObject({
+    // Ignore background emails from other test files that may hit the mock meanwhile.
+    const mine = calls.filter((c) => c.body.to === "budi@example.com");
+    expect(mine).toHaveLength(1);
+    expect(mine[0]!.url).toBe("https://api.resend.com/emails");
+    expect(mine[0]!.auth).toBe("Bearer re_test_123");
+    expect(mine[0]!.body).toMatchObject({
       from: "Pyground <noreply@pyground.test>",
       to: "budi@example.com",
       subject: "Verify your Pyground email",
     });
-    expect(String(calls[0]!.body.html)).toContain("<html");
-    expect(String(calls[0]!.body.text)).toContain("verify?token=abc");
+    expect(String(mine[0]!.body.html)).toContain("<html");
+    expect(String(mine[0]!.body.text)).toContain("verify?token=abc");
   });
 
   it("a Resend failure returns false and never throws", async () => {
@@ -127,9 +129,11 @@ describe("sendEmail", () => {
   it("no API key in development: prints the email instead", async () => {
     const info = spyOn(console, "info").mockImplementation(() => {});
     expect(await sendEmail(mail())).toBe(false);
-    expect(String(info.mock.calls[0]?.[0])).toContain(
-      '(en) "Verify your Pyground email" to budi@example.com',
-    );
+    // Other files' background emails may log meanwhile, so look for this one specifically.
+    const logged = info.mock.calls
+      .map((c) => String(c[0]))
+      .find((m) => m.includes("budi@example.com"));
+    expect(logged).toContain('(en) "Verify your Pyground email" to budi@example.com');
     info.mockRestore();
   });
 });
