@@ -3,6 +3,7 @@ import { auth } from "./lib/auth";
 import { errorBody, errorHandler } from "./lib/errors";
 import { prisma } from "./lib/prisma";
 import { limit } from "./lib/rate-limit";
+import { adminRoutes } from "./modules/admin/routes";
 import { lessonRoutes } from "./modules/lessons/routes";
 import { meRoutes } from "./modules/me/routes";
 import { paymentRoutes } from "./modules/payments/routes";
@@ -28,6 +29,7 @@ const routes = new Elysia()
   .use(lessonRoutes)
   .use(progressRoutes)
   .use(paymentRoutes)
+  .use(adminRoutes)
   .get("/health", async ({ set }) => {
     try {
       await prisma.$queryRaw`SELECT 1`;

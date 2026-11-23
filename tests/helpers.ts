@@ -36,5 +36,9 @@ export async function createUser(
   return { id: user.id, email, cookie };
 }
 
-export const cleanupUsers = () =>
-  prisma.user.deleteMany({ where: { email: { startsWith: "test-" } } });
+export async function cleanupUsers() {
+  const where = { email: { startsWith: "test-" } };
+  // AccessGrant.grantedBy is onDelete: Restrict (audit trail), so grants by test admins go first.
+  await prisma.accessGrant.deleteMany({ where: { grantedBy: where } });
+  await prisma.user.deleteMany({ where });
+}
