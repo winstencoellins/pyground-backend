@@ -1,0 +1,98 @@
+---
+title: Looping with for
+slug: for-loops
+stage: 2
+module: Loops
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Repeat instructions without rewriting code, using for and range().
+---
+
+# Looping with `for`
+
+Say you want to show the numbers 1 to 5. You could write `print()` five times, but what about
+1 to 1000? That's where **loops** come in.
+
+<Playground initialCode={`for number in range(1, 6):
+    print(number)`} />
+
+## How to read it
+
+`for number in range(1, 6):` means: *for each `number` from 1 up to (but not including) 6, run
+the block below.*
+
+<AnimatedDiagram name="for-loop" caption="The variable number changes on every pass: 1, 2, 3, 4, 5." />
+
+<Callout type="warning">
+  Watch the **indentation** (4 spaces). Indented lines belong to the loop. Forget it and Python
+  raises an `IndentationError`.
+</Callout>
+
+## More about `range()`
+
+| Code | Result |
+| --- | --- |
+| `range(5)` | 0, 1, 2, 3, 4 |
+| `range(1, 6)` | 1, 2, 3, 4, 5 |
+| `range(0, 10, 2)` | 0, 2, 4, 6, 8 |
+
+## Looping over text and lists
+
+`for` isn't just for numbers. You can loop over every character in a string, or every item in
+a list:
+
+<Playground initialCode={`fruits = ["mango", "rambutan", "snake fruit"]
+for f in fruits:
+    print("I like", f)`} />
+
+<Callout type="tip">
+  Give loop variables meaningful names. `for f in fruits` works, but `for fruit in fruits` is clearer.
+</Callout>
+
+## Practice: adding up a total
+
+<Playground initialCode={`prices = [15000, 22000, 8000]
+total = 0
+for p in prices:
+    total = total + p
+print("Shopping total:", total)`} />
+
+Change the prices and watch the total update. In Stage 3 you'll learn a shorter way with `sum()`
+and comprehensions.
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="Understanding for loops (4 minutes)" />
+
+## Running it on your computer
+
+<FileTree>
+{`loop-practice/
+└── total.py`}
+</FileTree>
+
+<TerminalBlock command="python total.py" output={`Shopping total: 45000`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which numbers does range(3) produce?",
+      options: ["1, 2, 3", "0, 1, 2", "0, 1, 2, 3"],
+      answer: 1,
+      explanation: "range(n) starts at 0 and stops before n.",
+    },
+    {
+      question: "What decides which lines belong to the loop?",
+      options: ["Curly braces", "Indentation", "Semicolons"],
+      answer: 1,
+      explanation: "Python uses indentation to mark blocks of code.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `for` repeats a block of code for each item.
+- `range(start, stop, step)` produces a sequence of numbers; `stop` is excluded.
+- Indentation defines what's inside the loop.

@@ -1,0 +1,111 @@
+---
+title: Menangani Error dengan try/except
+slug: try-except
+stage: 3
+module: Penanganan Error
+order: 1
+isFree: false
+estimatedMinutes: 20
+description: Buat programmu tetap berjalan saat terjadi kesalahan, dengan try, except, else, dan finally.
+---
+
+# Menangani Error dengan `try`/`except`
+
+Program yang baik tidak langsung "meledak" ketika pengguna mengetik sesuatu yang aneh.
+Coba jalankan kode ini:
+
+<Playground initialCode={`umur = int("dua puluh")
+print(umur)`} />
+
+Python menampilkan `ValueError`, lalu program berhenti. Error seperti ini disebut **exception**.
+
+## Menangkap exception
+
+<Playground initialCode={`teks = "dua puluh"
+try:
+    umur = int(teks)
+    print("Umurmu", umur)
+except ValueError:
+    print("Masukkan umur dalam bentuk angka, ya!")`} />
+
+<AnimatedDiagram name="try-except-flow" caption="Jika baris di dalam try gagal, Python melompat ke except yang cocok." />
+
+## `else` dan `finally`
+
+- `else` berjalan **hanya jika** tidak ada error.
+- `finally` **selalu** berjalan, cocok untuk "beres-beres" seperti menutup file.
+
+<Playground initialCode={`def bagi(a, b):
+    try:
+        hasil = a / b
+    except ZeroDivisionError:
+        print("Tidak bisa membagi dengan nol")
+    else:
+        print("Hasil:", hasil)
+    finally:
+        print("Selesai menghitung")
+
+bagi(10, 2)
+bagi(10, 0)`} />
+
+<Callout type="warning">
+  Hindari `except:` tanpa nama exception. Itu akan menangkap **semua** error, termasuk bug di
+  kodemu sendiri, sehingga lebih sulit di-debug.
+</Callout>
+
+<Callout type="tip">
+  Tangkap exception yang spesifik (`ValueError`, `KeyError`, `FileNotFoundError`) dan simpan
+  pesannya dengan `except ValueError as e:` lalu `print(e)`.
+</Callout>
+
+## Membuat exception sendiri
+
+Kamu juga bisa memunculkan error dengan `raise` ketika data tidak masuk akal:
+
+<Playground initialCode={`def set_umur(umur):
+    if umur < 0:
+        raise ValueError("Umur tidak boleh negatif")
+    return umur
+
+try:
+    set_umur(-5)
+except ValueError as e:
+    print("Error:", e)`} />
+
+## Di proyek nyata
+
+<FileTree>
+{`kalkulator/
+├── main.py
+└── utils.py`}
+</FileTree>
+
+<TerminalBlock command="python main.py" output={`Masukkan angka: abc
+Masukkan angka yang valid!`} />
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="try/except dalam 5 menit" />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Blok mana yang selalu dijalankan, ada error atau tidak?",
+      options: ["else", "except", "finally"],
+      answer: 2,
+      explanation: "finally selalu berjalan, cocok untuk membersihkan sumber daya.",
+    },
+    {
+      question: "Exception apa yang muncul dari int(\"abc\")?",
+      options: ["TypeError", "ValueError", "KeyError"],
+      answer: 1,
+      explanation: "Tipenya benar (string), tapi nilainya tidak bisa diubah jadi angka.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `try` membungkus kode yang mungkin gagal; `except` menanganinya.
+- `else` untuk jalur sukses, `finally` untuk yang selalu dijalankan.
+- Tangkap exception spesifik dan gunakan `raise` untuk data yang tidak valid.

@@ -1,0 +1,110 @@
+---
+title: Handling Errors with try/except
+slug: try-except
+stage: 3
+module: Error Handling
+order: 1
+isFree: false
+estimatedMinutes: 20
+description: Keep your program running when things go wrong, with try, except, else, and finally.
+---
+
+# Handling Errors with `try`/`except`
+
+A good program doesn't just crash when a user types something unexpected. Try running this:
+
+<Playground initialCode={`age = int("twenty")
+print(age)`} />
+
+Python shows a `ValueError` and the program stops. Errors like this are called **exceptions**.
+
+## Catching an exception
+
+<Playground initialCode={`text = "twenty"
+try:
+    age = int(text)
+    print("You are", age)
+except ValueError:
+    print("Please enter your age as a number!")`} />
+
+<AnimatedDiagram name="try-except-flow" caption="If a line inside try fails, Python jumps to the matching except." />
+
+## `else` and `finally`
+
+- `else` runs **only if** no error happened.
+- `finally` **always** runs, which is handy for cleanup like closing files.
+
+<Playground initialCode={`def divide(a, b):
+    try:
+        result = a / b
+    except ZeroDivisionError:
+        print("Can't divide by zero")
+    else:
+        print("Result:", result)
+    finally:
+        print("Done calculating")
+
+divide(10, 2)
+divide(10, 0)`} />
+
+<Callout type="warning">
+  Avoid a bare `except:`. It catches **every** error, including bugs in your own code, which makes
+  debugging much harder.
+</Callout>
+
+<Callout type="tip">
+  Catch specific exceptions (`ValueError`, `KeyError`, `FileNotFoundError`) and keep the message
+  with `except ValueError as e:` then `print(e)`.
+</Callout>
+
+## Raising your own exceptions
+
+You can raise an error yourself with `raise` when data doesn't make sense:
+
+<Playground initialCode={`def set_age(age):
+    if age < 0:
+        raise ValueError("Age can't be negative")
+    return age
+
+try:
+    set_age(-5)
+except ValueError as e:
+    print("Error:", e)`} />
+
+## In a real project
+
+<FileTree>
+{`calculator/
+├── main.py
+└── utils.py`}
+</FileTree>
+
+<TerminalBlock command="python main.py" output={`Enter a number: abc
+Please enter a valid number!`} />
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="try/except in 5 minutes" />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which block always runs, error or not?",
+      options: ["else", "except", "finally"],
+      answer: 2,
+      explanation: "finally always runs, which makes it ideal for cleaning up resources.",
+    },
+    {
+      question: "Which exception does int(\"abc\") raise?",
+      options: ["TypeError", "ValueError", "KeyError"],
+      answer: 1,
+      explanation: "The type is right (a string), but its value can't be turned into a number.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `try` wraps code that might fail; `except` handles it.
+- `else` is for the success path, `finally` for what must always run.
+- Catch specific exceptions and use `raise` for invalid data.

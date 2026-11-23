@@ -1,0 +1,98 @@
+---
+title: Perulangan dengan for
+slug: for-loops
+stage: 2
+module: Perulangan
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Ulangi instruksi tanpa menulis ulang kode, dengan for dan range().
+---
+
+# Perulangan dengan `for`
+
+Misalkan kamu ingin menampilkan angka 1 sampai 5. Kamu bisa menulis `print()` lima kali,
+tapi bagaimana kalau sampai 1000? Di sinilah **perulangan** (loop) berguna.
+
+<Playground initialCode={`for angka in range(1, 6):
+    print(angka)`} />
+
+## Cara membacanya
+
+`for angka in range(1, 6):` artinya: *untuk setiap `angka` dari 1 sampai sebelum 6, jalankan
+blok di bawahnya.*
+
+<AnimatedDiagram name="for-loop" caption="Variabel angka berganti nilai di setiap putaran: 1, 2, 3, 4, 5." />
+
+<Callout type="warning">
+  Perhatikan **indentasi** (4 spasi). Baris yang menjorok ke dalam adalah bagian dari loop.
+  Kalau lupa indentasi, Python akan menampilkan `IndentationError`.
+</Callout>
+
+## `range()` lebih jauh
+
+| Kode | Hasil |
+| --- | --- |
+| `range(5)` | 0, 1, 2, 3, 4 |
+| `range(1, 6)` | 1, 2, 3, 4, 5 |
+| `range(0, 10, 2)` | 0, 2, 4, 6, 8 |
+
+## Loop untuk teks dan daftar
+
+`for` tidak hanya untuk angka. Kamu bisa mengulang setiap huruf dalam teks, atau setiap item
+dalam daftar:
+
+<Playground initialCode={`buah = ["mangga", "rambutan", "salak"]
+for b in buah:
+    print("Aku suka", b)`} />
+
+<Callout type="tip">
+  Beri nama variabel loop yang bermakna. `for b in buah` boleh, tapi `for nama_buah in buah` lebih jelas.
+</Callout>
+
+## Latihan: menghitung total
+
+<Playground initialCode={`harga = [15000, 22000, 8000]
+total = 0
+for h in harga:
+    total = total + h
+print("Total belanja:", total)`} />
+
+Ubah daftar harga dan lihat totalnya berubah. Di Stage 3 kamu akan belajar cara yang lebih
+singkat dengan `sum()` dan comprehension.
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="Memahami for loop (4 menit)" />
+
+## Menjalankan di komputermu
+
+<FileTree>
+{`latihan-loop/
+└── hitung.py`}
+</FileTree>
+
+<TerminalBlock command="python hitung.py" output={`Total belanja: 45000`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Angka apa saja yang dihasilkan range(3)?",
+      options: ["1, 2, 3", "0, 1, 2", "0, 1, 2, 3"],
+      answer: 1,
+      explanation: "range(n) mulai dari 0 dan berhenti sebelum n.",
+    },
+    {
+      question: "Apa yang menentukan baris mana yang termasuk dalam loop?",
+      options: ["Tanda kurung kurawal", "Indentasi", "Titik koma"],
+      answer: 1,
+      explanation: "Python memakai indentasi untuk menandai blok kode.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `for` mengulang blok kode untuk setiap item.
+- `range(awal, akhir, langkah)` menghasilkan deret angka; `akhir` tidak ikut.
+- Indentasi menentukan isi loop.

@@ -1,0 +1,95 @@
+---
+title: What Is Programming?
+slug: what-is-programming
+stage: 1
+module: What Is Programming
+order: 1
+isFree: true
+estimatedMinutes: 10
+description: Meet programming, Python, and your very first program, right in the browser.
+---
+
+# What Is Programming?
+
+Computers are incredibly fast, but they can't guess what you want. **Programming** is how we give
+a computer clear, step-by-step instructions. A set of those instructions is called a **program**,
+and the language we write it in is a **programming language**.
+
+Imagine writing a fried rice recipe for a friend who has never cooked:
+
+1. Heat the oil.
+2. Add the garlic and shallots, stir until fragrant.
+3. Add the rice and mix.
+4. Add sweet soy sauce and salt.
+
+If the steps are swapped or one is missing, the result is a mess. Programs work the same way: the
+computer runs your instructions **exactly** as written, from top to bottom.
+
+<AnimatedDiagram name="instructions-flow" caption="The computer reads instructions one by one, from top to bottom." />
+
+## Why Python?
+
+Python reads almost like simple English, which makes it great for beginners. Don't be fooled,
+though: professionals use Python to build web apps, analyze data, train AI models, and automate work.
+
+<Callout type="info">
+  On Pyground you don't need to install anything. Your Python code runs right in your browser.
+</Callout>
+
+## Your first program
+
+The simplest instruction in Python is `print()`, which shows text on the screen.
+Press **Run** below:
+
+<Playground initialCode={`print("Hello, world!")
+print("I'm learning Python on Pyground")`} />
+
+Try changing the text to your own name and run it again.
+
+<Callout type="tip">
+  Text in Python must be wrapped in quotes, `"like this"` or `'like this'`.
+</Callout>
+
+<Callout type="warning">
+  Python is case-sensitive. `Print("Hi")` raises an error, because the correct name is `print`.
+</Callout>
+
+## Outside the browser
+
+Later, when you build your own projects, you'll run Python from a terminal:
+
+<TerminalBlock command="python hello.py" output="Hello, world!" />
+
+And your project will have a file structure like this:
+
+<FileTree>
+{`first-project/
+└── hello.py`}
+</FileTree>
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="What is programming? (3 minutes)" />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What does print(\"Hello\") do?",
+      options: ["Prints paper on a printer", "Shows the text Hello on the screen", "Saves a file named Hello"],
+      answer: 1,
+      explanation: "print() shows text on the screen (output).",
+    },
+    {
+      question: "In what order does the computer run a program's instructions?",
+      options: ["Randomly", "Bottom to top", "Top to bottom"],
+      answer: 2,
+      explanation: "Unless we change the flow, Python runs lines from top to bottom.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A program is a set of instructions the computer runs in order.
+- Python is easy to read and used in many fields.
+- `print()` shows text on the screen.

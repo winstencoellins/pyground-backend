@@ -1,0 +1,106 @@
+---
+title: How the Web Works
+slug: how-the-web-works
+stage: 4
+module: How the Web Works
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Requests, responses, URLs, and status codes, the foundation before building web apps with Flask.
+---
+
+# How the Web Works
+
+Before building a web app with Flask, let's understand what happens when you open a website.
+
+<AnimatedDiagram name="request-response" caption="The browser sends a request; the server replies with a response." />
+
+## Requests and responses
+
+1. You type `https://example.com/products` into the browser.
+2. The browser sends a **request** to a **server**: "Please give me the `/products` page."
+3. The server runs some code (for example, your Flask code!) and sends back a **response**, usually HTML.
+4. The browser displays that HTML as a page.
+
+## Parts of a URL
+
+| Part | Example | Meaning |
+| --- | --- | --- |
+| Protocol | `https://` | How to communicate (securely) |
+| Domain | `example.com` | The server's address |
+| Path | `/products` | The page being requested |
+| Query | `?category=books` | Extra data |
+
+## Methods and status codes
+
+Requests have a **method**: `GET` to fetch data, `POST` to send data (like a form). Responses
+have a **status code**:
+
+- `200` OK, it worked
+- `404` Not Found, the page doesn't exist
+- `500` Internal Server Error, there's a bug on the server
+
+<Callout type="info">
+  You can watch every request in your browser: open DevTools (F12), then the **Network** tab.
+</Callout>
+
+## Trying it from Python
+
+The `requests` library (from Stage 3) can send requests just like a browser does:
+
+<Playground initialCode={`# A tiny simulation: the server is a function that receives a path
+def server(path):
+    pages = {"/": "Home", "/products": "Product list"}
+    if path in pages:
+        return 200, pages[path]
+    return 404, "Not found"
+
+for path in ["/", "/products", "/secret"]:
+    status, body = server(path)
+    print(path, "->", status, body)`} />
+
+Flask does essentially the same thing: it matches a path to a Python function.
+
+<Callout type="tip">
+  Remember this pattern: **path in, function runs, response out**. That's the heart of routing in
+  the next lesson.
+</Callout>
+
+## Your first Flask project, coming up
+
+<FileTree>
+{`flask-shop/
+├── app.py
+├── templates/
+│   └── index.html
+└── requirements.txt`}
+</FileTree>
+
+<TerminalBlock command="flask --app app run --debug" output={` * Running on http://127.0.0.1:5000`} />
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="Requests and responses, visualized" />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which status code means the page was not found?",
+      options: ["200", "404", "500"],
+      answer: 1,
+      explanation: "404 Not Found: the server has no page at that path.",
+    },
+    {
+      question: "Which method is usually used to submit a form?",
+      options: ["GET", "POST", "PRINT"],
+      answer: 1,
+      explanation: "POST sends data to the server in the request body.",
+    },
+  ]}
+/>
+
+## Summary
+
+- The browser sends a request; the server sends a response.
+- A URL has a protocol, domain, path, and query.
+- `GET`/`POST` are methods; `200`/`404`/`500` are status codes.

@@ -2,6 +2,11 @@ import { Elysia } from "elysia";
 import { auth } from "../lib/auth";
 import { ApiError } from "../lib/errors";
 
+/** Signed-in user or null, for routes that are public but personalised (e.g. "locked" flags). */
+export async function optionalUser(headers: Headers) {
+  return (await auth.api.getSession({ headers }))?.user ?? null;
+}
+
 async function requireSession(headers: Headers) {
   const session = await auth.api.getSession({ headers });
   if (!session) throw new ApiError(401, "UNAUTHORIZED", "Sign in required");

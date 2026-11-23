@@ -3,6 +3,7 @@ import { auth } from "./lib/auth";
 import { errorBody, errorHandler } from "./lib/errors";
 import { prisma } from "./lib/prisma";
 import { limit } from "./lib/rate-limit";
+import { lessonRoutes } from "./modules/lessons/routes";
 import { sessionPlugin } from "./plugins/session";
 
 /** Better Auth replies { code, message } on errors; rewrap into our { error: { code, message } }. */
@@ -22,6 +23,7 @@ async function authHandler(request: Request) {
 // Eden Treaty contract and errors land in Eden's `error`, not in every route's `data`.
 const routes = new Elysia()
   .use(sessionPlugin)
+  .use(lessonRoutes)
   .get("/health", async ({ set }) => {
     try {
       await prisma.$queryRaw`SELECT 1`;

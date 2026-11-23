@@ -1,0 +1,107 @@
+---
+title: Bagaimana Web Bekerja
+slug: how-the-web-works
+stage: 4
+module: Bagaimana Web Bekerja
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Request, response, URL, dan status code, fondasi sebelum membangun aplikasi web dengan Flask.
+---
+
+# Bagaimana Web Bekerja
+
+Sebelum membangun aplikasi web dengan Flask, kita perlu paham apa yang terjadi saat kamu
+membuka sebuah situs.
+
+<AnimatedDiagram name="request-response" caption="Browser mengirim request, server membalas dengan response." />
+
+## Request dan response
+
+1. Kamu mengetik `https://contoh.com/produk` di browser.
+2. Browser mengirim **request** ke **server**: "Tolong berikan halaman `/produk`."
+3. Server menjalankan kode (misalnya kode Flask-mu!) dan mengirim **response**: biasanya HTML.
+4. Browser menampilkan HTML itu sebagai halaman.
+
+## Bagian-bagian URL
+
+| Bagian | Contoh | Arti |
+| --- | --- | --- |
+| Protokol | `https://` | Cara berkomunikasi (aman) |
+| Domain | `contoh.com` | Alamat server |
+| Path | `/produk` | Halaman yang diminta |
+| Query | `?kategori=buku` | Data tambahan |
+
+## Method dan status code
+
+Request punya **method**: `GET` untuk mengambil data, `POST` untuk mengirim data (misalnya
+formulir). Response punya **status code**:
+
+- `200` OK, berhasil
+- `404` Not Found, halaman tidak ada
+- `500` Internal Server Error, ada bug di server
+
+<Callout type="info">
+  Kamu bisa melihat semua request di browser: buka DevTools (F12), lalu tab **Network**.
+</Callout>
+
+## Mencoba request dari Python
+
+Library `requests` (yang kamu pelajari di Stage 3) bisa mengirim request seperti browser:
+
+<Playground initialCode={`# Simulasi sederhana: server adalah fungsi yang menerima path
+def server(path):
+    halaman = {"/": "Beranda", "/produk": "Daftar produk"}
+    if path in halaman:
+        return 200, halaman[path]
+    return 404, "Tidak ditemukan"
+
+for path in ["/", "/produk", "/rahasia"]:
+    status, isi = server(path)
+    print(path, "->", status, isi)`} />
+
+Flask pada dasarnya melakukan hal yang sama: mencocokkan path dengan fungsi Python.
+
+<Callout type="tip">
+  Ingat pola ini: **path masuk, fungsi dijalankan, response keluar**. Itulah inti dari routing
+  di lesson berikutnya.
+</Callout>
+
+## Proyek Flask pertamamu nanti
+
+<FileTree>
+{`toko-flask/
+├── app.py
+├── templates/
+│   └── index.html
+└── requirements.txt`}
+</FileTree>
+
+<TerminalBlock command="flask --app app run --debug" output={` * Running on http://127.0.0.1:5000`} />
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="Request dan response, divisualisasikan" />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Status code apa yang berarti halaman tidak ditemukan?",
+      options: ["200", "404", "500"],
+      answer: 1,
+      explanation: "404 Not Found: server tidak punya halaman di path itu.",
+    },
+    {
+      question: "Method apa yang biasa dipakai untuk mengirim formulir?",
+      options: ["GET", "POST", "PRINT"],
+      answer: 1,
+      explanation: "POST mengirim data ke server di dalam body request.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Browser mengirim request; server mengirim response.
+- URL terdiri dari protokol, domain, path, dan query.
+- `GET`/`POST` adalah method; `200`/`404`/`500` adalah status code.

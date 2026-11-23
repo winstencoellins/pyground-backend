@@ -1,0 +1,96 @@
+---
+title: Apa Itu Pemrograman?
+slug: what-is-programming
+stage: 1
+module: Apa Itu Pemrograman
+order: 1
+isFree: true
+estimatedMinutes: 10
+description: Kenalan dengan pemrograman, Python, dan program pertamamu, langsung di browser.
+---
+
+# Apa Itu Pemrograman?
+
+Komputer itu sangat cepat, tapi tidak bisa menebak maumu. **Pemrograman** adalah cara kita
+memberi instruksi yang jelas dan berurutan kepada komputer. Kumpulan instruksi itu disebut
+**program**, dan bahasa yang kita pakai untuk menulisnya disebut **bahasa pemrograman**.
+
+Bayangkan kamu menulis resep nasi goreng untuk teman yang belum pernah masak:
+
+1. Panaskan minyak.
+2. Masukkan bawang, tumis sampai harum.
+3. Masukkan nasi, aduk.
+4. Tambahkan kecap dan garam.
+
+Kalau langkahnya tertukar atau ada yang terlewat, hasilnya berantakan. Program juga begitu:
+komputer menjalankan instruksi **persis** seperti yang kamu tulis, dari atas ke bawah.
+
+<AnimatedDiagram name="instructions-flow" caption="Komputer membaca instruksi satu per satu, dari atas ke bawah." />
+
+## Kenapa Python?
+
+Python adalah bahasa pemrograman yang tulisannya mirip bahasa Inggris sederhana, sehingga
+cocok untuk pemula. Tapi jangan salah, Python juga dipakai profesional untuk membuat aplikasi web,
+analisis data, kecerdasan buatan, dan otomasi.
+
+<Callout type="info">
+  Di Pyground, kamu tidak perlu meng-install apa pun. Kode Python dijalankan langsung di browser-mu.
+</Callout>
+
+## Program pertamamu
+
+Instruksi paling sederhana di Python adalah `print()`, yang menampilkan teks ke layar.
+Tekan tombol **Jalankan** di bawah ini:
+
+<Playground initialCode={`print("Halo, dunia!")
+print("Aku sedang belajar Python di Pyground")`} />
+
+Coba ubah teksnya menjadi namamu sendiri, lalu jalankan lagi.
+
+<Callout type="tip">
+  Teks di Python harus diapit tanda kutip, `"seperti ini"` atau `'seperti ini'`.
+</Callout>
+
+<Callout type="warning">
+  Python membedakan huruf besar dan kecil. `Print("Halo")` akan error, karena yang benar adalah `print`.
+</Callout>
+
+## Di luar browser
+
+Nantinya, saat kamu membuat proyek sendiri, kamu akan menjalankan Python di terminal:
+
+<TerminalBlock command="python halo.py" output="Halo, dunia!" />
+
+Dan proyekmu akan punya struktur file seperti ini:
+
+<FileTree>
+{`proyek-pertama/
+└── halo.py`}
+</FileTree>
+
+<VideoEmbed url="https://www.youtube.com/embed/VIDEO_ID" title="Apa itu pemrograman? (3 menit)" />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang dilakukan print(\"Halo\")?",
+      options: ["Mencetak kertas ke printer", "Menampilkan teks Halo ke layar", "Menyimpan file bernama Halo"],
+      answer: 1,
+      explanation: "print() menampilkan teks ke layar (output).",
+    },
+    {
+      question: "Dalam urutan apa komputer menjalankan instruksi program?",
+      options: ["Acak", "Dari bawah ke atas", "Dari atas ke bawah"],
+      answer: 2,
+      explanation: "Kecuali kita mengubah alurnya, Python menjalankan baris dari atas ke bawah.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Program adalah kumpulan instruksi yang dijalankan komputer secara berurutan.
+- Python mudah dibaca dan dipakai di banyak bidang.
+- `print()` menampilkan teks ke layar.
