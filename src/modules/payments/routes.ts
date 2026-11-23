@@ -3,7 +3,8 @@ import { ApiError } from "../../lib/errors";
 import { prisma } from "../../lib/prisma";
 import { limit } from "../../lib/rate-limit";
 import { sessionPlugin } from "../../plugins/session";
-import { createSnapTransaction } from "./midtrans";
+import { applyStatus, verifySignature } from "./fulfill";
+import { createSnapTransaction, getTransactionStatus, serverKey } from "./midtrans";
 import { accessPass } from "./products";
 
 const orderView = (o: {
@@ -76,5 +77,29 @@ export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
     {
       auth: true,
       params: t.Object({ orderId: t.String({ pattern: "^[A-Z0-9-]+$", maxLength: 50 }) }),
+    },
+  )
+  .post(
+    "/midtrans/notification",
+    async ({ body }) => {
+      if (!verifySignature(body, serverKey())) {
+        console.warn(`[midtrans] bad signature for notification ${body.order_id}`);
+        throw new ApiError(401, "INVALID_SIGNATURE", "Signature does not match");
+      }
+      // The notification only tells us *that* something changed; Get Status is the source of truth.
+      // If Midtrans is unreachable this throws -> 500 -> Midtrans retries the notification.
+      const status = await getTransactionStatus(body.order_id);
+      const { result } = await applyStatus(body.order_id, status);
+      console.info(`[midtrans] ${body.order_id}: ${status.transaction_status} -> ${result}`);
+      return { ok: true };
+    },
+    {
+      beforeHandle: limit("midtrans-webhook", 120, 60_000),
+      body: t.Object({
+        order_id: t.String({ maxLength: 50 }),
+        status_code: t.String({ maxLength: 3 }),
+        gross_amount: t.String({ maxLength: 20 }),
+        signature_key: t.String({ maxLength: 128 }),
+      }),
     },
   );

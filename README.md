@@ -63,3 +63,28 @@ const api = treaty<App>(process.env.API_URL!);
 `${WEB_URL}/payment/result?orderId=…`, which polls `GET /api/payments/orders/:orderId`.
 Enabled methods: QRIS, GoPay, ShopeePay, BCA/BNI/BRI/Permata/CIMB/other VA, Mandiri Bill, credit card.
 Sandbox vs production is `MIDTRANS_IS_PRODUCTION` plus the matching keys.
+
+### Payment notifications (webhook)
+
+`POST /api/payments/midtrans/notification`:
+
+1. Verifies `signature_key = SHA512(order_id + status_code + gross_amount + MIDTRANS_SERVER_KEY)` (401 otherwise).
+2. Ignores the body's status and asks Midtrans' **Get Status API** for the real one (500 if unreachable, so Midtrans retries).
+3. `settlement`, or `capture` with `fraud_status: accept` -> in one transaction: order `PAID` (only if it wasn't already)
+   and `accessUntil = max(now, accessUntil) + 30 days`. Duplicates/retries are no-ops.
+   `pending` -> PENDING, `deny`/`cancel`/`failure` -> FAILED, `expire` -> EXPIRED, `refund` -> REFUNDED.
+   Nothing but a refund changes a PAID order. Amount mismatches are refused. Unknown orders get 200.
+
+**Notification URL** (Midtrans dashboard > Settings > Payment > Notification URL):
+`https://<your-api-domain>/api/payments/midtrans/notification` (sandbox and production dashboards are separate).
+
+**Testing in sandbox locally:** expose the API with a tunnel and use that URL as the notification URL:
+
+```bash
+cloudflared tunnel --url http://localhost:3001      # or: ngrok http 3001
+# dashboard.sandbox.midtrans.com -> Notification URL = https://<tunnel>/api/payments/midtrans/notification
+```
+
+Then pay through Snap with Midtrans' sandbox methods (test card `4811 1111 1111 1114`, CVV `123`, any future
+expiry, OTP `112233`; VA/QRIS/e-wallets via simulator.sandbox.midtrans.com) and watch the API log
+`[midtrans] PYG-…: settlement -> paid`.

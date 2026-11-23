@@ -1,4 +1,5 @@
 import { ApiError } from "../../lib/errors";
+import type { MidtransStatus } from "./fulfill";
 
 // Snap shows only these. QRIS is "other_qris"; "echannel" is Mandiri Bill.
 export const ENABLED_PAYMENTS = [
@@ -15,9 +16,14 @@ export const ENABLED_PAYMENTS = [
   "credit_card",
 ];
 
+export function serverKey(): string {
+  const key = process.env.MIDTRANS_SERVER_KEY;
+  if (!key) throw new ApiError(503, "PAYMENTS_UNAVAILABLE", "Payments are not configured");
+  return key;
+}
+
 function config() {
-  const serverKey = process.env.MIDTRANS_SERVER_KEY;
-  if (!serverKey) throw new ApiError(503, "PAYMENTS_UNAVAILABLE", "Payments are not configured");
+  const key = serverKey();
   const production = process.env.MIDTRANS_IS_PRODUCTION === "true";
   return {
     snapUrl: production
@@ -27,7 +33,7 @@ function config() {
     headers: {
       accept: "application/json",
       "content-type": "application/json",
-      authorization: `Basic ${btoa(`${serverKey}:`)}`,
+      authorization: `Basic ${btoa(`${key}:`)}`,
     },
   };
 }
@@ -76,12 +82,12 @@ export async function createSnapTransaction(
 }
 
 /** Midtrans Get Status API (used by the webhook to confirm a notification, task #24). */
-export async function getTransactionStatus(orderId: string): Promise<Record<string, unknown>> {
+export async function getTransactionStatus(orderId: string): Promise<MidtransStatus> {
   const { apiUrl, headers } = config();
   const res = await fetch(`${apiUrl}/v2/${encodeURIComponent(orderId)}/status`, {
     headers,
     signal: AbortSignal.timeout(15_000),
   });
   if (!res.ok) throw new Error(`Midtrans status ${res.status} for ${orderId}`);
-  return (await res.json()) as Record<string, unknown>;
+  return (await res.json()) as MidtransStatus;
 }
