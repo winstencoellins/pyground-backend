@@ -5,6 +5,7 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    seed: "bun prisma/seed.ts",
   },
   datasource: {
     // Railway: ${{Postgres.DATABASE_URL}}. To migrate Railway from your machine, set this to DATABASE_PUBLIC_URL.
