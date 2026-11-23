@@ -159,6 +159,22 @@ describe("idempotency", () => {
     expect(Math.abs((await accessOf(userId)) - (Date.now() + 30 * DAY))).toBeLessThan(5_000);
   });
 
+  it("the receipt email is sent exactly once, in the user's language", async () => {
+    const user = await createUser({ locale: "EN" });
+    const orderId = `PYG-TEST-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    await prisma.order.create({ data: { userId: user.id, orderId, amount: 49000 } });
+    settled(orderId);
+    const info = console.info as unknown as { mock: { calls: unknown[][] } };
+    const receipts = () =>
+      info.mock.calls.filter((c) => String(c[0]).includes(`"Pyground payment receipt ${orderId}"`));
+    await Promise.all(Array.from({ length: 5 }, () => notify(orderId)));
+    await notify(orderId);
+    for (let i = 0; i < 40 && receipts().length === 0; i++) await Bun.sleep(25); // sent after the 200
+    await Bun.sleep(100);
+    expect(receipts()).toHaveLength(1);
+    expect(String(receipts()[0]![0])).toContain("Payments are processed by Trixync.");
+  });
+
   it("a later retry after PAID changes nothing", async () => {
     const { userId, orderId } = await newOrder(null);
     settled(orderId);

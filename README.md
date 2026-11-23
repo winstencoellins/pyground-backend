@@ -88,3 +88,18 @@ cloudflared tunnel --url http://localhost:3001      # or: ngrok http 3001
 Then pay through Snap with Midtrans' sandbox methods (test card `4811 1111 1111 1114`, CVV `123`, any future
 expiry, OTP `112233`; VA/QRIS/e-wallets via simulator.sandbox.midtrans.com) and watch the API log
 `[midtrans] PYG-…: settlement -> paid`.
+
+## Emails (Resend + React Email)
+
+Templates live in `src/emails/` (copy for both languages in `i18n.ts`, shared layout with the
+"Supported by Trixync" footer). Each email goes out in the recipient's `User.locale`:
+
+| Email | Sent when |
+| --- | --- |
+| Verification | sign-up, and unverified sign-in attempts |
+| Password reset | `POST /api/auth/request-password-reset` |
+| Payment receipt ("Payments are processed by Trixync") | the webhook flips an order to PAID (exactly once) |
+
+Set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain verified in Resend). Without a key,
+development prints each email to the console; production logs only that it wasn't sent.
+Sending never throws, so auth and payments keep working if Resend is down.

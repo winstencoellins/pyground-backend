@@ -1,5 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import type { Prisma } from "../../generated/prisma/client";
+import { receiptEmail } from "../../emails";
+import { sendEmail } from "../../emails/send";
 import { prisma } from "../../lib/prisma";
 import { accessPass } from "./products";
 
@@ -105,4 +107,27 @@ export async function applyStatus(orderId: string, status: MidtransStatus) {
   return {
     result: updated.count ? (`set-${outcome.toLowerCase()}` as const) : ("unchanged" as const),
   };
+}
+
+/** Emails the receipt for a PAID order. Never throws. */
+export async function sendReceipt(orderId: string): Promise<boolean> {
+  try {
+    const order = await prisma.order.findUniqueOrThrow({
+      where: { orderId },
+      include: { user: true },
+    });
+    if (order.status !== "PAID" || !order.paidAt || !order.user.accessUntil) return false;
+    return await sendEmail(
+      receiptEmail(order.user, {
+        orderId: order.orderId,
+        amount: order.amount,
+        paidAt: order.paidAt,
+        paymentType: order.paymentType,
+        accessUntil: order.user.accessUntil,
+      }),
+    );
+  } catch (err) {
+    console.error(`[email] receipt for ${orderId} failed:`, (err as Error).message);
+    return false;
+  }
 }

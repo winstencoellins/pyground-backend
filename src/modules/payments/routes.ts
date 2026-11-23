@@ -3,7 +3,7 @@ import { ApiError } from "../../lib/errors";
 import { prisma } from "../../lib/prisma";
 import { limit } from "../../lib/rate-limit";
 import { sessionPlugin } from "../../plugins/session";
-import { applyStatus, verifySignature } from "./fulfill";
+import { applyStatus, sendReceipt, verifySignature } from "./fulfill";
 import { createSnapTransaction, getTransactionStatus, serverKey } from "./midtrans";
 import { accessPass } from "./products";
 
@@ -91,6 +91,8 @@ export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
       const status = await getTransactionStatus(body.order_id);
       const { result } = await applyStatus(body.order_id, status);
       console.info(`[midtrans] ${body.order_id}: ${status.transaction_status} -> ${result}`);
+      // Only the call that flipped the order to PAID sends the receipt; not awaited so Midtrans gets 200 fast.
+      if (result === "paid") void sendReceipt(body.order_id);
       return { ok: true };
     },
     {

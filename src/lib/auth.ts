@@ -1,25 +1,18 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, type User } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { emailLocale, SUBJECTS } from "../emails/i18n";
+import { authEmail } from "../emails";
+import { sendEmail } from "../emails/send";
 import { prisma } from "./prisma";
+
+type AuthUser = User & { locale?: unknown };
 
 const webUrl = process.env.WEB_URL;
 if (!webUrl) throw new Error("WEB_URL is not set");
 const cookieDomain = process.env.COOKIE_DOMAIN; // e.g. ".pyground.id" once on a custom domain
 
-// shortcut: links go to the console until Resend is wired (task #28). Never log tokens in production.
-function deliver(
-  kind: keyof typeof SUBJECTS,
-  user: { email: string; locale?: unknown },
-  url: string,
-) {
-  const locale = emailLocale(user);
-  if (process.env.NODE_ENV === "production") {
-    console.warn(`[auth] ${kind} email (${locale}) not sent: email delivery is not configured yet`);
-    return;
-  }
-  console.info(`[auth] (${locale}) "${SUBJECTS[kind][locale]}" to ${user.email}: ${url}`);
-}
+// Awaited but never throws (sendEmail swallows failures), so auth flows don't break if email is down.
+const deliver = (kind: "verification" | "passwordReset", user: AuthUser, url: string) =>
+  sendEmail(authEmail(kind, user, url)).then(() => undefined);
 
 /** Sign-up and update-user may send "id"/"en" (any case); store the enum, default ID. */
 const normalizeLocale = (value: unknown) => (String(value).toUpperCase() === "EN" ? "EN" : "ID");

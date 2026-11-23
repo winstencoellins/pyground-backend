@@ -34,7 +34,7 @@ afterAll(async () => {
 describe("email + password auth", () => {
   const links: string[] = [];
   const info = spyOn(console, "info").mockImplementation((msg: string) => {
-    if (msg.includes(email)) links.push(msg.slice(msg.indexOf("http")));
+    if (msg.includes(email)) links.push(/https?:\/\/[^\s\])]*verify-email[^\s\])]*/.exec(msg)![0]);
   });
 
   it("GET /api/me without a session -> 401 UNAUTHORIZED", async () => {
