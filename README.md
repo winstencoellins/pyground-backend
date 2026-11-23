@@ -24,3 +24,10 @@ bun run db:seed               # admin from SEED_ADMIN_* + sample student (sample
 Every error is `{ "error": { "code": "STABLE_CODE", "message": "for developers" } }`.
 The web translates `code`; never show `message` to users. Base codes: `VALIDATION_ERROR`,
 `INVALID_BODY`, `NOT_FOUND`, `RATE_LIMITED` (with `Retry-After`), `INTERNAL_ERROR`.
+
+## Auth
+
+Better Auth (email + password, email verification required) is served at `/api/auth/*`.
+pyground-web proxies `/api/*` here, so `WEB_URL` is used as Better Auth's `baseURL` and trusted origin.
+Until Resend is wired, verification and reset links are printed to the console (never in production).
+Protected routes use `{ auth: true }` (401 `UNAUTHORIZED`) or `{ admin: true }` (403 `FORBIDDEN`).
