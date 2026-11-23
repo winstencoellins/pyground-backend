@@ -13,4 +13,5 @@ bun run typecheck && bun run lint && bun run format:check
 ```bash
 cp .env.example .env
 docker compose up -d --wait   # Postgres 17 on localhost:5434 (set POSTGRES_PORT to change)
+bun run db:generate           # Prisma client -> src/generated/prisma
 ```
