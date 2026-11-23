@@ -88,7 +88,7 @@ export const adminRoutes = new Elysia({ prefix: "/api/admin" })
         orders: orders.map((o) => ({
           orderId: o.orderId,
           amount: o.amount,
-          status: o.status,
+          status: o.status as (typeof ORDER_STATUSES)[number],
           paymentType: o.paymentType,
           midtransTransactionId: o.midtransTransactionId,
           createdAt: o.createdAt,
