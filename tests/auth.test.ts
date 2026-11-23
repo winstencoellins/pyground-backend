@@ -116,3 +116,32 @@ describe("email + password auth", () => {
     info.mockRestore();
   });
 });
+
+describe("auth emails in production", () => {
+  it("never logs verification links or tokens", async () => {
+    const nodeEnv = process.env.NODE_ENV;
+    const logged: string[] = [];
+    const capture = (...args: unknown[]) => void logged.push(args.map(String).join(" "));
+    const spies = [spyOn(console, "info"), spyOn(console, "warn"), spyOn(console, "log")].map((s) =>
+      s.mockImplementation(capture),
+    );
+    process.env.NODE_ENV = "production";
+    const prodEmail = `test-prod-${crypto.randomUUID()}@example.com`;
+    try {
+      const res = await call("/api/auth/sign-up/email", {
+        method: "POST",
+        json: { email: prodEmail, password, name: "Prod" },
+      });
+      expect(res.status).toBe(200);
+    } finally {
+      process.env.NODE_ENV = nodeEnv;
+      spies.forEach((s) => s.mockRestore());
+      await prisma.user.deleteMany({ where: { email: prodEmail } });
+    }
+    const all = logged.join("\n");
+    expect(all).toContain("not sent");
+    expect(all).not.toContain("token=");
+    expect(all).not.toContain("http");
+    expect(all).not.toContain(prodEmail);
+  });
+});

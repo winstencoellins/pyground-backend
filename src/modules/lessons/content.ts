@@ -116,13 +116,13 @@ export function loadCatalog(root: string): Catalog {
   return { byLocale, ordered };
 }
 
-const CONTENT_DIR = process.env.CONTENT_DIR ?? join(import.meta.dir, "../../../content");
+const contentDir = () => process.env.CONTENT_DIR ?? join(import.meta.dir, "../../../content");
 let cached: Catalog | undefined;
 
 /** Cached in production; reloaded per call in development so content edits show up immediately. */
 export function getCatalog(): Catalog {
-  if (process.env.NODE_ENV !== "production") return loadCatalog(CONTENT_DIR);
-  return (cached ??= loadCatalog(CONTENT_DIR));
+  if (process.env.NODE_ENV !== "production") return loadCatalog(contentDir());
+  return (cached ??= loadCatalog(contentDir()));
 }
 
 /** The lesson in `locale`, or the Indonesian original with fallbackLocale when no translation exists. */

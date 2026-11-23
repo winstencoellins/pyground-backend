@@ -24,6 +24,30 @@ describe("health", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ status: "ok" });
   });
+
+  it("returns 503 when the database is unreachable (fails Railway's deploy health check)", async () => {
+    const port = 40000 + Math.floor(Math.random() * 20000);
+    const server = Bun.spawn(["bun", "src/index.ts"], {
+      env: {
+        ...process.env,
+        PORT: String(port),
+        DATABASE_URL: "postgresql://x:y@127.0.0.1:1/none",
+      },
+      stdout: "ignore",
+      stderr: "ignore",
+    });
+    try {
+      let res: Response | undefined;
+      for (let i = 0; i < 50 && !res; i++) {
+        res = await fetch(`http://localhost:${port}/health`).catch(() => undefined);
+        if (!res) await Bun.sleep(100);
+      }
+      expect(res?.status).toBe(503);
+      expect(await res!.json()).toEqual({ status: "degraded", database: "unreachable" });
+    } finally {
+      server.kill();
+    }
+  });
 });
 
 describe("error format", () => {

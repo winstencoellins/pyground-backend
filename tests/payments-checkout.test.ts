@@ -103,6 +103,33 @@ describe("POST /api/payments/checkout", () => {
   it("requires a session", async () => {
     expect((await checkout()).status).toBe(401);
   });
+
+  it("network failure talking to Midtrans -> 502, order FAILED", async () => {
+    globalThis.fetch = mock(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input instanceof Request ? input.url : input);
+      if (url.includes("midtrans.com")) throw new TypeError("fetch failed");
+      return realFetch(input, init);
+    }) as unknown as typeof fetch;
+    const res = await checkout(bob.cookie);
+    expect(res.status).toBe(502);
+    const latest = await prisma.order.findFirstOrThrow({
+      where: { userId: bob.id },
+      orderBy: { createdAt: "desc" },
+    });
+    expect(latest.status).toBe("FAILED");
+  });
+
+  it("invalid ACCESS_PASS_PRICE_IDR -> no order, nothing sent to Midtrans", async () => {
+    fakeMidtrans(201, { token: "t", redirect_url: "x" });
+    const before = await prisma.order.count({ where: { userId: bob.id } });
+    for (const price of ["49.000", "abc", "500"]) {
+      process.env.ACCESS_PASS_PRICE_IDR = price;
+      expect((await checkout(bob.cookie)).status).toBe(500);
+    }
+    process.env.ACCESS_PASS_PRICE_IDR = "49000";
+    expect(await prisma.order.count({ where: { userId: bob.id } })).toBe(before);
+    expect(sent).toHaveLength(0);
+  });
 });
 
 describe("orders", () => {

@@ -224,3 +224,92 @@ describe("GET /api/lessons/:slug", () => {
     expect((await call("/api/lessons/..%2F..%2Fetc")).status).toBe(400);
   });
 });
+
+describe("locale fallback through the HTTP routes", () => {
+  let root: string;
+  const original = process.env.CONTENT_DIR;
+  const lesson = (fm: Record<string, unknown>, body: string) =>
+    `---\n${Object.entries(fm)
+      .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+      .join("\n")}\n---\n${body}\n`;
+  const fm = { stage: 1, module: "Modul", order: 1, estimatedMinutes: 5, description: "d" };
+
+  beforeAll(() => {
+    root = mkdtempSync(join(tmpdir(), "pyground-fallback-"));
+    const put = (path: string, text: string) => {
+      mkdirSync(dirname(join(root, path)), { recursive: true });
+      writeFileSync(join(root, path), text);
+    };
+    put(
+      "id/1-x/01-m/terjemah.mdx",
+      lesson({ ...fm, title: "Ada Terjemahan", slug: "terjemah", isFree: true }, "Isi ID"),
+    );
+    put(
+      "en/1-x/01-m/terjemah.mdx",
+      lesson(
+        { ...fm, title: "Translated", slug: "terjemah", isFree: true, module: "Module" },
+        "EN body",
+      ),
+    );
+    put(
+      "id/1-x/01-m/belum.mdx",
+      lesson(
+        { ...fm, title: "Belum Diterjemahkan", slug: "belum", isFree: true, order: 2 },
+        "Hanya ID",
+      ),
+    );
+    put(
+      "id/2-y/01-m/berbayar.mdx",
+      lesson(
+        { ...fm, stage: 2, title: "Berbayar", slug: "berbayar", isFree: false },
+        "Rahasia berbayar",
+      ),
+    );
+    process.env.CONTENT_DIR = root;
+  });
+  afterAll(() => {
+    if (original === undefined) delete process.env.CONTENT_DIR;
+    else process.env.CONTENT_DIR = original;
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('detail: missing English -> Indonesian content with fallbackLocale: "id"', async () => {
+    const body = (await (await call("/api/lessons/belum?locale=en")).json()) as Record<
+      string,
+      unknown
+    >;
+    expect(body).toMatchObject({ locale: "id", fallbackLocale: "id", source: "Hanya ID\n" });
+    expect((body.frontmatter as { title: string }).title).toBe("Belum Diterjemahkan");
+  });
+
+  it("detail: existing English -> English, no fallbackLocale", async () => {
+    const body = (await (await call("/api/lessons/terjemah?locale=en")).json()) as Record<
+      string,
+      unknown
+    >;
+    expect(body).toMatchObject({ locale: "en", source: "EN body\n" });
+    expect(body.fallbackLocale).toBeUndefined();
+  });
+
+  it("index: flags only the untranslated lesson", async () => {
+    const idx = (await (await call("/api/lessons?locale=en")).json()) as {
+      stages: {
+        modules: { lessons: { slug: string; title: string; fallbackLocale?: string }[] }[];
+      }[];
+    };
+    const lessons = idx.stages.flatMap((s) => s.modules.flatMap((m) => m.lessons));
+    expect(lessons.map((l) => [l.slug, l.title, l.fallbackLocale ?? null])).toEqual([
+      ["terjemah", "Translated", null],
+      ["belum", "Belum Diterjemahkan", "id"],
+      ["berbayar", "Berbayar", "id"],
+    ]);
+  });
+
+  it("the paywall still applies to fallback content", async () => {
+    const res = await call("/api/lessons/berbayar?locale=en");
+    expect(res.status).toBe(403);
+    expect(await res.text()).not.toContain("Rahasia");
+    const ok = await call("/api/lessons/berbayar?locale=en", { headers: { cookie: withAccess } });
+    expect(await ok.json()).toMatchObject({ fallbackLocale: "id", source: "Rahasia berbayar\n" });
+  });
+});
