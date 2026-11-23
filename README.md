@@ -94,10 +94,10 @@ expiry, OTP `112233`; VA/QRIS/e-wallets via simulator.sandbox.midtrans.com) and 
 Templates live in `src/emails/` (copy for both languages in `i18n.ts`, shared layout with the
 "Supported by Trixync" footer). Each email goes out in the recipient's `User.locale`:
 
-| Email | Sent when |
-| --- | --- |
-| Verification | sign-up, and unverified sign-in attempts |
-| Password reset | `POST /api/auth/request-password-reset` |
+| Email                                                 | Sent when                                         |
+| ----------------------------------------------------- | ------------------------------------------------- |
+| Verification                                          | sign-up, and unverified sign-in attempts          |
+| Password reset                                        | `POST /api/auth/request-password-reset`           |
 | Payment receipt ("Payments are processed by Trixync") | the webhook flips an order to PAID (exactly once) |
 
 Set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain verified in Resend). Without a key,

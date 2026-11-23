@@ -22,7 +22,7 @@ jobs:
       BETTER_AUTH_SECRET: ci-only-secret-not-used-anywhere-else-0000
       WEB_URL: http://localhost:3000
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
       - run: bun run db:generate
