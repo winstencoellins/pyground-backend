@@ -4,7 +4,7 @@ import { errorBody, errorHandler } from "./lib/errors";
 import { prisma } from "./lib/prisma";
 import { limit } from "./lib/rate-limit";
 import { lessonRoutes } from "./modules/lessons/routes";
-import { sessionPlugin } from "./plugins/session";
+import { meRoutes } from "./modules/me/routes";
 
 /** Better Auth replies { code, message } on errors; rewrap into our { error: { code, message } }. */
 async function authHandler(request: Request) {
@@ -22,7 +22,7 @@ async function authHandler(request: Request) {
 // All routes live here; `App` is their type, so the error handler (added below) stays out of the
 // Eden Treaty contract and errors land in Eden's `error`, not in every route's `data`.
 const routes = new Elysia()
-  .use(sessionPlugin)
+  .use(meRoutes)
   .use(lessonRoutes)
   .get("/health", async ({ set }) => {
     try {
@@ -37,19 +37,7 @@ const routes = new Elysia()
   .post("/api/auth/*", ({ request }) => authHandler(request), {
     parse: "none",
     beforeHandle: limit("auth", 10, 60_000),
-  })
-  .get(
-    "/api/me",
-    ({ user }) => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      accessUntil: user.accessUntil ?? null,
-      locale: user.locale,
-    }),
-    { auth: true },
-  );
+  });
 
 export const app = new Elysia().use(errorHandler).use(routes);
 

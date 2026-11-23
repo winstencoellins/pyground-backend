@@ -93,7 +93,7 @@ describe("email + password auth", () => {
       email,
       name: "Budi",
       role: "STUDENT",
-      locale: "ID",
+      locale: "id",
       accessUntil: null,
     });
     expect(Object.keys(body).sort()).toEqual([

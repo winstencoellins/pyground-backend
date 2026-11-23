@@ -4,7 +4,8 @@ import { optionalUser } from "../../plugins/session";
 import { hasAccess } from "./access";
 import { DEFAULT_LOCALE, getCatalog, resolveLesson, STAGE_TITLES, type Locale } from "./content";
 
-const localeQuery = t.Object({ locale: t.Optional(t.UnionEnum(["id", "en"])) });
+// Not t.UnionEnum: Elysia fills a missing UnionEnum with its first value, which would hide the user's saved locale.
+const localeQuery = t.Object({ locale: t.Optional(t.Union([t.Literal("id"), t.Literal("en")])) });
 
 /** ?locale wins, then the signed-in user's saved locale, then Indonesian. */
 const pickLocale = (query: { locale?: Locale }, user: { locale?: string | null } | null): Locale =>
