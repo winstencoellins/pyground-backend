@@ -43,7 +43,14 @@ const routes = new Elysia()
     beforeHandle: limit("auth", 10, 60_000),
   });
 
-export const app = new Elysia().use(errorHandler).use(routes);
+export const app = new Elysia()
+  .use(errorHandler)
+  // Every response is per-user (session, paid lessons, locked flags): no shared/CDN/browser caching.
+  // A route may override this explicitly.
+  .onRequest(({ set }) => {
+    set.headers["cache-control"] = "private, no-store";
+  })
+  .use(routes);
 
 /** Eden Treaty contract (published as @winstencoellins/pyground-api-types). */
 export type App = typeof routes;
