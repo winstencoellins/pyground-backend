@@ -5,6 +5,7 @@ import { prisma } from "./lib/prisma";
 import { limit } from "./lib/rate-limit";
 import { lessonRoutes } from "./modules/lessons/routes";
 import { meRoutes } from "./modules/me/routes";
+import { paymentRoutes } from "./modules/payments/routes";
 import { progressRoutes } from "./modules/progress/routes";
 
 /** Better Auth replies { code, message } on errors; rewrap into our { error: { code, message } }. */
@@ -26,6 +27,7 @@ const routes = new Elysia()
   .use(meRoutes)
   .use(lessonRoutes)
   .use(progressRoutes)
+  .use(paymentRoutes)
   .get("/health", async ({ set }) => {
     try {
       await prisma.$queryRaw`SELECT 1`;
