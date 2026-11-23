@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 import { ApiError } from "../../lib/errors";
 import { optionalUser } from "../../plugins/session";
-import { hasAccess } from "./access";
+import { assertCanOpen, hasAccess, slugParams } from "./access";
 import { DEFAULT_LOCALE, getCatalog, resolveLesson, STAGE_TITLES, type Locale } from "./content";
 
 // Not t.UnionEnum: Elysia fills a missing UnionEnum with its first value, which would hide the user's saved locale.
@@ -70,9 +70,7 @@ export const lessonRoutes = new Elysia({ prefix: "/api/lessons" })
       const resolved = resolveLesson(getCatalog(), params.slug, pickLocale(query, user));
       if (!resolved) throw new ApiError(404, "LESSON_NOT_FOUND", `No lesson "${params.slug}"`);
       const { lesson, locale, fallbackLocale } = resolved;
-      if (!lesson.isFree && !hasAccess(user)) {
-        throw new ApiError(403, "ACCESS_REQUIRED", "An active access pass is required");
-      }
+      assertCanOpen(lesson, user);
       const { title, slug, stage, module, order, isFree, estimatedMinutes, description } = lesson;
       return {
         locale,
@@ -82,7 +80,7 @@ export const lessonRoutes = new Elysia({ prefix: "/api/lessons" })
       };
     },
     {
-      params: t.Object({ slug: t.String({ pattern: "^[a-z0-9-]+$", maxLength: 100 }) }),
+      params: slugParams,
       query: localeQuery,
     },
   );

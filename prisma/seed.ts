@@ -59,8 +59,8 @@ if (process.env.NODE_ENV !== "production") {
       data: {
         userId: student.id,
         lessonSlug: "what-is-programming",
-        score: 80,
-        answers: { q1: "b", q2: "a", q3: "c", q4: "a", q5: "d" },
+        score: 100,
+        answers: [1, 2],
       },
     });
   }

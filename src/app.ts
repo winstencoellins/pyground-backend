@@ -5,6 +5,7 @@ import { prisma } from "./lib/prisma";
 import { limit } from "./lib/rate-limit";
 import { lessonRoutes } from "./modules/lessons/routes";
 import { meRoutes } from "./modules/me/routes";
+import { progressRoutes } from "./modules/progress/routes";
 
 /** Better Auth replies { code, message } on errors; rewrap into our { error: { code, message } }. */
 async function authHandler(request: Request) {
@@ -24,6 +25,7 @@ async function authHandler(request: Request) {
 const routes = new Elysia()
   .use(meRoutes)
   .use(lessonRoutes)
+  .use(progressRoutes)
   .get("/health", async ({ set }) => {
     try {
       await prisma.$queryRaw`SELECT 1`;
