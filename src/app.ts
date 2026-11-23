@@ -18,8 +18,9 @@ async function authHandler(request: Request) {
   });
 }
 
-export const app = new Elysia()
-  .use(errorHandler)
+// All routes live here; `App` is their type, so the error handler (added below) stays out of the
+// Eden Treaty contract and errors land in Eden's `error`, not in every route's `data`.
+const routes = new Elysia()
   .use(sessionPlugin)
   .get("/health", async ({ set }) => {
     try {
@@ -48,4 +49,7 @@ export const app = new Elysia()
     { auth: true },
   );
 
-export type App = typeof app;
+export const app = new Elysia().use(errorHandler).use(routes);
+
+/** Eden Treaty contract (published as @winstencoellins/pyground-api-types). */
+export type App = typeof routes;

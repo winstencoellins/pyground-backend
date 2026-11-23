@@ -31,3 +31,27 @@ Better Auth (email + password, email verification required) is served at `/api/a
 pyground-web proxies `/api/*` here, so `WEB_URL` is used as Better Auth's `baseURL` and trusted origin.
 Until Resend is wired, verification and reset links are printed to the console (never in production).
 Protected routes use `{ auth: true }` (401 `UNAUTHORIZED`) or `{ admin: true }` (403 `FORBIDDEN`).
+
+## API types package (`@winstencoellins/pyground-api-types`)
+
+`src/app.ts` exports `type App` (the routes, without the error handler). `bun run types:build` writes
+`types-package/dist/index.d.ts`: declarations only, no runtime code, and it fails if the contract
+would need any module other than `elysia`. On every push to `main`, the "Publish API types" workflow
+publishes it to GitHub Packages **if** `types-package/package.json` has a new version.
+
+**When routes or response shapes change, bump `types-package/package.json` `version`** (minor for new
+routes/fields, major for breaking changes) and note the version in the Notion task.
+
+Consuming it from pyground-web:
+
+```ini
+# .npmrc (token needs read:packages; in CI use the workflow's GITHUB_TOKEN or a PAT secret)
+@winstencoellins:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```ts
+import { treaty } from "@elysiajs/eden";
+import type { App } from "@winstencoellins/pyground-api-types";
+const api = treaty<App>(process.env.API_URL!);
+```
