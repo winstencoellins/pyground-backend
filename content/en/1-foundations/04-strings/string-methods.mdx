@@ -90,8 +90,8 @@ Tidy this name so it becomes `Rina Wulandari`, then replace `Rina` with `Rani`.
   questions={[
     {
       question: "What is \"  hello \".strip()?",
-      options: ["\"  hello \"", "\"hello\"", "\"HELLO\""],
-      answer: 1,
+      options: ["\"hello\"", "\"  hello \"", "\"HELLO\""],
+      answer: 0,
       explanation: "strip() removes spaces at the start and end.",
     },
     {
@@ -102,8 +102,8 @@ Tidy this name so it becomes `Rina Wulandari`, then replace `Rina` with `Rani`.
     },
     {
       question: "What is \"banana\".find(\"x\")?",
-      options: ["0", "-1", "Error"],
-      answer: 1,
+      options: ["0", "Error", "-1"],
+      answer: 2,
       explanation: "find() returns -1 when the text isn't found.",
     },
   ]}

@@ -84,8 +84,8 @@ pritn("Seru sekali!")`} />
   questions={[
     {
       question: "Apa yang terjadi pada baris yang diawali tanda #?",
-      options: ["Dijalankan dua kali", "Diabaikan oleh Python", "Menyebabkan error"],
-      answer: 1,
+      options: ["Diabaikan oleh Python", "Dijalankan dua kali", "Menyebabkan error"],
+      answer: 0,
       explanation: "Baris yang diawali # adalah komentar, dan Python mengabaikannya.",
     },
     {
@@ -96,8 +96,8 @@ pritn("Seru sekali!")`} />
     },
     {
       question: "Kamu menulis pritn(\"Halo\"). Error apa yang muncul?",
-      options: ["NameError", "SyntaxError", "Tidak ada error"],
-      answer: 0,
+      options: ["SyntaxError", "Tidak ada error", "NameError"],
+      answer: 2,
       explanation: "pritn belum pernah dibuat, jadi Python tidak mengenal nama itu: NameError.",
     },
   ]}

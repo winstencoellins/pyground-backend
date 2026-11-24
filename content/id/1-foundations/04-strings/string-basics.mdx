@@ -103,20 +103,20 @@ Dari `email = "siti@pyground.id"`, tampilkan huruf pertama dan jumlah karakterny
   questions={[
     {
       question: "Apa hasil dari \"kopi\"[1]?",
-      options: ["k", "o", "p"],
-      answer: 1,
+      options: ["k", "p", "o"],
+      answer: 2,
       explanation: "Indeks dimulai dari 0, jadi [1] adalah karakter kedua: o.",
     },
     {
       question: "Apa hasil dari len(\"aku suka\")?",
-      options: ["7", "8", "2"],
-      answer: 1,
+      options: ["8", "7", "2"],
+      answer: 0,
       explanation: "Spasi juga dihitung: a-k-u-spasi-s-u-k-a = 8 karakter.",
     },
     {
       question: "Apa hasil dari \"Indonesia\"[:4]?",
-      options: ["Indo", "Indon", "nesia"],
-      answer: 0,
+      options: ["Indon", "Indo", "nesia"],
+      answer: 1,
       explanation: "Slicing [:4] mengambil indeks 0 sampai sebelum 4: I-n-d-o.",
     },
   ]}

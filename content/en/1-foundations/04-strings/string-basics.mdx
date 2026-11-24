@@ -103,20 +103,20 @@ From `email = "siti@pyground.id"`, print the first letter and the number of char
   questions={[
     {
       question: "What is \"code\"[1]?",
-      options: ["c", "o", "d"],
-      answer: 1,
+      options: ["c", "d", "o"],
+      answer: 2,
       explanation: "Indexes start at 0, so [1] is the second character: o.",
     },
     {
       question: "What is len(\"i like\")?",
-      options: ["5", "6", "2"],
-      answer: 1,
+      options: ["6", "5", "2"],
+      answer: 0,
       explanation: "Spaces count too: i-space-l-i-k-e = 6 characters.",
     },
     {
       question: "What is \"Indonesia\"[:4]?",
-      options: ["Indo", "Indon", "nesia"],
-      answer: 0,
+      options: ["Indon", "Indo", "nesia"],
+      answer: 1,
       explanation: "The slice [:4] takes indexes 0 up to before 4: I-n-d-o.",
     },
   ]}

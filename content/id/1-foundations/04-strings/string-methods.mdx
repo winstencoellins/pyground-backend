@@ -90,8 +90,8 @@ Rapikan nama ini supaya menjadi `Rina Wulandari`, lalu ganti `Rina` dengan `Rani
   questions={[
     {
       question: "Apa hasil dari \"  halo \".strip()?",
-      options: ["\"  halo \"", "\"halo\"", "\"HALO\""],
-      answer: 1,
+      options: ["\"halo\"", "\"  halo \"", "\"HALO\""],
+      answer: 0,
       explanation: "strip() membuang spasi di awal dan akhir.",
     },
     {
@@ -102,8 +102,8 @@ Rapikan nama ini supaya menjadi `Rina Wulandari`, lalu ganti `Rina` dengan `Rani
     },
     {
       question: "Apa hasil dari \"pisang\".find(\"x\")?",
-      options: ["0", "-1", "Error"],
-      answer: 1,
+      options: ["0", "Error", "-1"],
+      answer: 2,
       explanation: "find() mengembalikan -1 kalau teks tidak ditemukan.",
     },
   ]}
