@@ -104,7 +104,7 @@ describe("real server process", () => {
     } finally {
       proc.kill();
     }
-  });
+  }, 15_000); // boots a real server, which loads every lesson
 
   it("refuses to boot in production with a sandbox key and MIDTRANS_IS_PRODUCTION=true", async () => {
     const { proc } = start({

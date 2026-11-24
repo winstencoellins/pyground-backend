@@ -24,6 +24,7 @@ type Progress = {
   completed: { slug: string; completedAt: string }[];
   stages: { stage: number; total: number; completed: number; percent: number }[];
   overall: number;
+  streak: { current: number; longest: number; activeToday: boolean };
 };
 
 describe("POST /api/progress/:slug/complete", () => {
@@ -76,6 +77,7 @@ describe("GET /api/progress", () => {
       { stage: 4, total: 1, completed: 0, percent: 0 },
     ]);
     expect(body.overall).toBe(3); // 2 of 61 lessons
+    expect(body.streak).toEqual({ current: 1, longest: 1, activeToday: true });
   });
 
   it("ignores progress rows for lessons no longer in /content", async () => {

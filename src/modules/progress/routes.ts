@@ -4,6 +4,7 @@ import { limit } from "../../lib/rate-limit";
 import { sessionPlugin } from "../../plugins/session";
 import { requireOpenableLesson, slugParams } from "../lessons/access";
 import { getCatalog } from "../lessons/content";
+import { streakOf } from "./streak";
 
 export const progressRoutes = new Elysia()
   .use(sessionPlugin)
@@ -34,6 +35,8 @@ export const progressRoutes = new Elysia()
         completed,
         stages: [...stages.values()].map((s) => ({ ...s, percent: percent(s.completed, s.total) })),
         overall: percent(done.size, catalog.ordered.length),
+        // Counts every completion, including lessons since removed from /content.
+        streak: streakOf(rows.map((r) => r.completedAt)),
       };
     },
     { auth: true },
