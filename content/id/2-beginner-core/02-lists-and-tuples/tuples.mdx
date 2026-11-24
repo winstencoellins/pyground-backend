@@ -1,0 +1,124 @@
+---
+title: Tuple
+slug: tuples
+stage: 2
+module: List dan Tuple
+order: 4
+isFree: false
+estimatedMinutes: 12
+description: Kenali tuple, list yang tidak bisa diubah, beserta unpacking dan kapan sebaiknya memakai tuple dibanding list.
+---
+
+# Tuple
+
+**Tuple** mirip list, tapi isinya **tidak bisa diubah** setelah dibuat. Tuple ditulis dengan
+kurung biasa `( )`.
+
+## Membuat dan membaca tuple
+
+<Playground initialCode={`koordinat = (-6.2, 106.8)
+warna_rgb = (255, 128, 0)
+
+print(koordinat[0])
+print(len(warna_rgb))
+
+for nilai in warna_rgb:
+    print(nilai)`} />
+
+Indeks, slicing, `len()`, `in`, dan `for` bekerja sama persis seperti di list.
+
+## Tidak bisa diubah
+
+<Playground expectError initialCode={`warna_rgb = (255, 128, 0)
+warna_rgb[0] = 100`} />
+
+Python memberi `TypeError: 'tuple' object does not support item assignment`. Tuple juga tidak
+punya `append()`, `remove()`, atau `sort()`.
+
+<Callout type="tip">
+  Tuple berisi satu nilai butuh koma: `(5,)`. Tanpa koma, `(5)` hanyalah angka 5 di dalam
+  kurung.
+</Callout>
+
+## Unpacking
+
+Isi tuple bisa langsung dipecah ke beberapa variabel sekaligus:
+
+<Playground initialCode={`siswa = ("Citra", 17, "XI IPA 2")
+nama, umur, kelas = siswa
+
+print(nama)
+print(umur)
+print(kelas)`} />
+
+Trik terkenal dengan unpacking adalah menukar dua variabel tanpa variabel bantuan:
+
+<Playground initialCode={`a = 1
+b = 2
+a, b = b, a
+print("a =", a, "b =", b)`} />
+
+## Kapan pakai tuple, kapan pakai list?
+
+| Pakai list kalau... | Pakai tuple kalau... |
+| --- | --- |
+| Isinya akan bertambah, berkurang, atau diurutkan | Isinya tetap, seperti koordinat atau tanggal |
+| Semua isinya sejenis (daftar nilai, daftar nama) | Setiap posisi punya arti (nama, umur, kelas) |
+
+Tuple juga aman dari perubahan tidak sengaja di bagian lain program.
+
+## Mengubah tuple jadi list (dan sebaliknya)
+
+Kalau kamu benar-benar perlu mengubah isinya, ubah dulu jadi list:
+
+<Playground initialCode={`hari_kerja = ("Senin", "Selasa", "Rabu", "Kamis", "Jumat")
+jadwal = list(hari_kerja)
+jadwal.append("Sabtu")
+print(jadwal)
+print(tuple(jadwal))`} />
+
+## Latihan
+
+Daftar produk di bawah disimpan sebagai list berisi tuple `(nama, harga)`. Tampilkan setiap
+produk dengan unpacking, lalu hitung total harganya.
+
+<Playground initialCode={`produk = [("Pensil", 3000), ("Buku", 12000), ("Penghapus", 2000)]
+total = 0
+
+for nama, harga in produk:
+    # Tampilkan nama dan harga, lalu tambahkan harga ke total
+    pass
+
+print("Total:", total)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa perbedaan utama tuple dan list?",
+      options: ["Isi tuple tidak bisa diubah", "Tuple lebih panjang", "Tuple tidak punya indeks"],
+      answer: 0,
+      explanation: "Tuple bersifat immutable: setelah dibuat, isinya tetap.",
+    },
+    {
+      question: "Mana yang merupakan tuple berisi satu nilai?",
+      options: ["(5)", "(5,)", "[5]"],
+      answer: 1,
+      explanation: "Komalah yang membuat tuple. (5) hanya angka 5.",
+    },
+    {
+      question: "Setelah x, y = (3, 7), berapa nilai y?",
+      options: ["3", "(3, 7)", "7"],
+      answer: 2,
+      explanation: "Unpacking mengisi variabel sesuai urutan: x = 3, y = 7.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Tuple ditulis dengan `( )` dan isinya tidak bisa diubah.
+- Membaca tuple sama seperti list: indeks, slicing, `len()`, `for`.
+- Unpacking: `a, b, c = tuple_tiga_isi`, dan `a, b = b, a` untuk menukar.
+- Pakai tuple untuk data yang tetap, list untuk data yang berubah.

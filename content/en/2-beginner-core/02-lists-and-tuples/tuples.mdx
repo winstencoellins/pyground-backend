@@ -1,0 +1,124 @@
+---
+title: Tuples
+slug: tuples
+stage: 2
+module: Lists and Tuples
+order: 4
+isFree: false
+estimatedMinutes: 12
+description: Meet tuples, lists that can't be changed, along with unpacking and when to choose a tuple over a list.
+---
+
+# Tuples
+
+A **tuple** is like a list, but its items **can't be changed** once it's created. Tuples use
+round brackets `( )`.
+
+## Creating and reading tuples
+
+<Playground initialCode={`coordinates = (-6.2, 106.8)
+rgb = (255, 128, 0)
+
+print(coordinates[0])
+print(len(rgb))
+
+for value in rgb:
+    print(value)`} />
+
+Indexing, slicing, `len()`, `in`, and `for` all work exactly like they do with lists.
+
+## They can't be changed
+
+<Playground expectError initialCode={`rgb = (255, 128, 0)
+rgb[0] = 100`} />
+
+Python raises `TypeError: 'tuple' object does not support item assignment`. Tuples also have
+no `append()`, `remove()`, or `sort()`.
+
+<Callout type="tip">
+  A one-item tuple needs a comma: `(5,)`. Without the comma, `(5)` is just the number 5 in
+  brackets.
+</Callout>
+
+## Unpacking
+
+You can split a tuple into several variables at once:
+
+<Playground initialCode={`student = ("Citra", 17, "XI Science 2")
+name, age, grade = student
+
+print(name)
+print(age)
+print(grade)`} />
+
+A famous unpacking trick is swapping two variables without a helper variable:
+
+<Playground initialCode={`a = 1
+b = 2
+a, b = b, a
+print("a =", a, "b =", b)`} />
+
+## When to use a tuple vs a list
+
+| Use a list when... | Use a tuple when... |
+| --- | --- |
+| Items will be added, removed, or sorted | The items are fixed, like coordinates or a date |
+| All items are the same kind (scores, names) | Each position has a meaning (name, age, grade) |
+
+Tuples are also safe from accidental changes elsewhere in your program.
+
+## Converting between tuples and lists
+
+If you really need to change the items, turn it into a list first:
+
+<Playground initialCode={`weekdays = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+schedule = list(weekdays)
+schedule.append("Saturday")
+print(schedule)
+print(tuple(schedule))`} />
+
+## Exercise
+
+The products below are stored as a list of `(name, price)` tuples. Print each product using
+unpacking, then calculate the total price.
+
+<Playground initialCode={`products = [("Pencil", 3000), ("Notebook", 12000), ("Eraser", 2000)]
+total = 0
+
+for name, price in products:
+    # Print the name and price, then add the price to total
+    pass
+
+print("Total:", total)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is the main difference between a tuple and a list?",
+      options: ["A tuple's items can't be changed", "Tuples are longer", "Tuples have no indexes"],
+      answer: 0,
+      explanation: "Tuples are immutable: once created, their items stay the same.",
+    },
+    {
+      question: "Which of these is a one-item tuple?",
+      options: ["(5)", "(5,)", "[5]"],
+      answer: 1,
+      explanation: "The comma is what makes a tuple. (5) is just the number 5.",
+    },
+    {
+      question: "After x, y = (3, 7), what is y?",
+      options: ["3", "(3, 7)", "7"],
+      answer: 2,
+      explanation: "Unpacking fills the variables in order: x = 3, y = 7.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Tuples use `( )` and their items can't be changed.
+- Reading a tuple works like a list: indexes, slicing, `len()`, `for`.
+- Unpacking: `a, b, c = three_item_tuple`, and `a, b = b, a` to swap.
+- Use tuples for fixed data, lists for data that changes.

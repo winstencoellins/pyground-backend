@@ -1,0 +1,147 @@
+---
+title: Adding, Removing, and Sorting
+slug: list-methods
+stage: 2
+module: Lists and Tuples
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Use list methods such as append, insert, remove, pop, and sort, and check membership with in.
+---
+
+# Adding, Removing, and Sorting
+
+Lists rarely stay still. Shopping lists grow, queues shrink, and scores need sorting. Python
+has **methods** for all of that.
+
+## Adding items
+
+- `append(x)` adds `x` to the **end** of the list.
+- `insert(i, x)` inserts `x` at index `i`.
+
+<Playground initialCode={`queue = ["Ani", "Budi"]
+queue.append("Citra")
+print(queue)
+
+queue.insert(0, "Dodi")
+print(queue)`} />
+
+## Removing items
+
+- `remove(x)` removes the first `x` it finds.
+- `pop()` takes out and returns the last item. `pop(i)` does the same at index `i`.
+
+<Playground initialCode={`queue = ["Dodi", "Ani", "Budi", "Citra"]
+
+queue.remove("Budi")
+print(queue)
+
+served = queue.pop(0)
+print("Now serving:", served)
+print("Still waiting:", queue)`} />
+
+<Callout type="warning">
+  `remove()` raises a `ValueError` if the item isn't in the list. Check with `in` first if
+  you're not sure.
+</Callout>
+
+## Checking membership with `in`
+
+<Playground initialCode={`groceries = ["rice", "eggs", "sugar"]
+
+if "eggs" in groceries:
+    print("Eggs are already on the list")
+
+if "coffee" not in groceries:
+    groceries.append("coffee")
+
+print(groceries)`} />
+
+## Sorting
+
+- `sort()` sorts the list itself (the original changes).
+- `sorted(list)` returns a new sorted list and leaves the original alone.
+- Add `reverse=True` to sort from largest to smallest.
+
+<Playground initialCode={`scores = [78, 92, 65, 88]
+
+ordered = sorted(scores)
+print("New:", ordered)
+print("Original:", scores)
+
+scores.sort(reverse=True)
+print("Original after sort:", scores)`} />
+
+<Callout type="tip">
+  `sort()` returns nothing (the result is `None`). So don't write `scores = scores.sort()`,
+  or you'll lose your list.
+</Callout>
+
+## Handy built-in functions
+
+<Playground initialCode={`prices = [12000, 5500, 30000, 8000]
+print("Total:", sum(prices))
+print("Most expensive:", max(prices))
+print("Cheapest:", min(prices))
+print("How many times 5500 appears:", prices.count(5500))
+print("Position of 30000:", prices.index(30000))`} />
+
+## Building a list in a loop
+
+The accumulator pattern from the last module works for lists too: start with `[]`, then
+`append()` on each pass.
+
+<Playground initialCode={`scores = [78, 92, 65, 88, 55, 70]
+passed = []
+
+for s in scores:
+    if s >= 70:
+        passed.append(s)
+
+print("Passed:", passed)`} />
+
+## Exercise
+
+Build a simple to-do list: add three tasks, mark one as done (remove it), then print the
+remaining tasks in alphabetical order.
+
+<Playground initialCode={`tasks = []
+
+# 1. Add three tasks with append()
+
+# 2. Remove one task with remove()
+
+# 3. Sort, then print them one by one
+print(tasks)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which method adds an item to the end of a list?",
+      options: ["append()", "insert()", "add()"],
+      answer: 0,
+      explanation: "append() always adds at the end. insert() needs an index.",
+    },
+    {
+      question: "If nums = [3, 1, 2], what is nums after nums = nums.sort()?",
+      options: ["[1, 2, 3]", "None", "[3, 1, 2]"],
+      answer: 1,
+      explanation: "sort() changes the list in place and returns None, so nums becomes None.",
+    },
+    {
+      question: "What does pop() do without an index?",
+      options: ["Removes the first item", "Empties the list", "Takes out and returns the last item"],
+      answer: 2,
+      explanation: "pop() with no index works on the last item and returns it.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Add: `append(x)`, `insert(i, x)`.
+- Remove: `remove(x)`, `pop()`, `pop(i)`.
+- Check: `x in my_list`, `x not in my_list`.
+- Sort: `my_list.sort()` (changes the original) or `sorted(my_list)` (new list).

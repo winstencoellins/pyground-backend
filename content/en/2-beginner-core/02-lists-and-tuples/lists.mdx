@@ -1,0 +1,120 @@
+---
+title: Introducing Lists
+slug: lists
+stage: 2
+module: Lists and Tuples
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Store many values in one variable with a list, then read and change its items by index.
+---
+
+# Introducing Lists
+
+Imagine writing a shopping list. Creating one variable per item (`item1`, `item2`, `item3`,
+...) quickly gets messy. A **list** stores many values in one variable, in order.
+
+## Creating a list
+
+Lists use square brackets `[ ]`, with items separated by commas:
+
+<Playground initialCode={`groceries = ["rice", "eggs", "oil", "sugar"]
+scores = [80, 95, 72]
+empty = []
+
+print(groceries)
+print(scores)
+print(empty)
+print("Number of items:", len(groceries))`} />
+
+The `len()` you used on strings works on lists too: it gives the number of items.
+
+## Reading items by index
+
+Every item has a position number called an **index**. Just like strings, indexes start at
+**0**:
+
+<Playground initialCode={`groceries = ["rice", "eggs", "oil", "sugar"]
+
+print(groceries[0])   # rice
+print(groceries[2])   # oil
+print(groceries[-1])  # sugar, negative indexes count from the end`} />
+
+<Callout type="warning">
+  A list with 4 items has indexes 0 to 3. If you write `groceries[4]`, Python raises
+  `IndexError: list index out of range`.
+</Callout>
+
+<Playground expectError initialCode={`groceries = ["rice", "eggs", "oil", "sugar"]
+print(groceries[4])`} />
+
+## Changing items
+
+Unlike strings, lists **can be changed**. Put the index on the left of `=`:
+
+<Playground initialCode={`groceries = ["rice", "eggs", "oil", "sugar"]
+groceries[1] = "flour"
+print(groceries)`} />
+
+## Mixed items are allowed
+
+One list can hold different data types, although we usually keep similar data together so
+it's easier to work with:
+
+<Playground initialCode={`student = ["Budi", 16, True]
+print(student[0], "is", student[1], "years old")`} />
+
+## Looping over a list
+
+You know this from the Loops module. `for` takes the items one at a time:
+
+<Playground initialCode={`groceries = ["rice", "eggs", "oil", "sugar"]
+for number, item in enumerate(groceries, start=1):
+    print(f"{number}. {item}")`} />
+
+`enumerate()` gives you a running number along with each item, so you don't need your own
+counter.
+
+## Exercise
+
+Calculate the average of the scores below, then print the first and the last score.
+
+<Playground initialCode={`scores = [78, 85, 92, 66, 88]
+
+# Calculate the average (hint: sum() and len())
+average = 0
+
+print("Average:", average)
+# Print the first and last score here`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "If fruits = [\"apple\", \"orange\", \"mango\"], what is fruits[1]?",
+      options: ["orange", "apple", "mango"],
+      answer: 0,
+      explanation: "Indexes start at 0, so index 1 is the second item.",
+    },
+    {
+      question: "What does len([10, 20, 30, 40]) return?",
+      options: ["3", "4", "40"],
+      answer: 1,
+      explanation: "len() counts the items in the list, which is 4.",
+    },
+    {
+      question: "Which index always gets the last item of a list?",
+      options: ["0", "len(list)", "-1"],
+      answer: 2,
+      explanation: "Negative indexes count from the end, and -1 is the last item.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A list stores many values in order: `[item1, item2, ...]`.
+- Indexes start at `0`; index `-1` is the last item.
+- List items can be changed: `my_list[index] = new_value`.
+- `len()` counts the items, and `enumerate()` numbers them while looping.

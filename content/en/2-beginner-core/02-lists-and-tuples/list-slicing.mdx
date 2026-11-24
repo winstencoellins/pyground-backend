@@ -1,0 +1,125 @@
+---
+title: Slicing and Copying Lists
+slug: list-slicing
+stage: 2
+module: Lists and Tuples
+order: 3
+isFree: false
+estimatedMinutes: 12
+description: Take part of a list with slicing, understand why two variables can point to the same list, and copy lists correctly.
+---
+
+# Slicing and Copying Lists
+
+## Slicing: taking part of a list
+
+Slicing works just like with strings: `my_list[start:end]`. The `end` index is **not
+included**.
+
+<Playground initialCode={`months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+
+print(months[0:3])   # first 3 months
+print(months[3:])    # from index 3 to the end
+print(months[:2])    # from the start up to index 2
+print(months[-2:])   # last 2 months
+print(months[::2])   # every second one: Jan, Mar, May
+print(months[::-1])  # reversed`} />
+
+<Callout type="info">
+  Slicing never raises an `IndexError`. If the bounds go past the end, Python just takes
+  what's there.
+</Callout>
+
+## The trap: two names, one list
+
+Look closely at this example:
+
+<Playground initialCode={`a = [1, 2, 3]
+b = a
+b.append(4)
+
+print("a:", a)
+print("b:", b)`} />
+
+`a` changed too! The line `b = a` does **not** create a new list. It only gives the same list
+a second name. Think of one box with two labels.
+
+## Copying a list properly
+
+When you want a separate new list, copy it with `copy()` or the slice `[:]`:
+
+<Playground initialCode={`original = [1, 2, 3]
+copy1 = original.copy()
+copy2 = original[:]
+
+copy1.append(4)
+copy2.append(99)
+
+print("original:", original)
+print("copy1:", copy1)
+print("copy2:", copy2)`} />
+
+## Lists inside lists
+
+A list item can be another list. This is useful for table-like data:
+
+<Playground initialCode={`classroom = [
+    ["Ani", 88],
+    ["Budi", 75],
+    ["Citra", 92],
+]
+
+print(classroom[2])      # ['Citra', 92]
+print(classroom[2][0])   # Citra
+
+for name, score in classroom:
+    print(f"{name}: {score}")`} />
+
+The first index picks the row, the second picks the item inside that row.
+
+## Exercise
+
+From the daily temperatures below, print the first 3 days, the last 3 days, and make a
+sorted copy without changing the original list.
+
+<Playground initialCode={`temps = [31, 33, 30, 29, 34, 32, 28]
+
+# first 3 days
+
+# last 3 days
+
+# sorted copy (temps must not change)
+
+print("Original:", temps)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "If x = [10, 20, 30, 40], what is x[1:3]?",
+      options: ["[20, 30]", "[10, 20, 30]", "[20, 30, 40]"],
+      answer: 0,
+      explanation: "It starts at index 1 and stops before index 3.",
+    },
+    {
+      question: "a = [1, 2], then b = a, then b.append(3). What is a?",
+      options: ["[1, 2]", "[1, 2, 3]", "Error"],
+      answer: 1,
+      explanation: "b = a doesn't copy the list. a and b are the same list.",
+    },
+    {
+      question: "Which line makes a separate copy of a list?",
+      options: ["b = a", "b == a", "b = a.copy()"],
+      answer: 2,
+      explanation: "copy() (or a[:]) creates a new list with the same items.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `my_list[start:end:step]` takes part of a list; `end` is not included.
+- `b = a` doesn't copy, it only adds a second name.
+- Copy with `a.copy()` or `a[:]`.
+- Lists can contain lists; use two indexes like `data[row][col]`.

@@ -1,0 +1,121 @@
+---
+title: Mengenal List
+slug: lists
+stage: 2
+module: List dan Tuple
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Simpan banyak data dalam satu variabel dengan list, lalu ambil dan ubah isinya lewat indeks.
+---
+
+# Mengenal List
+
+Bayangkan kamu mencatat belanjaan. Membuat satu variabel untuk setiap barang (`barang1`,
+`barang2`, `barang3`, ...) jelas merepotkan. **List** menyimpan banyak nilai dalam satu
+variabel, berurutan.
+
+## Membuat list
+
+List ditulis dengan kurung siku `[ ]`, dan setiap isinya dipisah koma:
+
+<Playground initialCode={`belanjaan = ["beras", "telur", "minyak", "gula"]
+nilai = [80, 95, 72]
+kosong = []
+
+print(belanjaan)
+print(nilai)
+print(kosong)
+print("Jumlah barang:", len(belanjaan))`} />
+
+`len()` yang kamu pakai untuk string juga bekerja di list: hasilnya jumlah isi list.
+
+## Mengambil isi dengan indeks
+
+Setiap isi list punya nomor urut yang disebut **indeks**. Sama seperti string, indeks
+dimulai dari **0**:
+
+<Playground initialCode={`belanjaan = ["beras", "telur", "minyak", "gula"]
+
+print(belanjaan[0])   # beras
+print(belanjaan[2])   # minyak
+print(belanjaan[-1])  # gula, indeks negatif dihitung dari belakang`} />
+
+<Callout type="warning">
+  List berisi 4 barang punya indeks 0 sampai 3. Kalau kamu menulis `belanjaan[4]`, Python
+  akan memberi `IndexError: list index out of range`.
+</Callout>
+
+<Playground expectError initialCode={`belanjaan = ["beras", "telur", "minyak", "gula"]
+print(belanjaan[4])`} />
+
+## Mengubah isi list
+
+Berbeda dengan string, isi list **bisa diubah**. Cukup tulis indeksnya di sebelah kiri `=`:
+
+<Playground initialCode={`belanjaan = ["beras", "telur", "minyak", "gula"]
+belanjaan[1] = "tepung"
+print(belanjaan)`} />
+
+## Isi list boleh campur
+
+Satu list boleh berisi tipe data yang berbeda-beda, walaupun biasanya kita menyimpan data
+yang sejenis supaya mudah diolah:
+
+<Playground initialCode={`siswa = ["Budi", 16, True]
+print(siswa[0], "berumur", siswa[1])`} />
+
+## Loop melewati list
+
+Kamu sudah kenal ini dari modul Perulangan. `for` mengambil isi list satu per satu:
+
+<Playground initialCode={`belanjaan = ["beras", "telur", "minyak", "gula"]
+for nomor, barang in enumerate(belanjaan, start=1):
+    print(f"{nomor}. {barang}")`} />
+
+`enumerate()` memberi nomor urut sekaligus isinya, jadi kamu tidak perlu membuat
+penghitung sendiri.
+
+## Latihan
+
+Hitung rata-rata nilai di bawah ini, lalu tampilkan nilai pertama dan nilai terakhir.
+
+<Playground initialCode={`nilai = [78, 85, 92, 66, 88]
+
+# Hitung rata-rata (petunjuk: sum() dan len())
+rata_rata = 0
+
+print("Rata-rata:", rata_rata)
+# Tampilkan nilai pertama dan terakhir di sini`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kalau buah = [\"apel\", \"jeruk\", \"mangga\"], apa hasil buah[1]?",
+      options: ["jeruk", "apel", "mangga"],
+      answer: 0,
+      explanation: "Indeks dimulai dari 0, jadi indeks 1 adalah isi kedua.",
+    },
+    {
+      question: "Apa hasil len([10, 20, 30, 40])?",
+      options: ["3", "4", "40"],
+      answer: 1,
+      explanation: "len() menghitung jumlah isi list, yaitu 4.",
+    },
+    {
+      question: "Indeks berapa yang selalu mengambil isi terakhir list?",
+      options: ["0", "len(list)", "-1"],
+      answer: 2,
+      explanation: "Indeks negatif dihitung dari belakang, dan -1 adalah isi terakhir.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- List menyimpan banyak nilai berurutan: `[isi1, isi2, ...]`.
+- Indeks dimulai dari `0`; indeks `-1` adalah isi terakhir.
+- Isi list bisa diubah: `daftar[indeks] = nilai_baru`.
+- `len()` menghitung isi list, dan `enumerate()` memberi nomor saat loop.

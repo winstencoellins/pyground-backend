@@ -1,0 +1,147 @@
+---
+title: Menambah, Menghapus, dan Mengurutkan List
+slug: list-methods
+stage: 2
+module: List dan Tuple
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Pakai method list seperti append, insert, remove, pop, dan sort, lalu cek isi list dengan in.
+---
+
+# Menambah, Menghapus, dan Mengurutkan List
+
+List jarang diam. Daftar belanja bertambah, antrean berkurang, dan nilai perlu diurutkan.
+Python menyediakan **method** untuk semua itu.
+
+## Menambah isi
+
+- `append(x)` menambah `x` di **akhir** list.
+- `insert(i, x)` menyisipkan `x` di indeks `i`.
+
+<Playground initialCode={`antrean = ["Ani", "Budi"]
+antrean.append("Citra")
+print(antrean)
+
+antrean.insert(0, "Dodi")
+print(antrean)`} />
+
+## Menghapus isi
+
+- `remove(x)` menghapus `x` yang pertama ditemukan.
+- `pop()` mengambil sekaligus menghapus isi terakhir. `pop(i)` melakukannya di indeks `i`.
+
+<Playground initialCode={`antrean = ["Dodi", "Ani", "Budi", "Citra"]
+
+antrean.remove("Budi")
+print(antrean)
+
+dilayani = antrean.pop(0)
+print("Sekarang dilayani:", dilayani)
+print("Sisa antrean:", antrean)`} />
+
+<Callout type="warning">
+  `remove()` akan memberi `ValueError` kalau isinya tidak ada di list. Cek dulu dengan `in`
+  kalau kamu tidak yakin.
+</Callout>
+
+## Mengecek isi dengan `in`
+
+<Playground initialCode={`belanjaan = ["beras", "telur", "gula"]
+
+if "telur" in belanjaan:
+    print("Telur sudah dicatat")
+
+if "kopi" not in belanjaan:
+    belanjaan.append("kopi")
+
+print(belanjaan)`} />
+
+## Mengurutkan
+
+- `sort()` mengurutkan list itu sendiri (list aslinya berubah).
+- `sorted(list)` membuat list baru yang terurut, list asli tetap.
+- Tambahkan `reverse=True` untuk urutan dari besar ke kecil.
+
+<Playground initialCode={`nilai = [78, 92, 65, 88]
+
+terurut = sorted(nilai)
+print("Baru:", terurut)
+print("Asli:", nilai)
+
+nilai.sort(reverse=True)
+print("Asli setelah sort:", nilai)`} />
+
+<Callout type="tip">
+  `sort()` tidak mengembalikan apa-apa (hasilnya `None`). Jadi jangan tulis
+  `nilai = nilai.sort()`, karena isi `nilai` akan hilang.
+</Callout>
+
+## Fungsi bawaan yang berguna
+
+<Playground initialCode={`harga = [12000, 5500, 30000, 8000]
+print("Total:", sum(harga))
+print("Termahal:", max(harga))
+print("Termurah:", min(harga))
+print("Berapa kali 5500 muncul:", harga.count(5500))
+print("Posisi 30000:", harga.index(30000))`} />
+
+## Membangun list dari loop
+
+Pola akumulator dari modul sebelumnya juga bisa dipakai untuk list: mulai dari `[]`, lalu
+`append()` di setiap putaran.
+
+<Playground initialCode={`nilai = [78, 92, 65, 88, 55, 70]
+lulus = []
+
+for n in nilai:
+    if n >= 70:
+        lulus.append(n)
+
+print("Yang lulus:", lulus)`} />
+
+## Latihan
+
+Buat program to-do list sederhana: tambahkan tiga tugas, tandai satu tugas selesai (hapus dari
+list), lalu tampilkan sisa tugas secara berurutan sesuai abjad.
+
+<Playground initialCode={`tugas = []
+
+# 1. Tambahkan tiga tugas dengan append()
+
+# 2. Hapus satu tugas dengan remove()
+
+# 3. Urutkan lalu tampilkan satu per satu
+print(tugas)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Method apa yang menambah isi di akhir list?",
+      options: ["append()", "insert()", "add()"],
+      answer: 0,
+      explanation: "append() selalu menambah di akhir. insert() butuh indeks.",
+    },
+    {
+      question: "Kalau angka = [3, 1, 2], apa isi angka setelah angka = angka.sort()?",
+      options: ["[1, 2, 3]", "None", "[3, 1, 2]"],
+      answer: 1,
+      explanation: "sort() mengubah list langsung dan mengembalikan None, jadi angka menjadi None.",
+    },
+    {
+      question: "Apa yang dilakukan pop() tanpa indeks?",
+      options: ["Menghapus isi pertama", "Mengosongkan list", "Mengambil dan menghapus isi terakhir"],
+      answer: 2,
+      explanation: "pop() tanpa indeks bekerja di isi terakhir dan mengembalikan nilainya.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Tambah: `append(x)`, `insert(i, x)`.
+- Hapus: `remove(x)`, `pop()`, `pop(i)`.
+- Cek: `x in daftar`, `x not in daftar`.
+- Urutkan: `daftar.sort()` (mengubah asli) atau `sorted(daftar)` (membuat list baru).

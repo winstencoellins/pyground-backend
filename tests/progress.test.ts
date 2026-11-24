@@ -71,11 +71,11 @@ describe("GET /api/progress", () => {
     expect(body.completed.map((c) => c.slug).sort()).toEqual(["for-loops", "try-except"]);
     expect(body.stages).toEqual([
       { stage: 1, total: 14, completed: 0, percent: 0 },
-      { stage: 2, total: 4, completed: 1, percent: 25 },
+      { stage: 2, total: 8, completed: 1, percent: 13 },
       { stage: 3, total: 1, completed: 1, percent: 100 },
       { stage: 4, total: 1, completed: 0, percent: 0 },
     ]);
-    expect(body.overall).toBe(10); // 2 of 20 lessons
+    expect(body.overall).toBe(8); // 2 of 24 lessons
   });
 
   it("ignores progress rows for lessons no longer in /content", async () => {
@@ -86,7 +86,7 @@ describe("GET /api/progress", () => {
       await call("/api/progress", { headers: { cookie: student.cookie } })
     ).json()) as Progress;
     expect(body.completed.map((c) => c.slug)).toEqual(["what-is-programming"]);
-    expect(body.overall).toBe(5); // 1 of 20 lessons
+    expect(body.overall).toBe(4); // 1 of 24 lessons
   });
 
   it("requires a session", async () => {

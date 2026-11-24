@@ -1,0 +1,124 @@
+---
+title: Slicing dan Menyalin List
+slug: list-slicing
+stage: 2
+module: List dan Tuple
+order: 3
+isFree: false
+estimatedMinutes: 12
+description: Ambil sebagian list dengan slicing, pahami kenapa dua variabel bisa menunjuk list yang sama, dan cara menyalin list dengan benar.
+---
+
+# Slicing dan Menyalin List
+
+## Slicing: mengambil sebagian list
+
+Slicing bekerja sama seperti di string: `daftar[awal:akhir]`. Indeks `akhir` **tidak ikut**.
+
+<Playground initialCode={`bulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun"]
+
+print(bulan[0:3])   # 3 bulan pertama
+print(bulan[3:])    # dari indeks 3 sampai habis
+print(bulan[:2])    # dari awal sampai sebelum indeks 2
+print(bulan[-2:])   # 2 bulan terakhir
+print(bulan[::2])   # loncat 2: Jan, Mar, Mei
+print(bulan[::-1])  # dibalik`} />
+
+<Callout type="info">
+  Slicing tidak pernah memberi `IndexError`. Kalau batasnya melebihi panjang list, Python
+  hanya mengambil yang ada.
+</Callout>
+
+## Jebakan: dua nama, satu list
+
+Perhatikan contoh ini baik-baik:
+
+<Playground initialCode={`a = [1, 2, 3]
+b = a
+b.append(4)
+
+print("a:", a)
+print("b:", b)`} />
+
+`a` ikut berubah! Baris `b = a` **tidak** membuat list baru. Baris itu hanya memberi nama
+kedua untuk list yang sama. Bayangkan satu kotak dengan dua label.
+
+## Menyalin list dengan benar
+
+Kalau kamu ingin list baru yang terpisah, salin isinya dengan `copy()` atau slicing `[:]`:
+
+<Playground initialCode={`asli = [1, 2, 3]
+salinan = asli.copy()
+salinan2 = asli[:]
+
+salinan.append(4)
+salinan2.append(99)
+
+print("asli:", asli)
+print("salinan:", salinan)
+print("salinan2:", salinan2)`} />
+
+## List di dalam list
+
+Isi list boleh berupa list lain. Ini berguna untuk data berbentuk tabel:
+
+<Playground initialCode={`kelas = [
+    ["Ani", 88],
+    ["Budi", 75],
+    ["Citra", 92],
+]
+
+print(kelas[2])      # ['Citra', 92]
+print(kelas[2][0])   # Citra
+
+for nama, nilai in kelas:
+    print(f"{nama}: {nilai}")`} />
+
+Indeks pertama memilih baris, indeks kedua memilih isi di dalam baris itu.
+
+## Latihan
+
+Dari daftar suhu harian di bawah, tampilkan suhu 3 hari pertama, suhu 3 hari terakhir, dan
+buat salinan list yang terurut tanpa mengubah list aslinya.
+
+<Playground initialCode={`suhu = [31, 33, 30, 29, 34, 32, 28]
+
+# 3 hari pertama
+
+# 3 hari terakhir
+
+# salinan terurut (list suhu tidak boleh berubah)
+
+print("Asli:", suhu)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kalau x = [10, 20, 30, 40], apa hasil x[1:3]?",
+      options: ["[20, 30]", "[10, 20, 30]", "[20, 30, 40]"],
+      answer: 0,
+      explanation: "Mulai dari indeks 1, berhenti sebelum indeks 3.",
+    },
+    {
+      question: "a = [1, 2] lalu b = a lalu b.append(3). Apa isi a?",
+      options: ["[1, 2]", "[1, 2, 3]", "Error"],
+      answer: 1,
+      explanation: "b = a tidak menyalin list. a dan b adalah list yang sama.",
+    },
+    {
+      question: "Cara mana yang membuat salinan list yang terpisah?",
+      options: ["b = a", "b == a", "b = a.copy()"],
+      answer: 2,
+      explanation: "copy() (atau a[:]) membuat list baru dengan isi yang sama.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `daftar[awal:akhir:langkah]` mengambil sebagian list; `akhir` tidak ikut.
+- `b = a` tidak menyalin, hanya memberi nama kedua.
+- Salin dengan `a.copy()` atau `a[:]`.
+- List boleh berisi list lain; akses dengan dua indeks seperti `data[baris][kolom]`.

@@ -40,10 +40,14 @@ describe("real content", () => {
       "while-loops",
       "break-and-continue",
       "loop-patterns",
+      "lists",
+      "list-methods",
+      "list-slicing",
+      "tuples",
       "try-except",
       "how-the-web-works",
     ]);
-    expect(catalog.byLocale.en.size).toBe(20);
+    expect(catalog.byLocale.en.size).toBe(24);
   });
 
   it("every <Playground initialCode> is valid Python", () => {
@@ -174,6 +178,10 @@ describe("GET /api/lessons", () => {
       "while-loops",
       "break-and-continue",
       "loop-patterns",
+      "lists",
+      "list-methods",
+      "list-slicing",
+      "tuples",
       "try-except",
       "how-the-web-works",
     ]);
@@ -195,7 +203,7 @@ describe("GET /api/lessons", () => {
     const idx = (await (
       await call("/api/lessons", { headers: { cookie: expired } })
     ).json()) as Index;
-    expect(lessons(idx).filter((l) => l.locked).length).toBe(6);
+    expect(lessons(idx).filter((l) => l.locked).length).toBe(10);
   });
 
   it("rejects unknown locales", async () => {
