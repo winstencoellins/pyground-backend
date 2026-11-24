@@ -1,0 +1,114 @@
+---
+title: Looping with while
+slug: while-loops
+stage: 2
+module: Loops
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Repeat code as long as a condition is true, and avoid loops that never stop.
+---
+
+# Looping with `while`
+
+`for` is great when you know **how many times** to repeat. But sometimes you don't, for example
+"keep asking for the password **until** it's right". That's what `while` is for.
+
+`while` repeats a block of code **as long as** its condition is `True`:
+
+<Playground initialCode={`count = 1
+while count <= 5:
+    print("Round", count)
+    count += 1
+print("Done!")`} />
+
+How it works:
+
+1. Check the condition `count <= 5`. If it's `True`, run the block below.
+2. When the block finishes, **go back to the top** and check the condition again.
+3. As soon as the condition is `False`, the loop stops and the program moves on.
+
+## Watch out: loops that never stop
+
+If the condition **never** becomes `False`, the loop runs forever. This is called an *infinite
+loop*. For example, if we forget to write `count += 1`:
+
+```python
+count = 1
+while count <= 5:
+    print("Round", count)
+    # forgot count += 1, so count is always 1
+```
+
+<Callout type="warning">
+  Don't run the code above. Every `while` loop needs something inside it that eventually makes
+  the condition `False`.
+</Callout>
+
+## while with input
+
+`while` is perfect for programs that keep asking until the answer is right:
+
+<Playground initialCode={`password = ""
+while password != "python":
+    password = input("Password: ")
+print("Logged in!")`} />
+
+Another example: saving until you reach a goal.
+
+<Playground initialCode={`savings = 0
+goal = 100000
+weeks = 0
+
+while savings < goal:
+    savings += 15000
+    weeks += 1
+
+print(f"Goal reached in {weeks} weeks, savings Rp{savings:,}")`} />
+
+## for or while?
+
+| Use | When... | Example |
+| --- | --- | --- |
+| `for` | you know the number of rounds, or you go through every item | print 1 to 10, every letter in a name |
+| `while` | you stop once a condition is reached | ask until the answer is right, save until a goal |
+
+## Practice
+
+Write a rocket launch countdown from 10 to 1, then print `Liftoff!`.
+
+<Playground initialCode={`seconds = 10
+
+# Write your while loop here
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "When does a while loop stop?",
+      options: ["After 10 rounds", "When its condition becomes False", "Never"],
+      answer: 1,
+      explanation: "while keeps repeating as long as its condition is True.",
+    },
+    {
+      question: "x = 0, then while x < 3: x += 1. What is x after the loop?",
+      options: ["2", "3", "4"],
+      answer: 1,
+      explanation: "x goes 1, 2, 3. At x = 3, the condition x < 3 is False and the loop stops.",
+    },
+    {
+      question: "What commonly causes an infinite loop?",
+      options: ["Using for", "Forgetting to change the variable the condition checks", "Using print()"],
+      answer: 1,
+      explanation: "If the variable never changes, the condition never becomes False.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `while condition:` repeats as long as the condition is `True`.
+- Make sure something inside the loop changes the condition, or it becomes an infinite loop.
+- Use `for` for a known number of rounds, `while` for "until something happens".

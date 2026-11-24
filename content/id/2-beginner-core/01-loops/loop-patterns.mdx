@@ -1,0 +1,126 @@
+---
+title: Pola-Pola Perulangan
+slug: loop-patterns
+stage: 2
+module: Perulangan
+order: 4
+isFree: false
+estimatedMinutes: 15
+description: Kuasai pola loop yang paling sering dipakai, yaitu menjumlah, menghitung, mencari nilai terbesar, dan loop bersarang.
+---
+
+# Pola-Pola Perulangan
+
+Sebagian besar loop yang akan kamu tulis mengikuti beberapa pola yang sama. Kalau kamu hafal
+polanya, menulis program jadi jauh lebih cepat.
+
+## Pola 1: menjumlah (akumulator)
+
+Siapkan variabel bernilai `0` **sebelum** loop, lalu tambahkan sesuatu di setiap putaran:
+
+<Playground initialCode={`total = 0
+for angka in range(1, 101):
+    total += angka
+print("1 + 2 + ... + 100 =", total)`} />
+
+## Pola 2: menghitung yang memenuhi syarat
+
+Mirip, tapi hanya menambah `1` kalau syaratnya terpenuhi:
+
+<Playground initialCode={`kelipatan_tiga = 0
+for angka in range(1, 51):
+    if angka % 3 == 0:
+        kelipatan_tiga += 1
+print("Kelipatan 3 dari 1 sampai 50:", kelipatan_tiga)`} />
+
+## Pola 3: mencari nilai terbesar
+
+Simpan "juara sementara", lalu ganti setiap kali menemukan yang lebih besar:
+
+<Playground initialCode={`nilai_ujian = [78, 92, 65, 88, 95, 70]
+tertinggi = nilai_ujian[0]
+
+for nilai in nilai_ujian:
+    if nilai > tertinggi:
+        tertinggi = nilai
+
+print("Nilai tertinggi:", tertinggi)`} />
+
+<Callout type="info">
+  Python sebenarnya punya `max()` dan `sum()` untuk ini. Tapi memahami polanya penting, karena
+  sering kali syaratnya lebih rumit daripada sekadar "terbesar".
+</Callout>
+
+## Pola 4: membangun teks
+
+Akumulator juga bisa berupa string. Mulai dari string kosong `""`:
+
+<Playground initialCode={`kata = "python"
+terbalik = ""
+for huruf in kata:
+    terbalik = huruf + terbalik
+print(terbalik)`} />
+
+## Pola 5: loop bersarang
+
+Loop boleh berada di dalam loop lain. Loop dalam berjalan **penuh** untuk setiap putaran loop
+luar:
+
+<Playground initialCode={`for baris in range(1, 4):
+    for kolom in range(1, 4):
+        print(f"{baris} x {kolom} = {baris * kolom}")
+    print("---")`} />
+
+Contoh visual: segitiga bintang.
+
+<Playground initialCode={`tinggi = 5
+for baris in range(1, tinggi + 1):
+    print("*" * baris)`} />
+
+<Callout type="tip">
+  Di contoh segitiga, `"*" * baris` menggantikan loop dalam. Kalau ada cara yang lebih singkat
+  dan tetap jelas, pakai saja.
+</Callout>
+
+## Latihan
+
+Buat tabel perkalian 1 sampai 5 yang tersusun rapi, dengan setiap baris berisi 5 hasil.
+
+<Playground initialCode={`for baris in range(1, 6):
+    teks_baris = ""
+    for kolom in range(1, 6):
+        # Tambahkan hasil baris * kolom ke teks_baris (pakai f-string dan :>4)
+        pass
+    print(teks_baris)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Di pola akumulator, di mana variabel total = 0 ditulis?",
+      options: ["Di dalam loop", "Sebelum loop", "Setelah loop"],
+      answer: 1,
+      explanation: "Kalau ditulis di dalam loop, total akan kembali ke 0 di setiap putaran.",
+    },
+    {
+      question: "Loop luar 3 putaran, loop dalam 4 putaran. Berapa kali isi loop dalam dijalankan?",
+      options: ["7", "12", "4"],
+      answer: 1,
+      explanation: "Loop dalam berjalan penuh (4 kali) untuk setiap putaran luar: 3 x 4 = 12.",
+    },
+    {
+      question: "Nilai awal yang tepat untuk akumulator teks adalah...",
+      options: ["0", "\"\" (string kosong)", "None"],
+      answer: 1,
+      explanation: "Teks digabung dengan +, jadi mulai dari string kosong.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Akumulator: mulai dari `0` atau `""` sebelum loop, tambahkan di setiap putaran.
+- Penghitung: tambah `1` hanya kalau syarat terpenuhi.
+- Nilai terbesar: simpan juara sementara, ganti kalau ada yang lebih besar.
+- Loop bersarang: loop dalam berjalan penuh untuk setiap putaran loop luar.

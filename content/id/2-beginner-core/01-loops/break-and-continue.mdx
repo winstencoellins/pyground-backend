@@ -1,0 +1,111 @@
+---
+title: break dan continue
+slug: break-and-continue
+stage: 2
+module: Perulangan
+order: 3
+isFree: false
+estimatedMinutes: 12
+description: Hentikan loop lebih awal dengan break dan lewati satu putaran dengan continue.
+---
+
+# `break` dan `continue`
+
+Kadang kamu perlu mengendalikan loop dari dalam: berhenti lebih awal, atau melewati satu
+putaran. Python punya dua kata kunci untuk itu.
+
+| Kata kunci | Fungsi |
+| --- | --- |
+| `break` | **menghentikan** loop sepenuhnya, lanjut ke kode setelah loop |
+| `continue` | **melewati** sisa putaran ini, langsung ke putaran berikutnya |
+
+## break: berhenti sekarang juga
+
+<Playground initialCode={`for angka in range(1, 11):
+    if angka == 5:
+        print("Ketemu 5, berhenti!")
+        break
+    print(angka)
+print("Loop selesai")`} />
+
+Pola yang sangat umum adalah `while True` dengan `break`. Loop berjalan "selamanya", tapi
+berhenti begitu pengguna mengetik perintah tertentu:
+
+<Playground initialCode={`while True:
+    perintah = input("Ketik sesuatu (atau 'keluar'): ").strip().lower()
+    if perintah == "keluar":
+        break
+    print("Kamu mengetik:", perintah)
+print("Sampai jumpa!")`} />
+
+<Callout type="tip">
+  `while True` aman dipakai selama **pasti** ada `break` yang bisa tercapai.
+</Callout>
+
+## continue: lewati putaran ini
+
+<Playground initialCode={`for angka in range(1, 11):
+    if angka % 2 == 0:
+        continue
+    print(angka)`} />
+
+Saat `angka` genap, `continue` melompati `print()`, jadi hanya bilangan ganjil yang tampil.
+
+Contoh lain: menghitung huruf vokal dalam sebuah kalimat, sambil melewati spasi.
+
+<Playground initialCode={`kalimat = "belajar python itu seru"
+vokal = 0
+
+for huruf in kalimat:
+    if huruf == " ":
+        continue
+    if huruf in "aiueo":
+        vokal += 1
+
+print("Jumlah vokal:", vokal)`} />
+
+## Latihan
+
+Buat program tebak angka. Angka rahasianya `7`. Terus minta tebakan sampai benar, lalu tampilkan
+berapa kali pengguna menebak. Beri petunjuk "terlalu kecil" atau "terlalu besar".
+
+<Playground initialCode={`rahasia = 7
+jumlah_tebakan = 0
+
+while True:
+    tebakan = int(input("Tebak angka 1-10: "))
+    jumlah_tebakan += 1
+    # Lanjutkan: beri petunjuk, dan break kalau benar
+    break
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang dilakukan break?",
+      options: ["Melewati satu putaran", "Menghentikan loop sepenuhnya", "Mengulang loop dari awal"],
+      answer: 1,
+      explanation: "break langsung keluar dari loop.",
+    },
+    {
+      question: "for i in range(5): if i == 2: continue, lalu print(i). Apa yang tampil?",
+      options: ["0 1 2 3 4", "0 1 3 4", "0 1"],
+      answer: 1,
+      explanation: "continue melewati print() hanya saat i == 2.",
+    },
+    {
+      question: "Kapan while True aman dipakai?",
+      options: ["Tidak pernah", "Kalau ada break yang pasti bisa tercapai", "Kalau loopnya pendek"],
+      answer: 1,
+      explanation: "Tanpa break, while True tidak akan pernah berhenti.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `break` menghentikan loop; `continue` melompat ke putaran berikutnya.
+- `while True` + `break` adalah pola umum untuk program yang terus bertanya.
+- Keduanya biasanya dipakai di dalam `if`.

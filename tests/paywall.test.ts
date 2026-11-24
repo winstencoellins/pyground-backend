@@ -46,7 +46,7 @@ describe("hasAccess boundaries", () => {
 
 describe("no paid lesson leaks", () => {
   it("covers every paid lesson in both locales (sanity)", () => {
-    expect(paidLessons().length).toBe(6);
+    expect(paidLessons().length).toBe(12);
   });
 
   for (const who of ["anonymous", "signed in without a pass"] as const) {

@@ -37,33 +37,40 @@ describe("real content", () => {
       "elif",
       "cashier-project",
       "for-loops",
+      "while-loops",
+      "break-and-continue",
+      "loop-patterns",
       "try-except",
       "how-the-web-works",
     ]);
-    expect(catalog.byLocale.en.size).toBe(17);
+    expect(catalog.byLocale.en.size).toBe(20);
   });
 
   it("every <Playground initialCode> is valid Python", () => {
+    const snippets: [string, string][] = [];
     for (const locale of ["id", "en"] as const) {
       for (const lesson of getCatalog().byLocale[locale].values()) {
         // `<Playground expectError initialCode=...>` is a deliberate error for the learner to fix.
         for (const [, broken, code] of lesson.source.matchAll(
           /<Playground (expectError )?initialCode=\{`([\s\S]*?)`\}/g,
         )) {
-          if (broken) continue;
-          const py = Bun.spawnSync(
-            ["python3", "-c", "import sys; compile(sys.stdin.read(), 'lesson', 'exec')"],
-            {
-              stdin: new TextEncoder().encode(code),
-            },
-          );
-          expect({ lesson: `${locale}/${lesson.slug}`, error: py.stderr.toString() }).toEqual({
-            lesson: `${locale}/${lesson.slug}`,
-            error: "",
-          });
+          if (!broken) snippets.push([`${locale}/${lesson.slug}`, code!]);
         }
       }
     }
+    expect(snippets.length).toBeGreaterThan(0);
+    // One python3 process for all snippets (one per snippet is too slow as content grows).
+    const check = `import json, sys
+for name, code in json.load(sys.stdin):
+    try:
+        compile(code, name, "exec")
+    except SyntaxError as e:
+        print(f"{name}: {e}")`;
+    const py = Bun.spawnSync(["python3", "-c", check], {
+      stdin: new TextEncoder().encode(JSON.stringify(snippets)),
+    });
+    expect(py.stderr.toString()).toBe("");
+    expect(py.stdout.toString()).toBe("");
   });
 });
 
@@ -162,7 +169,14 @@ describe("GET /api/lessons", () => {
       lessons(idx)
         .filter((l) => l.locked)
         .map((l) => l.slug),
-    ).toEqual(["for-loops", "try-except", "how-the-web-works"]);
+    ).toEqual([
+      "for-loops",
+      "while-loops",
+      "break-and-continue",
+      "loop-patterns",
+      "try-except",
+      "how-the-web-works",
+    ]);
     expect(idx.stages[0]!.modules.flatMap((m) => m.lessons).some((l) => l.locked)).toBe(false);
   });
 
@@ -181,7 +195,7 @@ describe("GET /api/lessons", () => {
     const idx = (await (
       await call("/api/lessons", { headers: { cookie: expired } })
     ).json()) as Index;
-    expect(lessons(idx).filter((l) => l.locked).length).toBe(3);
+    expect(lessons(idx).filter((l) => l.locked).length).toBe(6);
   });
 
   it("rejects unknown locales", async () => {

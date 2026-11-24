@@ -1,0 +1,114 @@
+---
+title: Perulangan dengan while
+slug: while-loops
+stage: 2
+module: Perulangan
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Ulangi kode selama sebuah syarat masih benar, dan hindari loop yang tidak pernah berhenti.
+---
+
+# Perulangan dengan `while`
+
+`for` cocok kalau kamu tahu **berapa kali** harus mengulang. Tapi kadang kamu tidak tahu,
+misalnya "terus tanya kata sandi **sampai** benar". Untuk itu ada `while`.
+
+`while` mengulang blok kode **selama** syaratnya `True`:
+
+<Playground initialCode={`hitung = 1
+while hitung <= 5:
+    print("Putaran ke", hitung)
+    hitung += 1
+print("Selesai!")`} />
+
+Cara kerjanya:
+
+1. Cek syarat `hitung <= 5`. Kalau `True`, jalankan blok di bawahnya.
+2. Setelah blok selesai, **kembali ke atas** dan cek syaratnya lagi.
+3. Begitu syaratnya `False`, loop berhenti dan program lanjut ke baris setelahnya.
+
+## Awas: loop yang tidak pernah berhenti
+
+Kalau syaratnya **tidak pernah** menjadi `False`, loop akan berjalan selamanya. Ini disebut
+*infinite loop*. Contohnya, kalau kita lupa menulis `hitung += 1`:
+
+```python
+hitung = 1
+while hitung <= 5:
+    print("Putaran ke", hitung)
+    # lupa hitung += 1, jadi hitung selalu 1
+```
+
+<Callout type="warning">
+  Jangan jalankan kode di atas. Setiap loop `while` harus punya sesuatu di dalamnya yang
+  akhirnya membuat syaratnya `False`.
+</Callout>
+
+## while dengan input
+
+`while` sangat cocok untuk program yang terus bertanya sampai jawabannya benar:
+
+<Playground initialCode={`kata_sandi = ""
+while kata_sandi != "python":
+    kata_sandi = input("Kata sandi: ")
+print("Berhasil masuk!")`} />
+
+Contoh lain: menabung sampai target tercapai.
+
+<Playground initialCode={`tabungan = 0
+target = 100000
+minggu = 0
+
+while tabungan < target:
+    tabungan += 15000
+    minggu += 1
+
+print(f"Target tercapai dalam {minggu} minggu, tabungan Rp{tabungan:,}")`} />
+
+## for atau while?
+
+| Pakai | Kalau... | Contoh |
+| --- | --- | --- |
+| `for` | jumlah putaran sudah diketahui, atau mengulang setiap item | cetak 1 sampai 10, setiap huruf dalam nama |
+| `while` | berhenti saat sebuah kondisi tercapai | tanya sampai jawaban benar, menabung sampai target |
+
+## Latihan
+
+Buat hitung mundur peluncuran roket dari 10 sampai 1, lalu tampilkan `Meluncur!`.
+
+<Playground initialCode={`detik = 10
+
+# Tulis while di sini
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kapan loop while berhenti?",
+      options: ["Setelah 10 putaran", "Saat syaratnya menjadi False", "Tidak pernah"],
+      answer: 1,
+      explanation: "while terus mengulang selama syaratnya True.",
+    },
+    {
+      question: "x = 0, lalu while x < 3: x += 1. Berapa nilai x setelah loop selesai?",
+      options: ["2", "3", "4"],
+      answer: 1,
+      explanation: "x naik 1, 2, 3. Saat x = 3, syarat x < 3 menjadi False dan loop berhenti.",
+    },
+    {
+      question: "Apa penyebab umum infinite loop?",
+      options: ["Memakai for", "Lupa mengubah variabel yang dicek di syarat", "Memakai print()"],
+      answer: 1,
+      explanation: "Kalau variabelnya tidak pernah berubah, syaratnya tidak pernah menjadi False.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `while syarat:` mengulang selama syaratnya `True`.
+- Pastikan ada yang mengubah syarat di dalam loop, supaya tidak menjadi infinite loop.
+- Pakai `for` untuk jumlah putaran yang diketahui, `while` untuk "sampai sesuatu terjadi".
