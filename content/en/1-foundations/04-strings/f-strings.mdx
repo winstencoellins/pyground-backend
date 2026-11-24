@@ -1,0 +1,111 @@
+---
+title: f-strings
+slug: f-strings
+stage: 1
+module: Strings
+order: 3
+isFree: true
+estimatedMinutes: 10
+description: Build sentences with variables neatly and format numbers using f-strings.
+---
+
+# f-strings
+
+Joining text and numbers with `+` and `str()` quickly gets messy:
+
+<Playground initialCode={`name = "Rudi"
+age = 20
+print("Hi " + name + ", you are " + str(age) + " years old")`} />
+
+**f-strings** make this much cleaner. Write the letter `f` before the quote, then put variables
+inside curly braces:
+
+<Playground initialCode={`name = "Rudi"
+age = 20
+print(f"Hi {name}, you are {age} years old")`} />
+
+No `str()` needed, Python converts it automatically.
+
+## Expressions inside the curly braces
+
+Inside the curly braces you can write calculations or call methods:
+
+<Playground initialCode={`price = 15000
+quantity = 3
+item = "iced coffee"
+print(f"{quantity} {item.title()} = Rp{price * quantity}")
+print(f"Next year I will be {17 + 1}")`} />
+
+## Formatting numbers
+
+After a colon inside the curly braces, you can control how a number looks:
+
+<Playground initialCode={`total = 1250000
+average = 87.6666
+
+print(f"Total: Rp{total:,}")
+print(f"Average: {average:.2f}")
+print(f"Average: {average:.0f}")`} />
+
+| Format | Meaning | Example result |
+| --- | --- | --- |
+| `:,` | thousands separator | `1,250,000` |
+| `:.2f` | 2 digits after the decimal point | `87.67` |
+| `:.0f` | rounded, no decimals | `88` |
+
+<Callout type="info">
+  Python uses English number formatting: commas for thousands and a dot for decimals. For the
+  Indonesian format (`1.250.000`), add `.replace(",", ".")` to the result.
+</Callout>
+
+<Playground initialCode={`total = 1250000
+rupiah = f"{total:,}".replace(",", ".")
+print(f"Total: Rp{rupiah}")`} />
+
+<Callout type="warning">
+  Don't forget the `f`. Without it, Python prints the curly braces as they are:
+  `"Hi {name}"`.
+</Callout>
+
+## Practice
+
+Make a simple receipt with an f-string: item name, quantity, and total price with a thousands
+separator.
+
+<Playground initialCode={`item = "Notebook"
+price = 4500
+quantity = 12
+
+# Example output: 12 x Notebook = Rp54,000
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What does print(f\"{2 * 5} apples\") show?",
+      options: ["{2 * 5} apples", "10 apples", "2 * 5 apples"],
+      answer: 1,
+      explanation: "What's inside the curly braces is calculated first: 2 * 5 = 10.",
+    },
+    {
+      question: "Which format shows 3.14159 as 3.14?",
+      options: [":,", ":.2f", ":2"],
+      answer: 1,
+      explanation: ":.2f means a float with 2 digits after the decimal point.",
+    },
+    {
+      question: "What does print(\"Hi {name}\") show (without the f)?",
+      options: ["Hi {name}", "Hi and the value of name", "Error"],
+      answer: 0,
+      explanation: "Without the f, curly braces are just ordinary text.",
+    },
+  ]}
+/>
+
+## Summary
+
+- f-string: an `f` before the quote, variables or expressions inside curly braces.
+- No `str()` needed for numbers.
+- `:,` for a thousands separator, `:.2f` for the number of decimal places.

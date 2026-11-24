@@ -1,0 +1,108 @@
+---
+title: Variables
+slug: variables
+stage: 1
+module: Variables and Data Types
+order: 1
+isFree: true
+estimatedMinutes: 10
+description: Store data under a name so you can use it and change it later.
+---
+
+# Variables
+
+Programs rarely just show fixed text. Usually a program needs to **remember** something: a user's
+name, a product price, a game score. For that we use **variables**.
+
+A variable is a **name** attached to a **value**. Think of a label on a jar: the label says
+`sugar`, and inside is sugar.
+
+<Playground initialCode={`name = "Budi"
+age = 17
+
+print(name)
+print(age)`} />
+
+In Python, `=` does **not** mean "equals" like in maths. It means: "store the value on the right
+under the name on the left".
+
+## Changing a variable
+
+You can replace a variable's value at any time. The old value is overwritten:
+
+<Playground initialCode={`score = 10
+print(score)
+
+score = 25
+print(score)
+
+score = score + 5
+print(score)`} />
+
+Read `score = score + 5` as: take the current value of `score` (25), add 5, then store the result
+back in `score`.
+
+## Printing several values at once
+
+`print()` accepts several values separated by commas. Python puts a space between them:
+
+<Playground initialCode={`city = "Bandung"
+temperature = 24
+print("The temperature in", city, "today is", temperature, "degrees")`} />
+
+## Naming rules
+
+- Letters, digits, and underscores `_` are allowed, but a name **can't start with a digit**.
+- No spaces. Use underscores: `total_price`, not `total price`.
+- Upper and lower case are different: `name` and `Name` are two different variables.
+- Choose names that describe the value: `coffee_price` is clearer than `x`.
+
+<Callout type="warning">
+  Using a variable that hasn't been created gives a `NameError`. Check for typos!
+</Callout>
+
+<Playground expectError initialCode={`coffee_price = 18000
+print(coffee_pricee)`} />
+
+## Practice
+
+Create the variables `favorite_food` and `portions`, then print a sentence like
+"I want 2 portions of satay".
+
+<Playground initialCode={`favorite_food = "satay"
+portions = 2
+
+# Write your print() here
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What does = mean in the line price = 5000?",
+      options: ["price equals 5000 (a comparison)", "Store 5000 in the variable price", "Error, you must use =="],
+      answer: 1,
+      explanation: "In Python, = is assignment: the value on the right is stored under the name on the left.",
+    },
+    {
+      question: "Which variable name is valid?",
+      options: ["2name", "first name", "first_name"],
+      answer: 2,
+      explanation: "Variable names can't start with a digit and can't contain spaces.",
+    },
+    {
+      question: "After x = 3 and then x = x + 2, what is x?",
+      options: ["3", "5", "2"],
+      answer: 1,
+      explanation: "x + 2 uses the current value of x (3), and the result 5 is stored back in x.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A variable stores a value under a name: `name = "Budi"`.
+- `=` means store, not compare.
+- A variable's value can be replaced; the old value is overwritten.
+- Pick clear names, with no spaces and not starting with a digit.

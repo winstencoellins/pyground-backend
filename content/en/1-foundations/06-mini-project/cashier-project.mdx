@@ -1,0 +1,223 @@
+---
+title: "Mini Project: Corner Shop Cashier"
+slug: cashier-project
+stage: 1
+module: Mini Project
+order: 1
+isFree: true
+estimatedMinutes: 25
+description: Combine everything you've learned to build a corner shop cashier program with discounts and a receipt.
+---
+
+# Mini Project: Corner Shop Cashier
+
+Congratulations, you've reached the end of Stage 1! Now it's time to combine everything into one
+complete program: a **corner shop (warung) cashier** that totals an order, applies discounts, and
+prints a receipt.
+
+What you'll use:
+
+- variables and data types;
+- `input()` and type conversion;
+- arithmetic operators;
+- string methods and f-strings;
+- `if`, `elif`, `else`.
+
+## The plan
+
+Good programmers plan before writing code. Our program will:
+
+1. Ask for the customer's name.
+2. Ask how many of each of three menu items they want: fried rice, chicken noodles, and iced tea.
+3. Calculate the subtotal.
+4. Apply a discount: 10% if the subtotal is at least Rp100,000, 5% if it's at least Rp50,000.
+5. Ask whether the customer has a member card (an extra Rp5,000 off).
+6. Print a tidy receipt.
+
+Let's build it step by step.
+
+## Step 1: price list and input
+
+Store the prices in variables so they're easy to change. Names in all capitals are a convention
+for values that don't change (constants).
+
+<Playground initialCode={`FRIED_RICE_PRICE = 18000
+CHICKEN_NOODLES_PRICE = 15000
+ICED_TEA_PRICE = 5000
+
+name = input("Customer name: ").strip().title()
+fried_rice = int(input("Fried rice (portions): "))
+chicken_noodles = int(input("Chicken noodles (portions): "))
+iced_tea = int(input("Iced tea (glasses): "))
+
+print(f"{name}'s order: {fried_rice} fried rice, {chicken_noodles} chicken noodles, {iced_tea} iced tea")`} />
+
+## Step 2: subtotal
+
+<Playground initialCode={`FRIED_RICE_PRICE = 18000
+CHICKEN_NOODLES_PRICE = 15000
+ICED_TEA_PRICE = 5000
+
+fried_rice = 2
+chicken_noodles = 1
+iced_tea = 3
+
+subtotal = (
+    fried_rice * FRIED_RICE_PRICE
+    + chicken_noodles * CHICKEN_NOODLES_PRICE
+    + iced_tea * ICED_TEA_PRICE
+)
+print(f"Subtotal: Rp{subtotal:,}")`} />
+
+<Callout type="info">
+  A long expression can be split over several lines when it's wrapped in brackets.
+</Callout>
+
+## Step 3: discount
+
+Remember, order the conditions from the largest:
+
+<Playground initialCode={`subtotal = 69000
+
+if subtotal >= 100000:
+    discount_percent = 10
+elif subtotal >= 50000:
+    discount_percent = 5
+else:
+    discount_percent = 0
+
+discount = subtotal * discount_percent // 100
+print(f"Discount {discount_percent}%: Rp{discount:,}")`} />
+
+Why `// 100` and not `/ 100`? To keep the result a whole number. Rupiah has no cents.
+
+## Step 4: member card
+
+<Playground initialCode={`total = 65550
+member = input("Member card? (yes/no): ").strip().lower()
+
+if member == "yes":
+    member_discount = 5000
+else:
+    member_discount = 0
+
+total = total - member_discount
+print(f"Total to pay: Rp{total:,}")`} />
+
+`.strip().lower()` means `" YES "`, `"Yes"`, and `"yes"` are all accepted.
+
+## Step 5: the complete program
+
+Here is the complete program. Run it and try a few scenarios: a small order, a big order, with
+and without a member card.
+
+<Playground initialCode={`FRIED_RICE_PRICE = 18000
+CHICKEN_NOODLES_PRICE = 15000
+ICED_TEA_PRICE = 5000
+MEMBER_DISCOUNT = 5000
+
+print("=" * 34)
+print("WARUNG PYGROUND".center(34))
+print("=" * 34)
+
+name = input("Customer name: ").strip().title()
+fried_rice = int(input("Fried rice (portions): "))
+chicken_noodles = int(input("Chicken noodles (portions): "))
+iced_tea = int(input("Iced tea (glasses): "))
+member = input("Member card? (yes/no): ").strip().lower() == "yes"
+
+subtotal = (
+    fried_rice * FRIED_RICE_PRICE
+    + chicken_noodles * CHICKEN_NOODLES_PRICE
+    + iced_tea * ICED_TEA_PRICE
+)
+
+if subtotal >= 100000:
+    discount_percent = 10
+elif subtotal >= 50000:
+    discount_percent = 5
+else:
+    discount_percent = 0
+discount = subtotal * discount_percent // 100
+
+if member:
+    member_off = MEMBER_DISCOUNT
+else:
+    member_off = 0
+
+total = subtotal - discount - member_off
+
+print()
+print(f"Customer : {name}")
+print("-" * 34)
+print(f"Fried rice      x{fried_rice:<3} Rp{fried_rice * FRIED_RICE_PRICE:>10,}")
+print(f"Chicken noodles x{chicken_noodles:<3} Rp{chicken_noodles * CHICKEN_NOODLES_PRICE:>10,}")
+print(f"Iced tea        x{iced_tea:<3} Rp{iced_tea * ICED_TEA_PRICE:>10,}")
+print("-" * 34)
+print(f"Subtotal              Rp{subtotal:>10,}")
+print(f"Discount {discount_percent:>2}%          -Rp{discount:>9,}")
+print(f"Member                -Rp{member_off:>9,}")
+print("=" * 34)
+print(f"TOTAL                 Rp{total:>10,}")
+print("=" * 34)
+
+if subtotal == 0:
+    print("No order yet. See you!")
+else:
+    print(f"Thank you, {name}!")`} />
+
+<Callout type="info">
+  `:>10,` means right-aligned, 10 characters wide, with a thousands separator, and `:<3` means
+  left-aligned, 3 characters wide. These formats keep the numbers on the receipt lined up.
+</Callout>
+
+## Challenges
+
+Got it working? Try extending your program:
+
+1. Add a fourth menu item, for example `crackers` at Rp2,000.
+2. Add 11% tax, calculated **after** the discount.
+3. Ask how much money the customer pays, then calculate the change. If it's not enough, show how
+   much is still missing.
+4. Make sure the total is never negative, for example with a tiny order and a member card.
+
+<Playground initialCode={`# Copy the complete program above here, then extend it!
+`} />
+
+<Callout type="tip">
+  The program you've built can't yet repeat questions or hold a long menu list. That's what you'll
+  learn in Stage 2: **loops** and **lists**.
+</Callout>
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Why store prices in variables like ICED_TEA_PRICE instead of writing the numbers directly?",
+      options: ["So the program runs faster", "So they're easy to change in one place", "Because Python requires it"],
+      answer: 1,
+      explanation: "If a price goes up, you change one line, not every place the number is used.",
+    },
+    {
+      question: "The subtotal is Rp120,000. What discount does the customer get?",
+      options: ["5%", "10%", "15%"],
+      answer: 1,
+      explanation: "The first True condition is subtotal >= 100000, so the discount is 10%.",
+    },
+    {
+      question: "What does .strip().lower() do for the member answer?",
+      options: ["Turns the answer into a number", "Makes ' YES ' and 'yes' count as the same", "Deletes the answer"],
+      answer: 1,
+      explanation: "Spaces are removed and letters made the same case before comparing.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Plan your program before writing code, then build it step by step.
+- Store fixed values in capitalized variables so they're easy to change.
+- Tidy input with `strip()` and `lower()`, convert numbers with `int()`.
+- `if`/`elif`/`else` decide the discount; f-strings make a tidy receipt.
+- You've finished Stage 1. Well done!

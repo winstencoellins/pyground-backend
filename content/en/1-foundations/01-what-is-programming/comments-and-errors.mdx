@@ -1,0 +1,110 @@
+---
+title: Comments and Reading Errors
+slug: comments-and-errors
+stage: 1
+module: What Is Programming
+order: 2
+isFree: true
+estimatedMinutes: 10
+description: Write notes inside your code and learn to read error messages without panicking.
+---
+
+# Comments and Reading Errors
+
+Before going further, two habits will help you a lot: writing **comments** and reading **error
+messages**.
+
+## Comments
+
+A comment is a note inside your code that Python **does not run**. Comments start with a hash
+sign `#`. Everything after `#` on that line is ignored.
+
+<Playground initialCode={`# This program greets the user
+print("Hello!")  # comments can also go at the end of a line
+
+# print("This line will not appear")
+print("Done")`} />
+
+Comments are useful for:
+
+- explaining **why** the code is written that way, for your future self;
+- temporarily "switching off" a line without deleting it.
+
+<Callout type="tip">
+  Try removing the `#` before `print("This line will not appear")`, then run it again.
+</Callout>
+
+## Errors are normal
+
+Every programmer, even after many years, sees errors every day. An error doesn't mean you failed.
+It's Python's way of telling you **where** and **what** the problem is.
+
+Run this code. It's broken on purpose:
+
+<Playground expectError initialCode={`print("Hello")
+print("World"`} />
+
+Python will show a message like this:
+
+<TerminalBlock command="python hello.py" output={`  File "hello.py", line 2
+    print("World"
+         ^
+SyntaxError: '(' was never closed`} />
+
+## How to read an error message
+
+Read it from the **bottom up**:
+
+1. **The last line** tells you the type of error and what it means: `SyntaxError: '(' was never closed`
+   means an opening bracket was never closed.
+2. **`line 2`** shows the line number with the problem.
+3. The **`^`** points at the spot Python suspects.
+
+Some errors you'll meet often:
+
+| Error | Meaning |
+| --- | --- |
+| `SyntaxError` | The code breaks Python's writing rules (brackets, quotes, colons). |
+| `NameError` | You used a name that doesn't exist yet, or made a typo. |
+| `TypeError` | You combined data types that don't fit, like text and a number. |
+
+Now fix this code until it runs:
+
+<Playground expectError initialCode={`print("I am learning Python)
+pritn("This is fun!")`} />
+
+<Callout type="info">
+  There are two mistakes: a missing quote and a typo. Python only reports the first error it
+  finds, so fix them one at a time.
+</Callout>
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What happens to a line that starts with #?",
+      options: ["It runs twice", "Python ignores it", "It causes an error"],
+      answer: 1,
+      explanation: "A line starting with # is a comment, and Python ignores it.",
+    },
+    {
+      question: "Which part of an error message should you read first?",
+      options: ["The top line", "The bottom line", "No need to read it"],
+      answer: 1,
+      explanation: "The last line holds the error type and a short explanation.",
+    },
+    {
+      question: "You wrote pritn(\"Hello\"). Which error appears?",
+      options: ["NameError", "SyntaxError", "No error"],
+      answer: 0,
+      explanation: "pritn was never defined, so Python doesn't know that name: NameError.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Comments start with `#` and are not run.
+- Errors are normal. Read error messages from the bottom up.
+- Look at the error type, the line number, and the `^` marker.

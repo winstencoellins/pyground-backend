@@ -1,0 +1,130 @@
+---
+title: String Basics
+slug: string-basics
+stage: 1
+module: Strings
+order: 1
+isFree: true
+estimatedMinutes: 12
+description: Join, repeat, and take parts of text with indexes and slicing.
+---
+
+# String Basics
+
+A **string** (`str`) is text: names, messages, addresses, passwords. Almost every program works
+with text, so let's get to know strings better.
+
+## Creating strings
+
+Strings can use single quotes `'...'` or double quotes `"..."`. Pick one and be consistent. If the
+text contains a quote, use the other kind on the outside:
+
+<Playground initialCode={`greeting = "Hello"
+city = 'Surabaya'
+sentence = "My name is Andi, just call me 'Ndi'"
+print(greeting, city)
+print(sentence)`} />
+
+For text over several lines, use triple quotes:
+
+<Playground initialCode={`poem = """Roses are red,
+violets are blue,
+Python is friendly,
+and Pyground is too."""
+print(poem)`} />
+
+## Joining and repeating
+
+`+` joins two strings, `*` repeats a string:
+
+<Playground initialCode={`first = "Budi"
+last = "Santoso"
+print(first + " " + last)
+print("ha" * 3)
+print("=" * 20)`} />
+
+## String length: len()
+
+`len()` counts the characters, including spaces:
+
+<Playground initialCode={`password = "secret123"
+print(len(password))
+print(len("Hello world"))`} />
+
+## Indexes: getting one character
+
+Every character has a position number called an **index**. Indexes start at **0**, not 1.
+
+| Character | `P` | `y` | `t` | `h` | `o` | `n` |
+| --- | --- | --- | --- | --- | --- | --- |
+| Index | 0 | 1 | 2 | 3 | 4 | 5 |
+| Negative index | -6 | -5 | -4 | -3 | -2 | -1 |
+
+<Playground initialCode={`language = "Python"
+print(language[0])
+print(language[3])
+print(language[-1])`} />
+
+Negative indexes count from the end: `[-1]` is always the last character.
+
+<Callout type="warning">
+  An index past the end of the string gives an `IndexError`. `"Python"[6]` fails, because the last
+  index is 5.
+</Callout>
+
+## Slicing: taking a part
+
+`text[start:end]` takes the characters from index `start` up to **but not including** `end`:
+
+<Playground initialCode={`language = "Python"
+print(language[0:2])
+print(language[2:6])
+print(language[:3])
+print(language[3:])
+
+phone = "081234567890"
+print("Number ending in", phone[-4:])`} />
+
+Leave out `start` to begin at the start. Leave out `end` to go to the end.
+
+## Practice
+
+From `email = "siti@pyground.id"`, print the first letter and the number of characters.
+
+<Playground initialCode={`email = "siti@pyground.id"
+
+# Print the first letter
+# Print the number of characters
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is \"code\"[1]?",
+      options: ["c", "o", "d"],
+      answer: 1,
+      explanation: "Indexes start at 0, so [1] is the second character: o.",
+    },
+    {
+      question: "What is len(\"i like\")?",
+      options: ["5", "6", "2"],
+      answer: 1,
+      explanation: "Spaces count too: i-space-l-i-k-e = 6 characters.",
+    },
+    {
+      question: "What is \"Indonesia\"[:4]?",
+      options: ["Indo", "Indon", "nesia"],
+      answer: 0,
+      explanation: "The slice [:4] takes indexes 0 up to before 4: I-n-d-o.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Strings can use single, double, or triple quotes (for several lines).
+- `+` joins, `*` repeats, `len()` counts the length.
+- Indexes start at 0; `[-1]` is the last character.
+- `text[start:end]` takes part of a string, without including `end`.

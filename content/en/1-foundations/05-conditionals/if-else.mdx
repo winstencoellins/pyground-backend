@@ -1,0 +1,119 @@
+---
+title: if and else
+slug: if-else
+stage: 1
+module: Conditionals
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Build programs that make decisions with if and else, and understand indentation.
+---
+
+# if and else
+
+Now our programs can **choose a path**: run certain code only when a condition is met.
+
+## if
+
+<Playground initialCode={`temperature = 34
+
+if temperature > 30:
+    print("It's really hot, drink plenty of water!")
+
+print("Program finished")`} />
+
+Try changing `temperature` to `25` and run it again. The line inside the `if` is skipped, but
+`Program finished` still appears.
+
+The structure:
+
+1. The word `if`, then the condition, then a **colon** `:`.
+2. The line below is **indented** by 4 spaces. This line runs when the condition is `True`.
+
+## Indentation is required
+
+In many other languages, indentation is only for neatness. In Python, indentation **decides**
+which lines belong inside the `if`:
+
+<Playground initialCode={`balance = 5000
+
+if balance < 10000:
+    print("Your balance is running low")
+    print("Top up soon")
+print("Thank you")`} />
+
+If you forget the indentation, Python refuses to run the program:
+
+<Playground expectError initialCode={`balance = 5000
+if balance < 10000:
+print("Your balance is running low")`} />
+
+<Callout type="tip">
+  Always use 4 spaces for indentation. Code editors usually add them automatically after you type
+  a colon and press Enter.
+</Callout>
+
+## else
+
+`else` runs code **when the `if` condition isn't met**. Exactly one of the two blocks runs, never
+both.
+
+<Playground initialCode={`score = int(input("Enter your exam score: "))
+
+if score >= 75:
+    print("Congratulations, you passed!")
+else:
+    print("Not passed yet, try again.")`} />
+
+## Example: odd or even
+
+Remember the `%` operator? A number is even when its remainder after dividing by 2 is 0:
+
+<Playground initialCode={`number = int(input("Enter a number: "))
+
+if number % 2 == 0:
+    print(f"{number} is an even number")
+else:
+    print(f"{number} is an odd number")`} />
+
+## Practice
+
+Build a password checker. If what's typed equals `"python123"`, show `Login successful`.
+Otherwise, show `Wrong password`.
+
+<Playground initialCode={`correct_password = "python123"
+typed = input("Password: ")
+
+# Write your if and else here
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What must go at the end of an if line?",
+      options: ["A semicolon ;", "A colon :", "Curly braces"],
+      answer: 1,
+      explanation: "Every if and else line ends with a colon.",
+    },
+    {
+      question: "How does Python know which lines are inside the if?",
+      options: ["From their indentation", "From blank lines", "From comments"],
+      answer: 0,
+      explanation: "The indented lines after the if belong to the if block.",
+    },
+    {
+      question: "When does the else block run?",
+      options: ["Always", "When the if condition is False", "When the if condition is True"],
+      answer: 1,
+      explanation: "else is the alternative path when the if condition isn't met.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `if condition:` runs the block below only when the condition is `True`.
+- `else:` runs the alternative block when the condition is `False`.
+- 4-space indentation defines the block, and it's required in Python.

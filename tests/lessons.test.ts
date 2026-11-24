@@ -40,7 +40,7 @@ describe("real content", () => {
       "try-except",
       "how-the-web-works",
     ]);
-    expect(catalog.byLocale.en.size).toBe(4);
+    expect(catalog.byLocale.en.size).toBe(17);
   });
 
   it("every <Playground initialCode> is valid Python", () => {

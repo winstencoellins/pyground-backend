@@ -1,0 +1,120 @@
+---
+title: elif and Nested Conditions
+slug: elif
+stage: 1
+module: Conditionals
+order: 3
+isFree: true
+estimatedMinutes: 12
+description: Handle more than two possibilities with elif, and understand the order conditions are checked in.
+---
+
+# elif and Nested Conditions
+
+`if` and `else` give only two options. What if there are more possibilities, like the letter
+grades A, B, C, D? That's what `elif` (short for *else if*) is for.
+
+<Playground initialCode={`score = int(input("Exam score (0-100): "))
+
+if score >= 85:
+    print("Grade: A")
+elif score >= 70:
+    print("Grade: B")
+elif score >= 55:
+    print("Grade: C")
+else:
+    print("Grade: D")`} />
+
+## Order matters
+
+Python checks the conditions **from top to bottom** and **stops at the first one that is
+`True`**. The rest are skipped.
+
+With a score of `90`, the condition `score >= 70` is also true, but it's never checked, because
+`score >= 85` already matched.
+
+See what happens when the order is reversed:
+
+<Playground initialCode={`score = 90
+
+if score >= 55:
+    print("C")
+elif score >= 70:
+    print("B")
+elif score >= 85:
+    print("A")`} />
+
+The result is `C`, when it should be `A`. The program runs without an error, but the logic is
+wrong.
+
+<Callout type="tip">
+  When using `>=`, order the conditions from the **largest** number to the smallest.
+</Callout>
+
+## else is optional
+
+The final `else` can be left out. If no condition is `True` and there's no `else`, no block runs.
+
+## if inside if
+
+An `if` block can contain another `if`. Notice the extra indentation:
+
+<Playground initialCode={`age = 20
+has_ticket = True
+
+if age >= 17:
+    if has_ticket:
+        print("Please come in")
+    else:
+        print("Buy a ticket at the counter first")
+else:
+    print("Sorry, 17 and over only")`} />
+
+Nested `if`s can often be simplified with `and`, but the form above is useful when each case
+needs a different message.
+
+## Practice
+
+Build a shipping cost program based on parcel weight:
+
+- up to 1 kg: Rp10,000
+- more than 1 kg, up to 5 kg: Rp25,000
+- more than 5 kg: Rp50,000
+
+<Playground initialCode={`weight = float(input("Parcel weight (kg): "))
+
+# Work out the shipping cost with if, elif, else
+# then show the result with an f-string
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "x = 10. The condition if x > 5 prints A, then elif x > 8 prints B. What is shown?",
+      options: ["A", "B", "A and B"],
+      answer: 0,
+      explanation: "Python stops at the first True condition (x > 5), so only A.",
+    },
+    {
+      question: "How many elifs can one conditional use?",
+      options: ["Only one", "At most three", "As many as you need"],
+      answer: 2,
+      explanation: "elif can be used as many times as needed.",
+    },
+    {
+      question: "Is else required after elif?",
+      options: ["Yes, always", "No, else is optional"],
+      answer: 1,
+      explanation: "Use else only when you need a block for 'every other case'.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `elif` adds another condition after `if`.
+- Python stops at the first `True` condition, so the order of conditions decides the result.
+- The final `else` is optional.
+- An `if` can sit inside another `if`, with extra indentation.

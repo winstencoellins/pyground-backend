@@ -1,0 +1,105 @@
+---
+title: Getting Input from the User
+slug: user-input
+stage: 1
+module: Input and Operators
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Build interactive programs that ask the user questions with input().
+---
+
+# Getting Input from the User
+
+So far our programs have always shown the same thing. With `input()`, a program can **ask** a
+question and use the user's answer.
+
+<Playground initialCode={`name = input("What is your name? ")
+print("Hello,", name)`} />
+
+<Callout type="info">
+  When the code runs, Pyground will ask you to type an answer. Type it and press Enter.
+</Callout>
+
+How it works:
+
+1. `input()` shows the question inside the brackets.
+2. The program **stops and waits** for the user to type.
+3. Whatever they type is stored in the variable `name`.
+
+<Callout type="tip">
+  Add a space at the end of the question, `"What is your name? "`, so the answer doesn't stick to it.
+</Callout>
+
+## input() always gives you text
+
+This is the most important rule in this lesson. Even if the user types a number, the result of
+`input()` is **always** a `str`:
+
+<Playground initialCode={`age = input("How old are you? ")
+print(type(age))`} />
+
+So the following code doesn't work as expected. Run it and type `17`:
+
+<Playground expectError initialCode={`age = input("How old are you? ")
+print("Next year you will be", age + 1)`} />
+
+The result is a `TypeError`, because `"17" + 1` mixes text and a number. The fix is to convert it
+first with `int()` or `float()`, exactly as you learned before:
+
+<Playground initialCode={`age = int(input("How old are you? "))
+print("Next year you will be", age + 1)`} />
+
+Read `int(input(...))` from the inside out: get the input, then turn it into an `int`.
+
+## A small program: bill splitter
+
+Combine everything you've learned so far: variables, data types, operators, and input.
+
+<Playground initialCode={`total = int(input("Total bill (Rp): "))
+people = int(input("Split between how many people? "))
+
+per_person = total / people
+print("Each person pays Rp", round(per_person))`} />
+
+## Practice
+
+Build a temperature converter. Ask for a temperature in Celsius, then show it in Fahrenheit.
+The formula: `fahrenheit = celsius * 9 / 5 + 32`.
+
+<Playground initialCode={`# 1. Ask for the temperature in Celsius (it can be a decimal, so use float)
+# 2. Calculate Fahrenheit
+# 3. Show the result
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "The user types 25 at x = input(). What is the type of x?",
+      options: ["int", "float", "str"],
+      answer: 2,
+      explanation: "input() always returns a str, whatever is typed.",
+    },
+    {
+      question: "What is the right way to ask the user for a whole number?",
+      options: ["input(int(\"Number: \"))", "int(input(\"Number: \"))", "input(\"Number: \") + 0"],
+      answer: 1,
+      explanation: "Get the input first, then convert the result with int().",
+    },
+    {
+      question: "What does the program do when it reaches input()?",
+      options: ["Moves straight on to the next line", "Stops and waits for the user to type", "Shows an error"],
+      answer: 1,
+      explanation: "The program waits until the user types something and presses Enter.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `input("question")` shows a question and waits for the user's answer.
+- The result of `input()` is **always** text (`str`).
+- Use `int(input(...))` or `float(input(...))` for numbers.
+- Congratulations! You can now build your first interactive program.

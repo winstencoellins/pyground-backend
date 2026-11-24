@@ -1,0 +1,126 @@
+---
+title: Arithmetic Operators
+slug: arithmetic-operators
+stage: 1
+module: Input and Operators
+order: 1
+isFree: true
+estimatedMinutes: 12
+description: Turn Python into your calculator with add, subtract, multiply, divide, remainder, and power.
+---
+
+# Arithmetic Operators
+
+Python can calculate like a calculator, but it's far more flexible because results can be stored
+in variables and reused.
+
+| Operator | Meaning | Example | Result |
+| --- | --- | --- | --- |
+| `+` | add | `7 + 2` | `9` |
+| `-` | subtract | `7 - 2` | `5` |
+| `*` | multiply | `7 * 2` | `14` |
+| `/` | divide | `7 / 2` | `3.5` |
+| `//` | floor division | `7 // 2` | `3` |
+| `%` | remainder (modulo) | `7 % 2` | `1` |
+| `**` | power | `7 ** 2` | `49` |
+
+<Playground initialCode={`print(7 + 2)
+print(7 - 2)
+print(7 * 2)
+print(7 / 2)
+print(7 // 2)
+print(7 % 2)
+print(7 ** 2)`} />
+
+<Callout type="info">
+  Division with `/` **always** gives a `float`, even `10 / 2` gives `5.0`.
+</Callout>
+
+## Floor division and remainder
+
+`//` and `%` are often used together. For example, how many hours and minutes are 135 minutes?
+
+<Playground initialCode={`total_minutes = 135
+hours = total_minutes // 60
+minutes = total_minutes % 60
+print(hours, "hours", minutes, "minutes")`} />
+
+`%` is also handy for checking even numbers: if `number % 2` is `0`, the number is even.
+
+## Order of operations
+
+Like in maths, Python does `**` first, then `*`, `/`, `//`, `%`, and finally `+` and `-`. Use
+**brackets** to set the order yourself:
+
+<Playground initialCode={`print(2 + 3 * 4)
+print((2 + 3) * 4)`} />
+
+## Calculating with variables
+
+<Playground initialCode={`rice_price = 12000
+iced_tea_price = 5000
+people = 3
+
+total = (rice_price + iced_tea_price) * people
+print("Total:", total)
+print("Per person:", total / people)`} />
+
+## Shorthand assignment operators
+
+Adding to a variable is so common that Python has a shortcut:
+
+| Long form | Shorthand |
+| --- | --- |
+| `score = score + 10` | `score += 10` |
+| `lives = lives - 1` | `lives -= 1` |
+| `price = price * 2` | `price *= 2` |
+
+<Playground initialCode={`balance = 50000
+balance += 20000
+balance -= 15000
+print("Final balance:", balance)`} />
+
+## Practice
+
+Calculate the area and perimeter of a rectangle with a length of 8 and a width of 5.
+
+<Playground initialCode={`length = 8
+width = 5
+
+area = 0       # replace with the right formula
+perimeter = 0  # replace with the right formula
+
+print("Area:", area)
+print("Perimeter:", perimeter)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is 10 / 4?",
+      options: ["2", "2.5", "2.0"],
+      answer: 1,
+      explanation: "The / operator always gives a float: 2.5.",
+    },
+    {
+      question: "What is 17 % 5?",
+      options: ["3", "2", "3.4"],
+      answer: 1,
+      explanation: "17 divided by 5 is 3, remainder 2. The % operator gives the remainder.",
+    },
+    {
+      question: "What is 2 + 3 * 2?",
+      options: ["10", "8", "12"],
+      answer: 1,
+      explanation: "Multiplication comes first: 3 * 2 = 6, then 2 + 6 = 8.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `+ - * /` work like in maths; `/` always gives a `float`.
+- `//` divides and drops the decimals, `%` gives the remainder, `**` raises to a power.
+- Use brackets to control the order of operations.
+- `x += 1` is shorthand for `x = x + 1`.

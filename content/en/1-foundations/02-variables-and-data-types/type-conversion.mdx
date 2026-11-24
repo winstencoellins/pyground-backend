@@ -1,0 +1,104 @@
+---
+title: Converting Data Types
+slug: type-conversion
+stage: 1
+module: Variables and Data Types
+order: 3
+isFree: true
+estimatedMinutes: 10
+description: Turn text into numbers and back again with int(), float(), and str().
+---
+
+# Converting Data Types
+
+In the previous lesson, `"My age is " + 17` gave a `TypeError`. The fix is to **change the type**
+of one value so both match. This is called **type conversion**.
+
+| Function | Converts to | Example | Result |
+| --- | --- | --- | --- |
+| `int()` | whole number | `int("42")` | `42` |
+| `float()` | decimal | `float("3.5")` | `3.5` |
+| `str()` | text | `str(17)` | `"17"` |
+
+## Number to text: str()
+
+<Playground initialCode={`age = 17
+print("I am " + str(age) + " years old")`} />
+
+## Text to number: int() and float()
+
+<Playground initialCode={`price_text = "15000"
+quantity_text = "3"
+
+total = int(price_text) * int(quantity_text)
+print("Total to pay:", total)
+
+weight = float("2.5")
+print(weight + 1)`} />
+
+This will be very useful in the next lessons: everything a user types through `input()` is
+always **text**, so it has to be converted before you can calculate with it.
+
+## Things to watch out for
+
+`int()` on a decimal number **drops** the decimal part (it doesn't round):
+
+<Playground initialCode={`print(int(9.99))
+print(round(9.99))`} />
+
+Text that isn't a number can't be converted to a number:
+
+<Playground expectError initialCode={`print(int("ten"))`} />
+
+The result is a `ValueError`: the value can't be read as a number.
+
+<Callout type="warning">
+  `int("3.5")` is also an error. Text containing a decimal must go through `float()` first.
+</Callout>
+
+## Practice
+
+Run this code. There's no error, but the result is `Total: 250002500025000`! Text multiplied by a
+number gets **repeated**, not calculated. Fix it so it shows `Total: 75000`.
+
+<Playground initialCode={`price = "25000"
+quantity = 3
+print("Total: " + price * quantity)`} />
+
+<Callout type="tip">
+  You need two conversions: `price` to a number before multiplying, then the result to text
+  before joining. Bugs like this are more dangerous than errors, because the program keeps
+  running.
+</Callout>
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is int(\"8\") + 2?",
+      options: ["82", "10", "Error"],
+      answer: 1,
+      explanation: "int(\"8\") becomes the number 8, then 2 is added.",
+    },
+    {
+      question: "What is int(7.9)?",
+      options: ["7", "8", "7.9"],
+      answer: 0,
+      explanation: "int() drops the decimal part without rounding.",
+    },
+    {
+      question: "Which code raises a ValueError?",
+      options: ["str(100)", "float(\"2.5\")", "int(\"two\")"],
+      answer: 2,
+      explanation: "\"two\" can't be read as a number.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `int()`, `float()`, and `str()` convert between data types.
+- Use `str()` before joining a number to text.
+- `int()` drops decimals; `round()` rounds.
+- Converting text that isn't a number gives a `ValueError`.

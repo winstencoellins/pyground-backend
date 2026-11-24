@@ -1,0 +1,117 @@
+---
+title: String Methods
+slug: string-methods
+stage: 1
+module: Strings
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Tidy up and work with text using upper(), lower(), strip(), replace(), and friends.
+---
+
+# String Methods
+
+Strings come with many built-in abilities called **methods**. You call a method with a dot after
+the string: `text.upper()`.
+
+## Upper and lower case
+
+<Playground initialCode={`name = "aNdI pRaTaMa"
+print(name.upper())
+print(name.lower())
+print(name.title())
+print(name.capitalize())`} />
+
+| Method | Result |
+| --- | --- |
+| `upper()` | ALL UPPERCASE |
+| `lower()` | all lowercase |
+| `title()` | Every Word Capitalized |
+| `capitalize()` | Only the first letter uppercase |
+
+## Methods don't change the original string
+
+This matters: a method **returns a new string**. The original stays the same. Store the result if
+you want to use it:
+
+<Playground initialCode={`city = "jakarta"
+city.upper()
+print(city)
+
+city = city.upper()
+print(city)`} />
+
+## Tidying input: strip()
+
+Users often type spaces at the start or end by accident. `strip()` removes them:
+
+<Playground initialCode={`answer = "   yes   "
+print("[" + answer + "]")
+print("[" + answer.strip() + "]")`} />
+
+A very common combination for input is `input().strip().lower()`. Spaces are removed and letters
+are made the same case, so `" YES "`, `"Yes"`, and `"yes"` are treated the same.
+
+## Finding and replacing
+
+<Playground initialCode={`sentence = "I like coffee. Coffee is delicious."
+
+print(sentence.replace("coffee", "tea"))
+print(sentence.lower().count("coffee"))
+print(sentence.find("like"))
+print(sentence.startswith("I"))
+print(sentence.endswith("!"))`} />
+
+| Method | What it does |
+| --- | --- |
+| `replace(old, new)` | replaces every occurrence of some text |
+| `count(text)` | counts how many times some text appears |
+| `find(text)` | index of the first occurrence, or `-1` if not found |
+| `startswith(text)` / `endswith(text)` | `True` or `False` |
+
+There's also the `in` operator to check whether some text appears inside another string:
+
+<Playground initialCode={`email = "dewi@gmail.com"
+print("@" in email)
+print("yahoo" in email)`} />
+
+## Practice
+
+Tidy this name so it becomes `Rina Wulandari`, then replace `Rina` with `Rani`.
+
+<Playground initialCode={`name = "   rina WULANDARI  "
+
+# Tidy it first, then replace
+`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is \"  hello \".strip()?",
+      options: ["\"  hello \"", "\"hello\"", "\"HELLO\""],
+      answer: 1,
+      explanation: "strip() removes spaces at the start and end.",
+    },
+    {
+      question: "After s = \"abc\" and then s.upper(), what is s?",
+      options: ["\"ABC\"", "\"abc\"", "Error"],
+      answer: 1,
+      explanation: "Methods return a new string. Without s = s.upper(), s doesn't change.",
+    },
+    {
+      question: "What is \"banana\".find(\"x\")?",
+      options: ["0", "-1", "Error"],
+      answer: 1,
+      explanation: "find() returns -1 when the text isn't found.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Methods are called with a dot: `text.lower()`.
+- String methods return a new string; store the result if you need it.
+- `strip()` and `lower()` are very useful for tidying input.
+- `replace()`, `count()`, `find()`, and `in` find and replace text.

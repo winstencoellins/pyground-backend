@@ -1,0 +1,115 @@
+---
+title: Comparisons and Logic
+slug: comparison-and-logic
+stage: 1
+module: Conditionals
+order: 1
+isFree: true
+estimatedMinutes: 12
+description: Compare values and combine conditions with and, or, and not to get True or False.
+---
+
+# Comparisons and Logic
+
+Before a program can make decisions, it has to answer **yes or no** questions: "Is the user 17
+yet?", "Is the password correct?". The answer is always `True` or `False`.
+
+## Comparison operators
+
+| Operator | Meaning | Example | Result |
+| --- | --- | --- | --- |
+| `==` | equal to | `5 == 5` | `True` |
+| `!=` | not equal to | `5 != 3` | `True` |
+| `>` | greater than | `7 > 10` | `False` |
+| `<` | less than | `3 < 8` | `True` |
+| `>=` | greater than or equal to | `17 >= 17` | `True` |
+| `<=` | less than or equal to | `20 <= 19` | `False` |
+
+<Playground initialCode={`age = 17
+print(age >= 17)
+print(age == 18)
+print(age != 18)
+
+score = 72
+passed = score >= 75
+print("Passed?", passed)`} />
+
+<Callout type="warning">
+  `=` stores a value, `==` compares. Mixing them up is a very common mistake.
+</Callout>
+
+## Comparing strings
+
+Strings can be compared too. The comparison is case-sensitive:
+
+<Playground initialCode={`print("apple" == "apple")
+print("Apple" == "apple")
+print("Apple".lower() == "apple")`} />
+
+That's why you should tidy input with `.strip().lower()` before comparing.
+
+## Combining conditions: and, or, not
+
+| Operator | The result is `True` when... |
+| --- | --- |
+| `and` | **both** conditions are `True` |
+| `or` | **at least one** condition is `True` |
+| `not` | the opposite: `not True` becomes `False` |
+
+<Playground initialCode={`age = 20
+has_id_card = True
+has_license = False
+
+print(age >= 17 and has_id_card)
+print(has_id_card or has_license)
+print(not has_license)`} />
+
+Everyday examples: you can go on a ride if you're at least 120 cm tall **and** at least 7 years
+old. A discount applies on Saturday **or** Sunday.
+
+<Playground initialCode={`height = 125
+age = 6
+can_ride = height >= 120 and age >= 7
+print("Can go on the ride?", can_ride)
+
+day = "sunday"
+weekend = day == "saturday" or day == "sunday"
+print("Weekend?", weekend)`} />
+
+## Ranges
+
+Python allows chained comparisons, just like in maths:
+
+<Playground initialCode={`score = 85
+print(80 <= score <= 100)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is 10 != 10?",
+      options: ["True", "False", "Error"],
+      answer: 1,
+      explanation: "10 equals 10, so 'not equal to' is False.",
+    },
+    {
+      question: "What is True and False?",
+      options: ["True", "False"],
+      answer: 1,
+      explanation: "and is only True when both sides are True.",
+    },
+    {
+      question: "What is \"Yes\" == \"yes\"?",
+      options: ["True", "False"],
+      answer: 1,
+      explanation: "String comparison is case-sensitive.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Comparison operators (`==`, `!=`, `>`, `<`, `>=`, `<=`) give `True` or `False`.
+- `=` stores, `==` compares.
+- `and` needs every condition to be true, `or` needs just one, `not` flips it.

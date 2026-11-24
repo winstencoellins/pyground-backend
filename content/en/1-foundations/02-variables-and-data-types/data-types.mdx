@@ -1,0 +1,103 @@
+---
+title: Data Types
+slug: data-types
+stage: 1
+module: Variables and Data Types
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Meet Python's four basic data types, int, float, str, and bool.
+---
+
+# Data Types
+
+Every value in Python has a **type**. The type decides what you can do with the value. Numbers
+can be added, text can be joined, and so on.
+
+There are four basic types you'll use every day:
+
+| Type | Full name | Examples | Used for |
+| --- | --- | --- | --- |
+| `int` | integer (whole number) | `17`, `-3`, `2024` | age, number of items |
+| `float` | floating point (decimal number) | `3.14`, `0.5`, `-2.0` | height, average score |
+| `str` | string (text) | `"Hello"`, `'Jakarta'` | names, addresses, messages |
+| `bool` | boolean (true/false) | `True`, `False` | logged in?, passed? |
+
+<Callout type="info">
+  Decimals in Python use a **dot**, not a comma: write `3.5`, not `3,5`.
+</Callout>
+
+## Checking the type with type()
+
+The `type()` function tells you the type of a value:
+
+<Playground initialCode={`age = 17
+height = 165.5
+name = "Siti"
+graduated = False
+
+print(type(age))
+print(type(height))
+print(type(name))
+print(type(graduated))`} />
+
+## Text that contains digits is still text
+
+This is a common trap. `"17"` in quotes is **text**, not a number:
+
+<Playground initialCode={`print(17 + 3)
+print("17" + "3")
+print(type("17"))`} />
+
+`17 + 3` gives `20`, but `"17" + "3"` gives `173`, because two pieces of text are **joined**,
+not added.
+
+If you mix text and numbers, Python refuses:
+
+<Playground expectError initialCode={`age = 17
+print("My age is " + age)`} />
+
+The result is a `TypeError`: Python doesn't know whether you want to add or join. In the next
+lesson you'll learn how to convert data types to fix this.
+
+## Booleans
+
+`bool` has only two values: `True` and `False`. The first letter **must be uppercase**. Booleans
+become very important when you learn about branching (`if`).
+
+<Playground initialCode={`raining = True
+has_umbrella = False
+print("Raining?", raining)
+print("Bringing an umbrella?", has_umbrella)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is the type of 9.75?",
+      options: ["int", "float", "str"],
+      answer: 1,
+      explanation: "A number with a decimal point is a float.",
+    },
+    {
+      question: "What does print(\"5\" + \"5\") show?",
+      options: ["10", "55", "Error"],
+      answer: 1,
+      explanation: "Both are text (str), so they're joined into 55.",
+    },
+    {
+      question: "Which boolean is written correctly?",
+      options: ["true", "TRUE", "True"],
+      answer: 2,
+      explanation: "Python only knows True and False, with a capital first letter.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `int` for whole numbers, `float` for decimals (with a dot), `str` for text, `bool` for
+  `True`/`False`.
+- `type()` shows the type of a value.
+- `"17"` is text. Text + text is joined; text + number gives a `TypeError`.
