@@ -1,0 +1,115 @@
+---
+title: Perbandingan dan Logika
+slug: comparison-and-logic
+stage: 1
+module: Percabangan
+order: 1
+isFree: true
+estimatedMinutes: 12
+description: Bandingkan nilai dan gabungkan syarat dengan and, or, dan not untuk menghasilkan True atau False.
+---
+
+# Perbandingan dan Logika
+
+Sebelum program bisa mengambil keputusan, ia harus bisa menjawab pertanyaan **ya atau tidak**:
+"Apakah umurnya sudah 17?", "Apakah kata sandinya benar?". Jawabannya selalu `True` atau `False`.
+
+## Operator perbandingan
+
+| Operator | Arti | Contoh | Hasil |
+| --- | --- | --- | --- |
+| `==` | sama dengan | `5 == 5` | `True` |
+| `!=` | tidak sama dengan | `5 != 3` | `True` |
+| `>` | lebih besar | `7 > 10` | `False` |
+| `<` | lebih kecil | `3 < 8` | `True` |
+| `>=` | lebih besar atau sama | `17 >= 17` | `True` |
+| `<=` | lebih kecil atau sama | `20 <= 19` | `False` |
+
+<Playground initialCode={`umur = 17
+print(umur >= 17)
+print(umur == 18)
+print(umur != 18)
+
+nilai = 72
+lulus = nilai >= 75
+print("Lulus?", lulus)`} />
+
+<Callout type="warning">
+  `=` menyimpan nilai, `==` membandingkan. Tertukar keduanya adalah kesalahan yang sangat umum.
+</Callout>
+
+## Membandingkan string
+
+String juga bisa dibandingkan. Perbandingannya membedakan huruf besar dan kecil:
+
+<Playground initialCode={`print("apel" == "apel")
+print("Apel" == "apel")
+print("Apel".lower() == "apel")`} />
+
+Karena itu, rapikan input dengan `.strip().lower()` sebelum membandingkan.
+
+## Menggabungkan syarat: and, or, not
+
+| Operator | Hasilnya `True` kalau... |
+| --- | --- |
+| `and` | **kedua** syarat `True` |
+| `or` | **salah satu** syarat `True` |
+| `not` | kebalikannya: `not True` menjadi `False` |
+
+<Playground initialCode={`umur = 20
+punya_ktp = True
+punya_sim = False
+
+print(umur >= 17 and punya_ktp)
+print(punya_ktp or punya_sim)
+print(not punya_sim)`} />
+
+Contoh sehari-hari: boleh masuk wahana kalau tinggi minimal 120 cm **dan** umur minimal 7 tahun.
+Diskon berlaku kalau hari Sabtu **atau** Minggu.
+
+<Playground initialCode={`tinggi = 125
+umur = 6
+boleh_naik = tinggi >= 120 and umur >= 7
+print("Boleh naik wahana?", boleh_naik)
+
+hari = "minggu"
+akhir_pekan = hari == "sabtu" or hari == "minggu"
+print("Akhir pekan?", akhir_pekan)`} />
+
+## Rentang nilai
+
+Python mengizinkan perbandingan berantai, persis seperti di matematika:
+
+<Playground initialCode={`nilai = 85
+print(80 <= nilai <= 100)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil dari 10 != 10?",
+      options: ["True", "False", "Error"],
+      answer: 1,
+      explanation: "10 sama dengan 10, jadi 'tidak sama dengan' bernilai False.",
+    },
+    {
+      question: "Apa hasil dari True and False?",
+      options: ["True", "False"],
+      answer: 1,
+      explanation: "and hanya True kalau kedua sisinya True.",
+    },
+    {
+      question: "Apa hasil dari \"Ya\" == \"ya\"?",
+      options: ["True", "False"],
+      answer: 1,
+      explanation: "Perbandingan string membedakan huruf besar dan kecil.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Operator perbandingan (`==`, `!=`, `>`, `<`, `>=`, `<=`) menghasilkan `True` atau `False`.
+- `=` untuk menyimpan, `==` untuk membandingkan.
+- `and` butuh semua syarat benar, `or` cukup satu, `not` membalik.

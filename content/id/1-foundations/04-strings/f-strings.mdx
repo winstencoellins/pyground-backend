@@ -1,0 +1,110 @@
+---
+title: f-string
+slug: f-strings
+stage: 1
+module: String
+order: 3
+isFree: true
+estimatedMinutes: 10
+description: Susun kalimat berisi variabel dengan rapi dan atur format angka memakai f-string.
+---
+
+# f-string
+
+Menyambung teks dan angka dengan `+` dan `str()` cepat jadi berantakan:
+
+<Playground initialCode={`nama = "Rudi"
+umur = 20
+print("Halo " + nama + ", umurmu " + str(umur) + " tahun")`} />
+
+**f-string** membuatnya jauh lebih rapi. Tulis huruf `f` sebelum tanda kutip, lalu taruh
+variabel di dalam kurung kurawal:
+
+<Playground initialCode={`nama = "Rudi"
+umur = 20
+print(f"Halo {nama}, umurmu {umur} tahun")`} />
+
+Tidak perlu `str()`, Python mengubahnya otomatis.
+
+## Ekspresi di dalam kurung kurawal
+
+Di dalam kurung kurawal kamu bisa menulis perhitungan atau memanggil method:
+
+<Playground initialCode={`harga = 15000
+jumlah = 3
+nama = "kopi susu"
+print(f"{jumlah} {nama.title()} = Rp{harga * jumlah}")
+print(f"Tahun depan umurku {17 + 1}")`} />
+
+## Mengatur format angka
+
+Setelah titik dua di dalam kurung kurawal, kamu bisa mengatur tampilan angka:
+
+<Playground initialCode={`total = 1250000
+rata_rata = 87.6666
+
+print(f"Total: Rp{total:,}")
+print(f"Rata-rata: {rata_rata:.2f}")
+print(f"Rata-rata: {rata_rata:.0f}")`} />
+
+| Format | Arti | Contoh hasil |
+| --- | --- | --- |
+| `:,` | pemisah ribuan | `1,250,000` |
+| `:.2f` | 2 angka di belakang koma | `87.67` |
+| `:.0f` | dibulatkan tanpa desimal | `88` |
+
+<Callout type="info">
+  Python memakai format angka Inggris: koma untuk ribuan dan titik untuk desimal. Kalau ingin
+  format Indonesia (`1.250.000`), tambahkan `.replace(",", ".")` pada hasilnya.
+</Callout>
+
+<Playground initialCode={`total = 1250000
+rupiah = f"{total:,}".replace(",", ".")
+print(f"Total: Rp{rupiah}")`} />
+
+<Callout type="warning">
+  Jangan lupa huruf `f`. Tanpa `f`, Python menampilkan kurung kurawalnya apa adanya:
+  `"Halo {nama}"`.
+</Callout>
+
+## Latihan
+
+Buat struk sederhana dengan f-string: nama barang, jumlah, dan total harga dengan pemisah ribuan.
+
+<Playground initialCode={`barang = "Buku tulis"
+harga = 4500
+jumlah = 12
+
+# Contoh hasil: 12 x Buku tulis = Rp54,000
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil dari print(f\"{2 * 5} apel\")?",
+      options: ["{2 * 5} apel", "10 apel", "2 * 5 apel"],
+      answer: 1,
+      explanation: "Isi kurung kurawal dihitung dulu: 2 * 5 = 10.",
+    },
+    {
+      question: "Format mana yang menampilkan 3.14159 sebagai 3.14?",
+      options: [":,", ":.2f", ":2"],
+      answer: 1,
+      explanation: ":.2f berarti float dengan 2 angka di belakang koma.",
+    },
+    {
+      question: "Apa yang tampil dari print(\"Halo {nama}\") (tanpa f)?",
+      options: ["Halo {nama}", "Halo dan isi variabel nama", "Error"],
+      answer: 0,
+      explanation: "Tanpa huruf f, kurung kurawal hanyalah teks biasa.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- f-string: huruf `f` sebelum kutip, variabel atau ekspresi di dalam kurung kurawal.
+- Tidak perlu `str()` untuk angka.
+- `:,` untuk pemisah ribuan, `:.2f` untuk jumlah angka desimal.

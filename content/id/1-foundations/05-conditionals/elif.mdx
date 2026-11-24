@@ -1,0 +1,120 @@
+---
+title: elif dan Percabangan Bertingkat
+slug: elif
+stage: 1
+module: Percabangan
+order: 3
+isFree: true
+estimatedMinutes: 12
+description: Tangani lebih dari dua kemungkinan dengan elif, dan pahami urutan pengecekan syarat.
+---
+
+# elif dan Percabangan Bertingkat
+
+`if` dan `else` hanya memberi dua pilihan. Bagaimana kalau ada lebih banyak kemungkinan, misalnya
+nilai huruf A, B, C, D? Untuk itu ada `elif` (singkatan dari *else if*).
+
+<Playground initialCode={`nilai = int(input("Nilai ujian (0-100): "))
+
+if nilai >= 85:
+    print("Nilai huruf: A")
+elif nilai >= 70:
+    print("Nilai huruf: B")
+elif nilai >= 55:
+    print("Nilai huruf: C")
+else:
+    print("Nilai huruf: D")`} />
+
+## Urutan itu penting
+
+Python memeriksa syarat **dari atas ke bawah** dan **berhenti di syarat pertama yang `True`**.
+Sisanya dilewati.
+
+Dengan nilai `90`, syarat `nilai >= 70` juga benar, tapi tidak pernah dicek, karena
+`nilai >= 85` sudah lebih dulu terpenuhi.
+
+Lihat apa yang terjadi kalau urutannya terbalik:
+
+<Playground initialCode={`nilai = 90
+
+if nilai >= 55:
+    print("C")
+elif nilai >= 70:
+    print("B")
+elif nilai >= 85:
+    print("A")`} />
+
+Hasilnya `C`, padahal seharusnya `A`. Programnya berjalan tanpa error, tapi logikanya salah.
+
+<Callout type="tip">
+  Saat memakai `>=`, urutkan syarat dari angka **terbesar** ke terkecil.
+</Callout>
+
+## else bersifat opsional
+
+`else` di akhir boleh tidak ada. Kalau tidak ada syarat yang `True` dan tidak ada `else`, tidak
+ada blok yang dijalankan.
+
+## if di dalam if
+
+Blok `if` boleh berisi `if` lain. Perhatikan indentasinya yang bertambah:
+
+<Playground initialCode={`umur = 20
+punya_tiket = True
+
+if umur >= 17:
+    if punya_tiket:
+        print("Silakan masuk")
+    else:
+        print("Beli tiket dulu di loket")
+else:
+    print("Maaf, khusus 17 tahun ke atas")`} />
+
+Sering kali `if` bertingkat bisa disederhanakan dengan `and`, tapi bentuk di atas berguna kalau
+setiap kasus butuh pesan yang berbeda.
+
+## Latihan
+
+Buat program ongkos kirim berdasarkan berat paket:
+
+- sampai 1 kg: Rp10.000
+- lebih dari 1 kg sampai 5 kg: Rp25.000
+- lebih dari 5 kg: Rp50.000
+
+<Playground initialCode={`berat = float(input("Berat paket (kg): "))
+
+# Tentukan ongkir dengan if, elif, else
+# lalu tampilkan hasilnya dengan f-string
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "x = 10. Syarat if x > 5 mencetak A, lalu elif x > 8 mencetak B. Apa yang tampil?",
+      options: ["A", "B", "A dan B"],
+      answer: 0,
+      explanation: "Python berhenti di syarat pertama yang True (x > 5), jadi hanya A.",
+    },
+    {
+      question: "Berapa banyak elif yang boleh dipakai dalam satu percabangan?",
+      options: ["Hanya satu", "Maksimal tiga", "Sebanyak yang dibutuhkan"],
+      answer: 2,
+      explanation: "elif boleh dipakai berkali-kali.",
+    },
+    {
+      question: "Apakah else wajib ada setelah elif?",
+      options: ["Ya, selalu", "Tidak, else bersifat opsional"],
+      answer: 1,
+      explanation: "else hanya dipakai kalau kamu butuh blok untuk 'semua kemungkinan lain'.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `elif` menambahkan syarat lain setelah `if`.
+- Python berhenti di syarat pertama yang `True`, jadi urutan syarat menentukan hasil.
+- `else` di akhir bersifat opsional.
+- `if` boleh berada di dalam `if` lain, dengan indentasi tambahan.

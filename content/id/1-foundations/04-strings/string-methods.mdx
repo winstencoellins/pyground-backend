@@ -1,0 +1,117 @@
+---
+title: Method String
+slug: string-methods
+stage: 1
+module: String
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Rapikan dan olah teks dengan upper(), lower(), strip(), replace(), dan kawan-kawan.
+---
+
+# Method String
+
+String punya banyak "kemampuan bawaan" yang disebut **method**. Method dipanggil dengan titik
+setelah string: `teks.upper()`.
+
+## Huruf besar dan kecil
+
+<Playground initialCode={`nama = "aNdI pRaTaMa"
+print(nama.upper())
+print(nama.lower())
+print(nama.title())
+print(nama.capitalize())`} />
+
+| Method | Hasil |
+| --- | --- |
+| `upper()` | SEMUA HURUF BESAR |
+| `lower()` | semua huruf kecil |
+| `title()` | Setiap Kata Diawali Huruf Besar |
+| `capitalize()` | Hanya huruf pertama yang besar |
+
+## Method tidak mengubah string aslinya
+
+Ini penting: method **menghasilkan string baru**. String aslinya tetap sama. Simpan hasilnya
+kalau ingin memakainya:
+
+<Playground initialCode={`kota = "jakarta"
+kota.upper()
+print(kota)
+
+kota = kota.upper()
+print(kota)`} />
+
+## Merapikan input: strip()
+
+Pengguna sering tidak sengaja mengetik spasi di awal atau akhir. `strip()` membuangnya:
+
+<Playground initialCode={`jawaban = "   ya   "
+print("[" + jawaban + "]")
+print("[" + jawaban.strip() + "]")`} />
+
+Kombinasi yang sangat sering dipakai untuk input: `input().strip().lower()`. Spasi dibuang,
+huruf disamakan, jadi `" YA "`, `"Ya"`, dan `"ya"` dianggap sama.
+
+## Mencari dan mengganti
+
+<Playground initialCode={`kalimat = "Saya suka kopi. Kopi itu enak."
+
+print(kalimat.replace("kopi", "teh"))
+print(kalimat.lower().count("kopi"))
+print(kalimat.find("suka"))
+print(kalimat.startswith("Saya"))
+print(kalimat.endswith("!"))`} />
+
+| Method | Fungsi |
+| --- | --- |
+| `replace(lama, baru)` | mengganti semua kemunculan teks |
+| `count(teks)` | menghitung berapa kali teks muncul |
+| `find(teks)` | indeks kemunculan pertama, atau `-1` kalau tidak ada |
+| `startswith(teks)` / `endswith(teks)` | `True` atau `False` |
+
+Ada juga operator `in` untuk mengecek apakah sebuah teks ada di dalam string lain:
+
+<Playground initialCode={`email = "dewi@gmail.com"
+print("@" in email)
+print("yahoo" in email)`} />
+
+## Latihan
+
+Rapikan nama ini supaya menjadi `Rina Wulandari`, lalu ganti `Rina` dengan `Rani`.
+
+<Playground initialCode={`nama = "   rina WULANDARI  "
+
+# Rapikan dulu, lalu ganti
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil dari \"  halo \".strip()?",
+      options: ["\"  halo \"", "\"halo\"", "\"HALO\""],
+      answer: 1,
+      explanation: "strip() membuang spasi di awal dan akhir.",
+    },
+    {
+      question: "Setelah s = \"abc\" lalu s.upper(), berapa isi s?",
+      options: ["\"ABC\"", "\"abc\"", "Error"],
+      answer: 1,
+      explanation: "Method menghasilkan string baru. Tanpa s = s.upper(), s tidak berubah.",
+    },
+    {
+      question: "Apa hasil dari \"pisang\".find(\"x\")?",
+      options: ["0", "-1", "Error"],
+      answer: 1,
+      explanation: "find() mengembalikan -1 kalau teks tidak ditemukan.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Method dipanggil dengan titik: `teks.lower()`.
+- Method string menghasilkan string baru; simpan hasilnya kalau perlu.
+- `strip()` dan `lower()` sangat berguna untuk merapikan input.
+- `replace()`, `count()`, `find()`, dan `in` untuk mencari dan mengganti teks.

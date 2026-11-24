@@ -1,0 +1,222 @@
+---
+title: "Proyek Mini: Kasir Warung"
+slug: cashier-project
+stage: 1
+module: Proyek Mini
+order: 1
+isFree: true
+estimatedMinutes: 25
+description: Gabungkan semua yang sudah kamu pelajari untuk membuat program kasir warung lengkap dengan diskon dan struk.
+---
+
+# Proyek Mini: Kasir Warung
+
+Selamat, kamu sudah sampai di akhir Tahap 1! Sekarang saatnya menggabungkan semuanya menjadi satu
+program utuh: **kasir warung** yang menghitung belanjaan, memberi diskon, dan mencetak struk.
+
+Yang akan kamu pakai:
+
+- variabel dan tipe data;
+- `input()` dan konversi tipe;
+- operator aritmatika;
+- method string dan f-string;
+- `if`, `elif`, `else`.
+
+## Rencana program
+
+Programmer yang baik merencanakan dulu sebelum menulis kode. Program kita akan:
+
+1. Menanyakan nama pembeli.
+2. Menanyakan jumlah pembelian untuk tiga menu: nasi goreng, mie ayam, dan es teh.
+3. Menghitung subtotal.
+4. Memberi diskon: 10% kalau subtotal minimal Rp100.000, 5% kalau minimal Rp50.000.
+5. Menanyakan apakah pembeli punya kartu member (potongan tambahan Rp5.000).
+6. Mencetak struk yang rapi.
+
+Kita bangun langkah demi langkah.
+
+## Langkah 1: daftar harga dan input
+
+Simpan harga di variabel supaya mudah diubah. Nama variabel dengan huruf kapital semua adalah
+kebiasaan untuk nilai yang tidak berubah (konstanta).
+
+<Playground initialCode={`HARGA_NASI_GORENG = 18000
+HARGA_MIE_AYAM = 15000
+HARGA_ES_TEH = 5000
+
+nama = input("Nama pembeli: ").strip().title()
+nasi_goreng = int(input("Nasi goreng (porsi): "))
+mie_ayam = int(input("Mie ayam (porsi): "))
+es_teh = int(input("Es teh (gelas): "))
+
+print(f"Pesanan {nama}: {nasi_goreng} nasi goreng, {mie_ayam} mie ayam, {es_teh} es teh")`} />
+
+## Langkah 2: subtotal
+
+<Playground initialCode={`HARGA_NASI_GORENG = 18000
+HARGA_MIE_AYAM = 15000
+HARGA_ES_TEH = 5000
+
+nasi_goreng = 2
+mie_ayam = 1
+es_teh = 3
+
+subtotal = (
+    nasi_goreng * HARGA_NASI_GORENG
+    + mie_ayam * HARGA_MIE_AYAM
+    + es_teh * HARGA_ES_TEH
+)
+print(f"Subtotal: Rp{subtotal:,}")`} />
+
+<Callout type="info">
+  Ekspresi panjang boleh dipecah ke beberapa baris kalau diapit kurung.
+</Callout>
+
+## Langkah 3: diskon
+
+Ingat, urutkan syarat dari yang terbesar:
+
+<Playground initialCode={`subtotal = 69000
+
+if subtotal >= 100000:
+    persen_diskon = 10
+elif subtotal >= 50000:
+    persen_diskon = 5
+else:
+    persen_diskon = 0
+
+diskon = subtotal * persen_diskon // 100
+print(f"Diskon {persen_diskon}%: Rp{diskon:,}")`} />
+
+Kenapa `// 100` dan bukan `/ 100`? Supaya hasilnya tetap bilangan bulat. Rupiah tidak punya sen.
+
+## Langkah 4: kartu member
+
+<Playground initialCode={`total = 65550
+member = input("Punya kartu member? (ya/tidak): ").strip().lower()
+
+if member == "ya":
+    potongan_member = 5000
+else:
+    potongan_member = 0
+
+total = total - potongan_member
+print(f"Total bayar: Rp{total:,}")`} />
+
+`.strip().lower()` membuat jawaban `" YA "`, `"Ya"`, dan `"ya"` semuanya diterima.
+
+## Langkah 5: program lengkap
+
+Ini program lengkapnya. Jalankan dan coba beberapa skenario: belanja sedikit, belanja banyak,
+dengan dan tanpa kartu member.
+
+<Playground initialCode={`HARGA_NASI_GORENG = 18000
+HARGA_MIE_AYAM = 15000
+HARGA_ES_TEH = 5000
+POTONGAN_MEMBER = 5000
+
+print("=" * 32)
+print("WARUNG PYGROUND".center(32))
+print("=" * 32)
+
+nama = input("Nama pembeli: ").strip().title()
+nasi_goreng = int(input("Nasi goreng (porsi): "))
+mie_ayam = int(input("Mie ayam (porsi): "))
+es_teh = int(input("Es teh (gelas): "))
+member = input("Punya kartu member? (ya/tidak): ").strip().lower() == "ya"
+
+subtotal = (
+    nasi_goreng * HARGA_NASI_GORENG
+    + mie_ayam * HARGA_MIE_AYAM
+    + es_teh * HARGA_ES_TEH
+)
+
+if subtotal >= 100000:
+    persen_diskon = 10
+elif subtotal >= 50000:
+    persen_diskon = 5
+else:
+    persen_diskon = 0
+diskon = subtotal * persen_diskon // 100
+
+if member:
+    potongan = POTONGAN_MEMBER
+else:
+    potongan = 0
+
+total = subtotal - diskon - potongan
+
+print()
+print(f"Pembeli : {nama}")
+print("-" * 32)
+print(f"Nasi goreng x{nasi_goreng:<3} Rp{nasi_goreng * HARGA_NASI_GORENG:>12,}")
+print(f"Mie ayam    x{mie_ayam:<3} Rp{mie_ayam * HARGA_MIE_AYAM:>12,}")
+print(f"Es teh      x{es_teh:<3} Rp{es_teh * HARGA_ES_TEH:>12,}")
+print("-" * 32)
+print(f"Subtotal          Rp{subtotal:>12,}")
+print(f"Diskon {persen_diskon:>2}%        -Rp{diskon:>11,}")
+print(f"Member            -Rp{potongan:>11,}")
+print("=" * 32)
+print(f"TOTAL             Rp{total:>12,}")
+print("=" * 32)
+
+if subtotal == 0:
+    print("Belum ada pesanan. Sampai jumpa!")
+else:
+    print(f"Terima kasih, {nama}!")`} />
+
+<Callout type="info">
+  `:>12,` artinya rata kanan selebar 12 karakter dengan pemisah ribuan, dan `:<3` rata kiri
+  selebar 3. Format ini membuat angka di struk sejajar.
+</Callout>
+
+## Tantangan
+
+Sudah berhasil? Coba kembangkan programmu:
+
+1. Tambahkan menu keempat, misalnya `kerupuk` seharga Rp2.000.
+2. Tambahkan pajak 11% yang dihitung **setelah** diskon.
+3. Minta uang yang dibayarkan, lalu hitung kembaliannya. Kalau uangnya kurang, tampilkan
+   berapa yang masih kurang.
+4. Pastikan total tidak pernah negatif, misalnya saat pesanan kecil tapi memakai kartu member.
+
+<Playground initialCode={`# Salin program lengkap di atas ke sini, lalu kembangkan!
+`} />
+
+<Callout type="tip">
+  Program yang kamu buat sekarang belum bisa mengulang pertanyaan atau menyimpan daftar menu yang
+  panjang. Itulah yang akan kamu pelajari di Tahap 2: **perulangan** dan **list**.
+</Callout>
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kenapa harga disimpan di variabel seperti HARGA_ES_TEH, bukan ditulis langsung?",
+      options: ["Supaya program lebih cepat", "Supaya mudah diubah di satu tempat", "Karena Python mewajibkannya"],
+      answer: 1,
+      explanation: "Kalau harga naik, cukup ubah satu baris, bukan setiap tempat angka itu dipakai.",
+    },
+    {
+      question: "Subtotal Rp120.000. Diskon berapa persen yang didapat?",
+      options: ["5%", "10%", "15%"],
+      answer: 1,
+      explanation: "Syarat pertama yang True adalah subtotal >= 100000, jadi diskon 10%.",
+    },
+    {
+      question: "Apa gunanya .strip().lower() pada jawaban member?",
+      options: ["Mengubah jawaban menjadi angka", "Agar ' YA ' dan 'ya' dianggap sama", "Menghapus jawaban"],
+      answer: 1,
+      explanation: "Spasi dibuang dan huruf diseragamkan sebelum dibandingkan.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Rencanakan program sebelum menulis kode, lalu bangun langkah demi langkah.
+- Simpan nilai tetap di variabel berhuruf kapital supaya mudah diubah.
+- Rapikan input dengan `strip()` dan `lower()`, ubah angka dengan `int()`.
+- `if`/`elif`/`else` menentukan diskon; f-string membuat struk yang rapi.
+- Kamu sudah menyelesaikan Tahap 1. Hebat!

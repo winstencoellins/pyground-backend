@@ -1,0 +1,121 @@
+---
+title: if dan else
+slug: if-else
+stage: 1
+module: Percabangan
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Buat program yang mengambil keputusan dengan if dan else, dan pahami indentasi.
+---
+
+# if dan else
+
+Sekarang program kita bisa **memilih jalan**: menjalankan kode tertentu hanya kalau sebuah syarat
+terpenuhi.
+
+## if
+
+<Playground initialCode={`suhu = 34
+
+if suhu > 30:
+    print("Panas sekali, minum yang banyak!")
+
+print("Program selesai")`} />
+
+Coba ubah `suhu` menjadi `25` lalu jalankan lagi. Baris di dalam `if` dilewati, tapi
+`Program selesai` tetap muncul.
+
+Strukturnya:
+
+1. Kata `if`, lalu syarat, lalu **titik dua** `:`.
+2. Baris di bawahnya **menjorok ke dalam** (indentasi) 4 spasi. Baris inilah yang dijalankan
+   kalau syaratnya `True`.
+
+## Indentasi itu wajib
+
+Di banyak bahasa lain, indentasi hanya untuk kerapian. Di Python, indentasi **menentukan** baris
+mana yang termasuk di dalam `if`:
+
+<Playground initialCode={`saldo = 5000
+
+if saldo < 10000:
+    print("Saldo hampir habis")
+    print("Segera isi ulang")
+print("Terima kasih")`} />
+
+Kalau indentasinya lupa, Python menolak menjalankan program:
+
+<Playground expectError initialCode={`saldo = 5000
+if saldo < 10000:
+print("Saldo hampir habis")`} />
+
+<Callout type="tip">
+  Selalu pakai 4 spasi untuk indentasi. Editor kode biasanya otomatis menambahkannya setelah
+  kamu mengetik titik dua dan menekan Enter.
+</Callout>
+
+## else
+
+`else` menjalankan kode **kalau syarat `if` tidak terpenuhi**. Pasti salah satu dari dua blok
+yang jalan, tidak pernah keduanya.
+
+<Playground initialCode={`nilai = int(input("Masukkan nilai ujian: "))
+
+if nilai >= 75:
+    print("Selamat, kamu lulus!")
+else:
+    print("Belum lulus, coba lagi ya.")`} />
+
+## Contoh: ganjil atau genap
+
+Ingat operator `%`? Angka genap kalau sisa baginya dengan 2 adalah 0:
+
+<Playground initialCode={`angka = int(input("Masukkan angka: "))
+
+if angka % 2 == 0:
+    print(f"{angka} adalah bilangan genap")
+else:
+    print(f"{angka} adalah bilangan ganjil")`} />
+
+## Latihan
+
+Buat program pengecek kata sandi. Kalau yang diketik sama dengan `"python123"`, tampilkan
+`Login berhasil`. Kalau tidak, tampilkan `Kata sandi salah`.
+
+<Playground initialCode={`kata_sandi_benar = "python123"
+ketikan = input("Kata sandi: ")
+
+# Tulis if dan else di sini
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang wajib ada di akhir baris if?",
+      options: ["Titik koma ;", "Titik dua :", "Kurung kurawal"],
+      answer: 1,
+      explanation: "Setiap baris if dan else diakhiri titik dua.",
+    },
+    {
+      question: "Bagaimana Python tahu baris mana yang ada di dalam if?",
+      options: ["Dari indentasinya", "Dari baris kosong", "Dari komentar"],
+      answer: 0,
+      explanation: "Baris yang menjorok ke dalam setelah if termasuk dalam blok if.",
+    },
+    {
+      question: "Kapan blok else dijalankan?",
+      options: ["Selalu", "Kalau syarat if False", "Kalau syarat if True"],
+      answer: 1,
+      explanation: "else adalah jalan alternatif saat syarat if tidak terpenuhi.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `if syarat:` menjalankan blok di bawahnya hanya kalau syaratnya `True`.
+- `else:` menjalankan blok alternatif kalau syaratnya `False`.
+- Indentasi 4 spasi menentukan isi blok, dan wajib di Python.

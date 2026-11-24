@@ -1,0 +1,130 @@
+---
+title: Dasar-Dasar String
+slug: string-basics
+stage: 1
+module: String
+order: 1
+isFree: true
+estimatedMinutes: 12
+description: Gabungkan, ulangi, dan ambil sebagian teks dengan indeks dan slicing.
+---
+
+# Dasar-Dasar String
+
+**String** (`str`) adalah teks: nama, pesan, alamat, kata sandi. Hampir semua program bekerja
+dengan teks, jadi mari kita kenal lebih dekat.
+
+## Membuat string
+
+String boleh diapit tanda kutip satu `'...'` atau dua `"..."`. Pilih salah satu dan konsisten.
+Kalau teksnya mengandung tanda kutip, pakai jenis kutip yang lain di luarnya:
+
+<Playground initialCode={`sapaan = "Halo"
+kota = 'Surabaya'
+kalimat = "Namaku Andi, panggil saja 'Ndi'"
+print(sapaan, kota)
+print(kalimat)`} />
+
+Untuk teks beberapa baris, pakai tiga tanda kutip:
+
+<Playground initialCode={`pantun = """Jalan-jalan ke kota Medan,
+jangan lupa membeli duku.
+Belajar Python memang menyenangkan,
+apalagi bersama Pyground."""
+print(pantun)`} />
+
+## Menggabung dan mengulang
+
+`+` menyambung dua string, `*` mengulang string:
+
+<Playground initialCode={`depan = "Budi"
+belakang = "Santoso"
+print(depan + " " + belakang)
+print("ha" * 3)
+print("=" * 20)`} />
+
+## Panjang string: len()
+
+`len()` menghitung jumlah karakter, termasuk spasi:
+
+<Playground initialCode={`kata_sandi = "rahasia123"
+print(len(kata_sandi))
+print(len("Halo dunia"))`} />
+
+## Indeks: mengambil satu karakter
+
+Setiap karakter punya nomor urut yang disebut **indeks**. Indeks dimulai dari **0**, bukan 1.
+
+| Karakter | `P` | `y` | `t` | `h` | `o` | `n` |
+| --- | --- | --- | --- | --- | --- | --- |
+| Indeks | 0 | 1 | 2 | 3 | 4 | 5 |
+| Indeks negatif | -6 | -5 | -4 | -3 | -2 | -1 |
+
+<Playground initialCode={`bahasa = "Python"
+print(bahasa[0])
+print(bahasa[3])
+print(bahasa[-1])`} />
+
+Indeks negatif dihitung dari belakang: `[-1]` selalu karakter terakhir.
+
+<Callout type="warning">
+  Indeks yang melewati panjang string menghasilkan `IndexError`. `"Python"[6]` error, karena
+  indeks terakhirnya 5.
+</Callout>
+
+## Slicing: mengambil sebagian
+
+`teks[awal:akhir]` mengambil karakter dari indeks `awal` sampai **sebelum** `akhir`:
+
+<Playground initialCode={`bahasa = "Python"
+print(bahasa[0:2])
+print(bahasa[2:6])
+print(bahasa[:3])
+print(bahasa[3:])
+
+nomor_hp = "081234567890"
+print("Nomor berakhiran", nomor_hp[-4:])`} />
+
+Kalau `awal` dikosongkan, mulai dari awal. Kalau `akhir` dikosongkan, sampai habis.
+
+## Latihan
+
+Dari `email = "siti@pyground.id"`, tampilkan huruf pertama dan jumlah karakternya.
+
+<Playground initialCode={`email = "siti@pyground.id"
+
+# Tampilkan huruf pertama
+# Tampilkan jumlah karakter
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil dari \"kopi\"[1]?",
+      options: ["k", "o", "p"],
+      answer: 1,
+      explanation: "Indeks dimulai dari 0, jadi [1] adalah karakter kedua: o.",
+    },
+    {
+      question: "Apa hasil dari len(\"aku suka\")?",
+      options: ["7", "8", "2"],
+      answer: 1,
+      explanation: "Spasi juga dihitung: a-k-u-spasi-s-u-k-a = 8 karakter.",
+    },
+    {
+      question: "Apa hasil dari \"Indonesia\"[:4]?",
+      options: ["Indo", "Indon", "nesia"],
+      answer: 0,
+      explanation: "Slicing [:4] mengambil indeks 0 sampai sebelum 4: I-n-d-o.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- String boleh memakai kutip satu, dua, atau tiga (untuk banyak baris).
+- `+` menyambung, `*` mengulang, `len()` menghitung panjang.
+- Indeks dimulai dari 0; `[-1]` adalah karakter terakhir.
+- `teks[awal:akhir]` mengambil sebagian string, tanpa menyertakan `akhir`.
