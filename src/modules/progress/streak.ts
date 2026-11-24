@@ -1,6 +1,4 @@
-const DAY = 86_400_000;
-const WIB = 7 * 60 * 60 * 1000; // Asia/Jakarta is UTC+7 all year (no DST)
-const jakartaDayNumber = (d: Date) => Math.floor((d.getTime() + WIB) / DAY);
+import { jakartaDayNumber } from "../../lib/jakarta";
 
 /**
  * Learning streak in Jakarta calendar days, counting days with at least one lesson completed.

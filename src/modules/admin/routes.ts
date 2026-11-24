@@ -2,9 +2,9 @@ import { Elysia, t } from "elysia";
 import { ApiError } from "../../lib/errors";
 import { prisma } from "../../lib/prisma";
 import { sessionPlugin } from "../../plugins/session";
+import { DAY, jakartaDate, jakartaDayNumber, jakartaDayStart } from "../../lib/jakarta";
 import { hasAccess } from "../lessons/access";
-
-const DAY = 86_400_000;
+import { getCatalog } from "../lessons/content";
 
 const page = {
   page: t.Optional(t.Integer({ minimum: 1, default: 1 })),
@@ -106,6 +106,73 @@ export const adminRoutes = new Elysia({ prefix: "/api/admin" })
         ...page,
         status: t.Optional(t.Union(ORDER_STATUSES.map((s) => t.Literal(s)))),
       }),
+    },
+  )
+  .get(
+    "/stats",
+    async ({ query }) => {
+      const days = query.days ?? 30;
+      const today = jakartaDayNumber(new Date());
+      const firstDay = today - days + 1;
+      const from = jakartaDayStart(firstDay);
+      const paid = { status: "PAID" as const };
+
+      const [allTime, windowOrders, totalUsers, activePasses, newUsers, completions, quiz] =
+        await Promise.all([
+          prisma.order.aggregate({ where: paid, _sum: { amount: true }, _count: true }),
+          // shortcut: buckets paid orders in JS; move to a SQL GROUP BY if a window ever holds 10k+ orders.
+          prisma.order.findMany({
+            where: { ...paid, paidAt: { gte: from } },
+            select: { amount: true, paidAt: true },
+          }),
+          prisma.user.count(),
+          prisma.user.count({ where: { role: "STUDENT", accessUntil: { gt: new Date() } } }),
+          prisma.user.count({ where: { createdAt: { gte: from } } }),
+          prisma.lessonProgress.groupBy({ by: ["lessonSlug"], _count: true }),
+          prisma.quizAttempt.groupBy({ by: ["lessonSlug"], _count: true, _avg: { score: true } }),
+        ]);
+
+      const daily = Array.from({ length: days }, (_, i) => ({
+        date: jakartaDate(firstDay + i),
+        amount: 0,
+        orders: 0,
+      }));
+      for (const o of windowOrders) {
+        const d = daily[jakartaDayNumber(o.paidAt!) - firstDay];
+        if (!d) continue; // paidAt in the future (clock skew); ignore
+        d.amount += o.amount;
+        d.orders++;
+      }
+      const done = new Map(completions.map((c) => [c.lessonSlug, c._count]));
+      const quizBy = new Map(quiz.map((q) => [q.lessonSlug, q]));
+
+      return {
+        days,
+        revenue: {
+          allTime: allTime._sum.amount ?? 0,
+          allTimeOrders: allTime._count,
+          window: daily.reduce((s, d) => s + d.amount, 0),
+          windowOrders: windowOrders.length,
+          daily,
+        },
+        users: { total: totalUsers, activePasses, newInWindow: newUsers },
+        // Every lesson in course order, including ones nobody has finished yet.
+        lessons: getCatalog().ordered.map((l) => {
+          const q = quizBy.get(l.slug);
+          return {
+            slug: l.slug,
+            title: l.title,
+            stage: l.stage,
+            completions: done.get(l.slug) ?? 0,
+            quizAttempts: q?._count ?? 0,
+            avgQuizScore: q?._avg.score == null ? null : Math.round(q._avg.score),
+          };
+        }),
+      };
+    },
+    {
+      admin: true,
+      query: t.Object({ days: t.Optional(t.Integer({ minimum: 1, maximum: 365, default: 30 })) }),
     },
   )
   .post(

@@ -40,6 +40,7 @@ describe("admin guard on every admin route", () => {
   const routes: [string, RequestInit & { json?: unknown }][] = [
     ["/api/admin/users", {}],
     ["/api/admin/orders", {}],
+    ["/api/admin/stats", {}],
     ["/api/admin/users/x/access", { method: "POST", json: { action: "revoke", reason: "test" } }],
   ];
   it("anonymous -> 401, student -> 403", async () => {
@@ -185,5 +186,92 @@ describe("POST /api/admin/users/:id/access", () => {
     const missing = await access("no-such-user", { action: "grant", days: 1, reason: "nobody" });
     expect(missing.status).toBe(404);
     expect(((await missing.json()) as ErrorBody).error.code).toBe("USER_NOT_FOUND");
+  });
+});
+
+describe("GET /api/admin/stats", () => {
+  type Stats = {
+    days: number;
+    revenue: {
+      allTime: number;
+      allTimeOrders: number;
+      window: number;
+      windowOrders: number;
+      daily: { date: string; amount: number; orders: number }[];
+    };
+    users: { total: number; activePasses: number; newInWindow: number };
+    lessons: {
+      slug: string;
+      stage: number;
+      completions: number;
+      quizAttempts: number;
+      avgQuizScore: number | null;
+    }[];
+  };
+  const stats = async (q = "") => (await (await asAdmin(`/api/admin/stats${q}`)).json()) as Stats;
+  const lesson = (s: Stats, slug: string) => s.lessons.find((l) => l.slug === slug)!;
+
+  it("counts only PAID orders, by Jakarta day, plus per-lesson completions and quiz scores", async () => {
+    const before = await stats("?days=7");
+    const buyer = await createUser({ accessUntil: new Date(Date.now() + 5 * DAY) });
+    await prisma.order.createMany({
+      data: [
+        {
+          userId: buyer.id,
+          orderId: `PYG-ST-${tag}-1`.toUpperCase(),
+          amount: 12345,
+          status: "PAID",
+          paidAt: new Date(),
+        },
+        // Paid 40 days ago: all-time only, outside the 7-day window.
+        {
+          userId: buyer.id,
+          orderId: `PYG-ST-${tag}-2`.toUpperCase(),
+          amount: 1000,
+          status: "PAID",
+          paidAt: new Date(Date.now() - 40 * DAY),
+        },
+        {
+          userId: buyer.id,
+          orderId: `PYG-ST-${tag}-3`.toUpperCase(),
+          amount: 99999,
+          status: "REFUNDED",
+          paidAt: new Date(),
+        },
+      ],
+    });
+    await prisma.lessonProgress.create({ data: { userId: buyer.id, lessonSlug: "tuples" } });
+    await prisma.quizAttempt.createMany({
+      data: [
+        { userId: buyer.id, lessonSlug: "tuples", score: 100, answers: [] },
+        { userId: buyer.id, lessonSlug: "tuples", score: 50, answers: [] },
+      ],
+    });
+    const after = await stats("?days=7");
+
+    expect(after.days).toBe(7);
+    expect(after.revenue.daily).toHaveLength(7);
+    expect(after.revenue.allTime - before.revenue.allTime).toBe(13345);
+    expect(after.revenue.allTimeOrders - before.revenue.allTimeOrders).toBe(2);
+    expect(after.revenue.window - before.revenue.window).toBe(12345);
+    expect(after.revenue.windowOrders - before.revenue.windowOrders).toBe(1);
+    expect(after.revenue.daily.at(-1)!.amount - before.revenue.daily.at(-1)!.amount).toBe(12345);
+    expect(after.revenue.window).toBe(after.revenue.daily.reduce((s, d) => s + d.amount, 0));
+    expect(after.users.total - before.users.total).toBe(1);
+    expect(after.users.activePasses - before.users.activePasses).toBe(1);
+
+    expect(after.lessons.length).toBeGreaterThan(50); // every lesson, in course order
+    expect(after.lessons[0]!.slug).toBe("what-is-programming");
+    expect(lesson(after, "tuples").completions - lesson(before, "tuples").completions).toBe(1);
+    expect(lesson(after, "tuples").quizAttempts - lesson(before, "tuples").quizAttempts).toBe(2);
+    if (lesson(before, "tuples").quizAttempts === 0) {
+      expect(lesson(after, "tuples").avgQuizScore).toBe(75);
+    }
+  });
+
+  it("validates days (1-365)", async () => {
+    expect((await asAdmin("/api/admin/stats?days=0")).status).toBe(400);
+    expect((await asAdmin("/api/admin/stats?days=366")).status).toBe(400);
+    expect((await stats()).revenue.daily).toHaveLength(30);
   });
 });
