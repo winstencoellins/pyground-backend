@@ -44,6 +44,37 @@ export const copy = {
       "Once changed, you'll be signed out on all devices.",
     ),
   },
+  expiresSoon: {
+    subject: L("Akses Pyground-mu berakhir 3 hari lagi", "Your Pyground access ends in 3 days"),
+    preview: L(
+      "Perpanjang agar belajarmu tidak terputus",
+      "Renew so your learning isn't interrupted",
+    ),
+    greeting: L("Halo {name},", "Hi {name},"),
+    body: L(
+      "Akses Pyground-mu akan berakhir pada {accessUntil}. Perpanjang sekarang supaya kamu tetap bisa membuka semua materi berbayar dan melanjutkan progresmu.",
+      "Your Pyground access ends on {accessUntil}. Renew now to keep every paid lesson unlocked and continue where you left off.",
+    ),
+    button: L("Perpanjang 30 hari", "Renew for 30 days"),
+    note: L(
+      "Perpanjangan ditambahkan ke sisa aksesmu, jadi tidak ada hari yang hilang.",
+      "Renewing adds to your remaining time, so you won't lose any days.",
+    ),
+  },
+  expiresToday: {
+    subject: L("Akses Pyground-mu berakhir hari ini", "Your Pyground access ends today"),
+    preview: L("Perpanjang untuk tetap membuka semua materi", "Renew to keep all lessons unlocked"),
+    greeting: L("Halo {name},", "Hi {name},"),
+    body: L(
+      "Akses Pyground-mu berakhir hari ini ({accessUntil}). Setelah itu, materi berbayar akan terkunci, tapi progres dan hasil kuismu tetap tersimpan.",
+      "Your Pyground access ends today ({accessUntil}). After that, paid lessons lock again, but your progress and quiz results stay saved.",
+    ),
+    button: L("Perpanjang sekarang", "Renew now"),
+    note: L(
+      "Materi gratis di Stage 1 tetap bisa kamu buka kapan saja.",
+      "Free Stage 1 lessons stay open any time.",
+    ),
+  },
   receipt: {
     subject: L("Kwitansi pembayaran Pyground {orderId}", "Pyground payment receipt {orderId}"),
     preview: L(

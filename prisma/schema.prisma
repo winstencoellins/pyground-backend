@@ -20,6 +20,11 @@ enum Locale {
   EN
 }
 
+enum ReminderKind {
+  EXPIRES_IN_3_DAYS
+  EXPIRES_TODAY
+}
+
 enum OrderStatus {
   PENDING
   PAID
@@ -49,6 +54,7 @@ model User {
   quizAttempts   QuizAttempt[]
   accessGrants   AccessGrant[]    @relation("GrantRecipient")
   grantsGiven    AccessGrant[]    @relation("GrantAdmin")
+  reminderEmails ReminderEmail[]
 
   @@map("users")
 }
@@ -158,4 +164,19 @@ model AccessGrant {
   @@index([userId])
   @@index([grantedById])
   @@map("access_grants")
+}
+
+/// One row per reminder actually sent, so re-running the cron never sends twice.
+/// accessUntil is the expiry the email was about: renewing changes it and re-arms the reminders.
+model ReminderEmail {
+  id          String       @id @default(cuid())
+  userId      String       @map("user_id")
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind        ReminderKind
+  accessUntil DateTime     @map("access_until")
+  sentAt      DateTime     @default(now()) @map("sent_at")
+
+  // Also serves as the userId index (leading column).
+  @@unique([userId, kind, accessUntil])
+  @@map("reminder_emails")
 }

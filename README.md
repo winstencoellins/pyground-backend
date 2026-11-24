@@ -103,3 +103,22 @@ Templates live in `src/emails/` (copy for both languages in `i18n.ts`, shared la
 Set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain verified in Resend). Without a key,
 development prints each email to the console; production logs only that it wasn't sent.
 Sending never throws, so auth and payments keep working if Resend is down.
+
+## Cron jobs
+
+Both run as separate Railway cron services from the same image (schedules are UTC):
+
+| Service          | Command                  | Schedule                      |
+| ---------------- | ------------------------ | ----------------------------- |
+| Expiry reminders | `bun run cron:reminders` | `0 1 * * *` (08:00 WIB)       |
+| Database backup  | `bun run cron:backup`    | e.g. `0 20 * * *` (03:00 WIB) |
+
+**Reminders** email STUDENTs with a verified email whose pass ends in 3 days or today (Asia/Jakarta
+calendar), in their language. Each `(user, kind, accessUntil)` is recorded in `reminder_emails`, so
+re-runs never double-send and a renewal re-arms them. Undelivered emails (Resend down or no key) are
+released for the next run and make the job exit non-zero.
+
+**Backups** run `pg_dump --format=custom` (credentials passed as `PG*` env vars, never argv) and upload
+`pyground/YYYY/MM/pyground-YYYYMMDD-HHMMSSZ.dump` to the bucket. `pg_dump` must match the server's
+major version (Postgres 17 locally). Set a lifecycle rule on the bucket to expire old dumps.
+Restore: `pg_restore --clean --no-owner -d "$DATABASE_PUBLIC_URL" pyground-….dump`.
