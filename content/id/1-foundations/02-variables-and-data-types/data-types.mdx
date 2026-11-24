@@ -1,0 +1,103 @@
+---
+title: Tipe Data
+slug: data-types
+stage: 1
+module: Variabel dan Tipe Data
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Kenali empat tipe data dasar Python, yaitu int, float, str, dan bool.
+---
+
+# Tipe Data
+
+Setiap nilai di Python punya **tipe**. Tipe menentukan apa yang bisa dilakukan dengan nilai itu.
+Angka bisa dijumlahkan, teks bisa digabung, dan seterusnya.
+
+Ada empat tipe dasar yang akan kamu pakai setiap hari:
+
+| Tipe | Nama lengkap | Contoh | Dipakai untuk |
+| --- | --- | --- | --- |
+| `int` | integer (bilangan bulat) | `17`, `-3`, `2024` | umur, jumlah barang |
+| `float` | floating point (bilangan desimal) | `3.14`, `0.5`, `-2.0` | tinggi badan, nilai rata-rata |
+| `str` | string (teks) | `"Halo"`, `'Jakarta'` | nama, alamat, pesan |
+| `bool` | boolean (benar/salah) | `True`, `False` | sudah login?, lulus? |
+
+<Callout type="info">
+  Desimal di Python memakai **titik**, bukan koma: tulis `3.5`, bukan `3,5`.
+</Callout>
+
+## Mengecek tipe dengan type()
+
+Fungsi `type()` memberi tahu tipe sebuah nilai:
+
+<Playground initialCode={`umur = 17
+tinggi = 165.5
+nama = "Siti"
+sudah_lulus = False
+
+print(type(umur))
+print(type(tinggi))
+print(type(nama))
+print(type(sudah_lulus))`} />
+
+## Teks yang berisi angka tetaplah teks
+
+Ini jebakan yang sering terjadi. `"17"` dengan tanda kutip adalah **teks**, bukan angka:
+
+<Playground initialCode={`print(17 + 3)
+print("17" + "3")
+print(type("17"))`} />
+
+`17 + 3` menghasilkan `20`, tapi `"17" + "3"` menghasilkan `173`, karena dua teks
+**disambung**, bukan dijumlahkan.
+
+Kalau teks dan angka dicampur, Python menolak:
+
+<Playground expectError initialCode={`umur = 17
+print("Umurku " + umur)`} />
+
+Hasilnya `TypeError`: Python tidak tahu apakah kamu ingin menjumlahkan atau menyambung. Di
+pelajaran berikutnya kamu akan belajar cara mengubah tipe data untuk mengatasinya.
+
+## Boolean
+
+`bool` hanya punya dua nilai: `True` dan `False`. Huruf pertamanya **wajib kapital**.
+Boolean akan sangat penting saat kamu belajar percabangan (`if`).
+
+<Playground initialCode={`hujan = True
+punya_payung = False
+print("Hujan?", hujan)
+print("Bawa payung?", punya_payung)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa tipe dari nilai 9.75?",
+      options: ["int", "float", "str"],
+      answer: 1,
+      explanation: "Angka dengan titik desimal bertipe float.",
+    },
+    {
+      question: "Apa hasil dari print(\"5\" + \"5\")?",
+      options: ["10", "55", "Error"],
+      answer: 1,
+      explanation: "Keduanya teks (str), jadi disambung menjadi 55.",
+    },
+    {
+      question: "Penulisan boolean mana yang benar?",
+      options: ["true", "TRUE", "True"],
+      answer: 2,
+      explanation: "Python hanya mengenal True dan False dengan huruf awal kapital.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `int` untuk bilangan bulat, `float` untuk desimal (pakai titik), `str` untuk teks, `bool` untuk
+  `True`/`False`.
+- `type()` menunjukkan tipe sebuah nilai.
+- `"17"` adalah teks. Teks + teks disambung, teks + angka menghasilkan `TypeError`.

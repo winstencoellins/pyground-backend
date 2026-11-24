@@ -1,0 +1,104 @@
+---
+title: Mengubah Tipe Data
+slug: type-conversion
+stage: 1
+module: Variabel dan Tipe Data
+order: 3
+isFree: true
+estimatedMinutes: 10
+description: Ubah teks menjadi angka dan sebaliknya dengan int(), float(), dan str().
+---
+
+# Mengubah Tipe Data
+
+Di pelajaran sebelumnya, `"Umurku " + 17` menghasilkan `TypeError`. Solusinya adalah **mengubah
+tipe** salah satu nilai supaya keduanya cocok. Proses ini disebut **konversi tipe**.
+
+| Fungsi | Mengubah menjadi | Contoh | Hasil |
+| --- | --- | --- | --- |
+| `int()` | bilangan bulat | `int("42")` | `42` |
+| `float()` | desimal | `float("3.5")` | `3.5` |
+| `str()` | teks | `str(17)` | `"17"` |
+
+## Angka menjadi teks: str()
+
+<Playground initialCode={`umur = 17
+print("Umurku " + str(umur) + " tahun")`} />
+
+## Teks menjadi angka: int() dan float()
+
+<Playground initialCode={`harga_teks = "15000"
+jumlah_teks = "3"
+
+total = int(harga_teks) * int(jumlah_teks)
+print("Total bayar:", total)
+
+berat = float("2.5")
+print(berat + 1)`} />
+
+Ini akan sangat berguna di pelajaran berikutnya: semua yang diketik pengguna lewat `input()`
+selalu berupa **teks**, jadi harus diubah dulu sebelum dihitung.
+
+## Hal-hal yang perlu diperhatikan
+
+`int()` pada angka desimal akan **membuang** bagian desimalnya (bukan membulatkan):
+
+<Playground initialCode={`print(int(9.99))
+print(round(9.99))`} />
+
+Teks yang bukan angka tidak bisa diubah menjadi angka:
+
+<Playground expectError initialCode={`print(int("sepuluh"))`} />
+
+Hasilnya `ValueError`: nilainya tidak bisa dibaca sebagai angka.
+
+<Callout type="warning">
+  `int("3.5")` juga error. Teks berisi desimal harus diubah dengan `float()` dulu.
+</Callout>
+
+## Latihan
+
+Jalankan kode ini. Tidak ada error, tapi hasilnya `Total: 250002500025000`! Teks yang dikali
+angka akan **diulang**, bukan dihitung. Perbaiki supaya menampilkan `Total: 75000`.
+
+<Playground initialCode={`harga = "25000"
+jumlah = 3
+print("Total: " + harga * jumlah)`} />
+
+<Callout type="tip">
+  Kamu perlu dua konversi: `harga` menjadi angka sebelum dikali, lalu hasilnya menjadi teks
+  sebelum disambung. Bug seperti ini lebih berbahaya daripada error, karena programnya tetap
+  berjalan.
+</Callout>
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil dari int(\"8\") + 2?",
+      options: ["82", "10", "Error"],
+      answer: 1,
+      explanation: "int(\"8\") menjadi angka 8, lalu dijumlahkan dengan 2.",
+    },
+    {
+      question: "Apa hasil dari int(7.9)?",
+      options: ["7", "8", "7.9"],
+      answer: 0,
+      explanation: "int() membuang bagian desimal tanpa membulatkan.",
+    },
+    {
+      question: "Kode mana yang menghasilkan ValueError?",
+      options: ["str(100)", "float(\"2.5\")", "int(\"dua\")"],
+      answer: 2,
+      explanation: "\"dua\" tidak bisa dibaca sebagai angka.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `int()`, `float()`, dan `str()` mengubah tipe data.
+- Pakai `str()` sebelum menyambung angka dengan teks.
+- `int()` membuang desimal; `round()` membulatkan.
+- Teks yang bukan angka menghasilkan `ValueError` saat dikonversi.

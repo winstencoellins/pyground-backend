@@ -12,6 +12,7 @@ content/<locale>/<n-stage>/<nn-module>/<slug>.mdx     locale: id (source of trut
   lesson, or an English file whose `slug`/`stage`/`order`/`isFree`/`estimatedMinutes` differ
   from the Indonesian one). Run `bun test tests/lessons.test.ts` after editing; it also checks
   that every `<Playground initialCode>` is valid Python.
+- Inside `initialCode`, avoid backslashes (`\n`) and `${`: the template literal would eat them.
 - Prettier ignores this folder on purpose (it breaks Python indentation inside template strings).
 
 ## Frontmatter (all keys required, no others)
@@ -32,6 +33,7 @@ description: One sentence, localized.
 | Component | Props |
 | --- | --- |
 | `<Playground initialCode={\`...\`} />` | Python run in the browser. Use a template literal for multi-line code. |
+| `<Playground expectError initialCode={\`...\`} />` | Code with a deliberate error for the learner to fix (skipped by the valid-Python test). `expectError` must come first. |
 | `<Quiz questions={[{ question, options: string[], answer: index, explanation }]} />` | Multiple choice. |
 | `<Callout type="tip\|warning\|info">…</Callout>` | Markdown children. |
 | `<AnimatedDiagram name="…" caption="…" />` | `name` selects a diagram built in the web app. |

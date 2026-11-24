@@ -1,0 +1,110 @@
+---
+title: Komentar dan Membaca Error
+slug: comments-and-errors
+stage: 1
+module: Apa Itu Pemrograman
+order: 2
+isFree: true
+estimatedMinutes: 10
+description: Tulis catatan di dalam kode dan pelajari cara membaca pesan error tanpa panik.
+---
+
+# Komentar dan Membaca Error
+
+Sebelum belajar lebih jauh, ada dua kebiasaan yang akan sangat membantumu: menulis **komentar**
+dan membaca **pesan error**.
+
+## Komentar
+
+Komentar adalah catatan di dalam kode yang **tidak dijalankan** oleh Python. Komentar diawali
+tanda pagar `#`. Semua tulisan setelah `#` di baris itu akan diabaikan.
+
+<Playground initialCode={`# Program ini menyapa pengguna
+print("Halo!")  # komentar juga boleh di akhir baris
+
+# print("Baris ini tidak akan muncul")
+print("Selesai")`} />
+
+Komentar berguna untuk:
+
+- menjelaskan **kenapa** kode ditulis seperti itu, untuk dirimu sendiri di masa depan;
+- "mematikan" sebuah baris sementara tanpa menghapusnya.
+
+<Callout type="tip">
+  Coba hapus tanda `#` sebelum `print("Baris ini tidak akan muncul")`, lalu jalankan lagi.
+</Callout>
+
+## Error itu normal
+
+Semua programmer, bahkan yang sudah bertahun-tahun, melihat error setiap hari. Error bukan tanda
+kamu gagal. Error adalah cara Python memberi tahu **di mana** dan **apa** masalahnya.
+
+Jalankan kode ini. Kodenya sengaja dibuat salah:
+
+<Playground expectError initialCode={`print("Halo")
+print("Dunia"`} />
+
+Python akan menampilkan pesan seperti ini:
+
+<TerminalBlock command="python halo.py" output={`  File "halo.py", line 2
+    print("Dunia"
+         ^
+SyntaxError: '(' was never closed`} />
+
+## Cara membaca pesan error
+
+Baca dari **bawah ke atas**:
+
+1. **Baris terakhir** memberi tahu jenis error dan penjelasannya: `SyntaxError: '(' was never closed`
+   artinya ada kurung buka yang tidak ditutup.
+2. **`line 2`** menunjukkan nomor baris yang bermasalah.
+3. Tanda **`^`** menunjuk posisi yang dicurigai Python.
+
+Beberapa error yang akan sering kamu temui:
+
+| Error | Artinya |
+| --- | --- |
+| `SyntaxError` | Penulisan kode tidak sesuai aturan Python (kurung, tanda kutip, titik dua). |
+| `NameError` | Kamu memakai nama yang belum dibuat, atau salah ketik. |
+| `TypeError` | Kamu menggabungkan tipe data yang tidak cocok, misalnya teks dengan angka. |
+
+Sekarang perbaiki kode ini sampai bisa berjalan:
+
+<Playground expectError initialCode={`print("Aku belajar Python)
+pritn("Seru sekali!")`} />
+
+<Callout type="info">
+  Ada dua kesalahan: satu tanda kutip yang hilang dan satu salah ketik. Python hanya melaporkan
+  error pertama yang ia temukan, jadi perbaiki satu per satu.
+</Callout>
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang terjadi pada baris yang diawali tanda #?",
+      options: ["Dijalankan dua kali", "Diabaikan oleh Python", "Menyebabkan error"],
+      answer: 1,
+      explanation: "Baris yang diawali # adalah komentar, dan Python mengabaikannya.",
+    },
+    {
+      question: "Bagian mana dari pesan error yang sebaiknya dibaca pertama kali?",
+      options: ["Baris paling atas", "Baris paling bawah", "Tidak perlu dibaca"],
+      answer: 1,
+      explanation: "Baris terakhir berisi jenis error dan penjelasan singkatnya.",
+    },
+    {
+      question: "Kamu menulis pritn(\"Halo\"). Error apa yang muncul?",
+      options: ["NameError", "SyntaxError", "Tidak ada error"],
+      answer: 0,
+      explanation: "pritn belum pernah dibuat, jadi Python tidak mengenal nama itu: NameError.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Komentar diawali `#` dan tidak dijalankan.
+- Error itu normal. Baca pesan error dari bawah ke atas.
+- Perhatikan jenis error, nomor baris, dan tanda `^`.

@@ -1,0 +1,126 @@
+---
+title: Operator Aritmatika
+slug: arithmetic-operators
+stage: 1
+module: Input dan Operator
+order: 1
+isFree: true
+estimatedMinutes: 12
+description: Jadikan Python kalkulatormu dengan tambah, kurang, kali, bagi, sisa bagi, dan pangkat.
+---
+
+# Operator Aritmatika
+
+Python bisa menghitung seperti kalkulator, tapi jauh lebih fleksibel karena hasilnya bisa
+disimpan di variabel dan dipakai lagi.
+
+| Operator | Arti | Contoh | Hasil |
+| --- | --- | --- | --- |
+| `+` | tambah | `7 + 2` | `9` |
+| `-` | kurang | `7 - 2` | `5` |
+| `*` | kali | `7 * 2` | `14` |
+| `/` | bagi | `7 / 2` | `3.5` |
+| `//` | bagi bulat | `7 // 2` | `3` |
+| `%` | sisa bagi (modulo) | `7 % 2` | `1` |
+| `**` | pangkat | `7 ** 2` | `49` |
+
+<Playground initialCode={`print(7 + 2)
+print(7 - 2)
+print(7 * 2)
+print(7 / 2)
+print(7 // 2)
+print(7 % 2)
+print(7 ** 2)`} />
+
+<Callout type="info">
+  Pembagian `/` **selalu** menghasilkan `float`, bahkan `10 / 2` hasilnya `5.0`.
+</Callout>
+
+## Bagi bulat dan sisa bagi
+
+`//` dan `%` sering dipakai bersama. Misalnya, 135 menit itu berapa jam dan berapa menit?
+
+<Playground initialCode={`total_menit = 135
+jam = total_menit // 60
+menit = total_menit % 60
+print(jam, "jam", menit, "menit")`} />
+
+`%` juga berguna untuk mengecek bilangan genap: kalau `angka % 2` hasilnya `0`, angkanya genap.
+
+## Urutan pengerjaan
+
+Seperti di matematika, Python mengerjakan `**` dulu, lalu `*`, `/`, `//`, `%`, baru `+` dan `-`.
+Pakai **kurung** untuk mengatur urutannya sendiri:
+
+<Playground initialCode={`print(2 + 3 * 4)
+print((2 + 3) * 4)`} />
+
+## Menghitung dengan variabel
+
+<Playground initialCode={`harga_nasi = 12000
+harga_es_teh = 5000
+jumlah_orang = 3
+
+total = (harga_nasi + harga_es_teh) * jumlah_orang
+print("Total:", total)
+print("Per orang:", total / jumlah_orang)`} />
+
+## Operator penugasan singkat
+
+Menambah isi variabel sangat sering dilakukan, jadi Python punya cara singkat:
+
+| Cara panjang | Cara singkat |
+| --- | --- |
+| `skor = skor + 10` | `skor += 10` |
+| `nyawa = nyawa - 1` | `nyawa -= 1` |
+| `harga = harga * 2` | `harga *= 2` |
+
+<Playground initialCode={`saldo = 50000
+saldo += 20000
+saldo -= 15000
+print("Saldo akhir:", saldo)`} />
+
+## Latihan
+
+Hitung luas dan keliling persegi panjang dengan panjang 8 dan lebar 5.
+
+<Playground initialCode={`panjang = 8
+lebar = 5
+
+luas = 0       # ganti dengan rumus yang benar
+keliling = 0   # ganti dengan rumus yang benar
+
+print("Luas:", luas)
+print("Keliling:", keliling)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil dari 10 / 4?",
+      options: ["2", "2.5", "2.0"],
+      answer: 1,
+      explanation: "Operator / selalu menghasilkan float: 2.5.",
+    },
+    {
+      question: "Apa hasil dari 17 % 5?",
+      options: ["3", "2", "3.4"],
+      answer: 1,
+      explanation: "17 dibagi 5 = 3, sisa 2. Operator % mengambil sisanya.",
+    },
+    {
+      question: "Apa hasil dari 2 + 3 * 2?",
+      options: ["10", "8", "12"],
+      answer: 1,
+      explanation: "Perkalian dikerjakan dulu: 3 * 2 = 6, lalu 2 + 6 = 8.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `+ - * /` bekerja seperti di matematika; `/` selalu menghasilkan `float`.
+- `//` membagi lalu membuang desimal, `%` mengambil sisa bagi, `**` memangkatkan.
+- Gunakan kurung untuk mengatur urutan pengerjaan.
+- `x += 1` adalah cara singkat dari `x = x + 1`.

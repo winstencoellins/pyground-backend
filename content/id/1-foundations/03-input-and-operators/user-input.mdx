@@ -1,0 +1,105 @@
+---
+title: Menerima Input dari Pengguna
+slug: user-input
+stage: 1
+module: Input dan Operator
+order: 2
+isFree: true
+estimatedMinutes: 12
+description: Buat program interaktif yang bertanya kepada pengguna dengan input().
+---
+
+# Menerima Input dari Pengguna
+
+Sejauh ini program kita selalu menampilkan hal yang sama. Dengan `input()`, program bisa
+**bertanya** dan memakai jawaban pengguna.
+
+<Playground initialCode={`nama = input("Siapa namamu? ")
+print("Halo,", nama)`} />
+
+<Callout type="info">
+  Saat kode dijalankan, Pyground akan memintamu mengetik jawaban. Ketik lalu tekan Enter.
+</Callout>
+
+Cara kerjanya:
+
+1. `input()` menampilkan teks pertanyaan di dalam kurung.
+2. Program **berhenti dan menunggu** pengguna mengetik.
+3. Apa pun yang diketik disimpan ke variabel `nama`.
+
+<Callout type="tip">
+  Beri spasi di akhir pertanyaan, `"Siapa namamu? "`, supaya jawaban tidak menempel.
+</Callout>
+
+## input() selalu menghasilkan teks
+
+Ini aturan paling penting di pelajaran ini. Walaupun pengguna mengetik angka, hasil `input()`
+**selalu** bertipe `str`:
+
+<Playground initialCode={`umur = input("Berapa umurmu? ")
+print(type(umur))`} />
+
+Jadi kode berikut tidak bekerja seperti yang diharapkan. Coba jalankan dan ketik `17`:
+
+<Playground expectError initialCode={`umur = input("Berapa umurmu? ")
+print("Tahun depan umurmu", umur + 1)`} />
+
+Hasilnya `TypeError`, karena `"17" + 1` mencampur teks dan angka. Solusinya, ubah dulu dengan
+`int()` atau `float()`, persis seperti yang kamu pelajari sebelumnya:
+
+<Playground initialCode={`umur = int(input("Berapa umurmu? "))
+print("Tahun depan umurmu", umur + 1)`} />
+
+`int(input(...))` dibaca dari dalam ke luar: ambil input, lalu ubah menjadi `int`.
+
+## Program kecil: kalkulator patungan
+
+Gabungkan semua yang sudah kamu pelajari: variabel, tipe data, operator, dan input.
+
+<Playground initialCode={`total = int(input("Total tagihan (Rp): "))
+orang = int(input("Dibagi berapa orang? "))
+
+per_orang = total / orang
+print("Setiap orang bayar Rp", round(per_orang))`} />
+
+## Latihan
+
+Buat program konversi suhu. Minta suhu dalam Celsius, lalu tampilkan dalam Fahrenheit.
+Rumusnya: `fahrenheit = celsius * 9 / 5 + 32`.
+
+<Playground initialCode={`# 1. Minta suhu dalam Celsius (bisa desimal, jadi pakai float)
+# 2. Hitung Fahrenheit
+# 3. Tampilkan hasilnya
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Pengguna mengetik 25 pada x = input(). Apa tipe x?",
+      options: ["int", "float", "str"],
+      answer: 2,
+      explanation: "input() selalu menghasilkan str, apa pun yang diketik.",
+    },
+    {
+      question: "Cara yang benar untuk meminta angka bulat dari pengguna?",
+      options: ["input(int(\"Angka: \"))", "int(input(\"Angka: \"))", "input(\"Angka: \") + 0"],
+      answer: 1,
+      explanation: "Ambil input dulu, lalu ubah hasilnya dengan int().",
+    },
+    {
+      question: "Apa yang dilakukan program saat sampai di baris input()?",
+      options: ["Langsung lanjut ke baris berikutnya", "Berhenti dan menunggu pengguna mengetik", "Menampilkan error"],
+      answer: 1,
+      explanation: "Program menunggu sampai pengguna mengetik dan menekan Enter.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `input("pertanyaan")` menampilkan pertanyaan dan menunggu jawaban pengguna.
+- Hasil `input()` **selalu** teks (`str`).
+- Gunakan `int(input(...))` atau `float(input(...))` untuk angka.
+- Selamat! Kamu sudah bisa membuat program interaktif pertamamu.

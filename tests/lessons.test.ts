@@ -23,6 +23,12 @@ describe("real content", () => {
     const catalog = getCatalog();
     expect(catalog.ordered.map((l) => l.slug)).toEqual([
       "what-is-programming",
+      "comments-and-errors",
+      "variables",
+      "data-types",
+      "type-conversion",
+      "arithmetic-operators",
+      "user-input",
       "for-loops",
       "try-except",
       "how-the-web-works",
@@ -33,7 +39,11 @@ describe("real content", () => {
   it("every <Playground initialCode> is valid Python", () => {
     for (const locale of ["id", "en"] as const) {
       for (const lesson of getCatalog().byLocale[locale].values()) {
-        for (const [, code] of lesson.source.matchAll(/initialCode=\{`([\s\S]*?)`\}/g)) {
+        // `<Playground expectError initialCode=...>` is a deliberate error for the learner to fix.
+        for (const [, broken, code] of lesson.source.matchAll(
+          /<Playground (expectError )?initialCode=\{`([\s\S]*?)`\}/g,
+        )) {
+          if (broken) continue;
           const py = Bun.spawnSync(
             ["python3", "-c", "import sys; compile(sys.stdin.read(), 'lesson', 'exec')"],
             {
@@ -140,12 +150,13 @@ describe("GET /api/lessons", () => {
       id: "01-what-is-programming",
       title: "Apa Itu Pemrograman",
     });
-    expect(lessons(idx).map((l) => [l.slug, l.locked])).toEqual([
-      ["what-is-programming", false],
-      ["for-loops", true],
-      ["try-except", true],
-      ["how-the-web-works", true],
-    ]);
+    expect(lessons(idx)[0]).toMatchObject({ slug: "what-is-programming", locked: false });
+    expect(
+      lessons(idx)
+        .filter((l) => l.locked)
+        .map((l) => l.slug),
+    ).toEqual(["for-loops", "try-except", "how-the-web-works"]);
+    expect(idx.stages[0]!.modules.flatMap((m) => m.lessons).some((l) => l.locked)).toBe(false);
   });
 
   it("?locale=en returns English titles", async () => {

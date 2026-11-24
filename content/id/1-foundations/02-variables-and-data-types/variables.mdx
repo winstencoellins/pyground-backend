@@ -1,0 +1,108 @@
+---
+title: Variabel
+slug: variables
+stage: 1
+module: Variabel dan Tipe Data
+order: 1
+isFree: true
+estimatedMinutes: 10
+description: Simpan data dengan nama supaya bisa dipakai dan diubah lagi nanti.
+---
+
+# Variabel
+
+Program jarang hanya menampilkan teks tetap. Biasanya program perlu **mengingat** sesuatu: nama
+pengguna, harga barang, atau skor permainan. Untuk itu kita memakai **variabel**.
+
+Variabel adalah **nama** yang menempel pada sebuah **nilai**. Bayangkan label yang kamu tempel di
+toples: labelnya `gula`, isinya gula.
+
+<Playground initialCode={`nama = "Budi"
+umur = 17
+
+print(nama)
+print(umur)`} />
+
+Tanda `=` di Python **bukan** "sama dengan" seperti di matematika. Artinya: "simpan nilai di
+kanan ke dalam nama di kiri".
+
+## Mengubah isi variabel
+
+Isi variabel boleh diganti kapan saja. Nilai yang lama akan tertimpa:
+
+<Playground initialCode={`skor = 10
+print(skor)
+
+skor = 25
+print(skor)
+
+skor = skor + 5
+print(skor)`} />
+
+Baris `skor = skor + 5` dibaca: ambil isi `skor` sekarang (25), tambah 5, lalu simpan hasilnya
+kembali ke `skor`.
+
+## Menampilkan beberapa nilai sekaligus
+
+`print()` bisa menerima beberapa nilai yang dipisah koma. Python akan memberi spasi di antaranya:
+
+<Playground initialCode={`kota = "Bandung"
+suhu = 24
+print("Suhu di", kota, "hari ini", suhu, "derajat")`} />
+
+## Aturan memberi nama
+
+- Boleh huruf, angka, dan garis bawah `_`, tapi **tidak boleh diawali angka**.
+- Tidak boleh ada spasi. Pakai garis bawah: `harga_total`, bukan `harga total`.
+- Huruf besar dan kecil dibedakan: `nama` dan `Nama` adalah dua variabel berbeda.
+- Pilih nama yang menjelaskan isinya: `harga_kopi` lebih jelas daripada `x`.
+
+<Callout type="warning">
+  Memakai variabel yang belum dibuat akan menghasilkan `NameError`. Cek salah ketik!
+</Callout>
+
+<Playground expectError initialCode={`harga_kopi = 18000
+print(harga_kopii)`} />
+
+## Latihan
+
+Buat variabel `makanan_favorit` dan `jumlah_porsi`, lalu tampilkan kalimat seperti
+"Aku mau 2 porsi sate".
+
+<Playground initialCode={`makanan_favorit = "sate"
+jumlah_porsi = 2
+
+# Tulis print() di sini
+`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa arti tanda = pada baris harga = 5000?",
+      options: ["harga sama dengan 5000 (perbandingan)", "Simpan 5000 ke dalam variabel harga", "Error, harus pakai =="],
+      answer: 1,
+      explanation: "Di Python, = adalah penugasan: nilai di kanan disimpan ke nama di kiri.",
+    },
+    {
+      question: "Nama variabel mana yang valid?",
+      options: ["2nama", "nama depan", "nama_depan"],
+      answer: 2,
+      explanation: "Nama variabel tidak boleh diawali angka dan tidak boleh mengandung spasi.",
+    },
+    {
+      question: "Setelah x = 3 lalu x = x + 2, berapa isi x?",
+      options: ["3", "5", "2"],
+      answer: 1,
+      explanation: "x + 2 dihitung dari isi x saat itu (3), hasilnya 5 disimpan kembali ke x.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Variabel menyimpan nilai dengan sebuah nama: `nama = "Budi"`.
+- `=` artinya menyimpan, bukan membandingkan.
+- Isi variabel bisa diganti, dan nilai lama tertimpa.
+- Pilih nama yang jelas, tanpa spasi, dan tidak diawali angka.
