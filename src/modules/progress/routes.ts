@@ -1,5 +1,6 @@
 import { Elysia, t } from "elysia";
 import { prisma } from "../../lib/prisma";
+import { limit } from "../../lib/rate-limit";
 import { sessionPlugin } from "../../plugins/session";
 import { requireOpenableLesson, slugParams } from "../lessons/access";
 import { getCatalog } from "../lessons/content";
@@ -49,7 +50,7 @@ export const progressRoutes = new Elysia()
       });
       return { slug: row.lessonSlug, completedAt: row.completedAt };
     },
-    { auth: true, params: slugParams },
+    { auth: true, params: slugParams, beforeHandle: limit("progress", 60, 60_000) },
   )
   .post(
     "/api/quiz/:slug/attempts",
@@ -74,6 +75,7 @@ export const progressRoutes = new Elysia()
     {
       auth: true,
       params: slugParams,
+      beforeHandle: limit("quiz", 30, 60_000),
       // answers[i] = chosen option index for question i (null = skipped)
       body: t.Object({
         score: t.Integer({ minimum: 0, maximum: 100 }),

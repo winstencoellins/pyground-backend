@@ -45,12 +45,21 @@ const routes = new Elysia()
     beforeHandle: limit("auth", 10, 60_000),
   });
 
+// JSON-only API: nothing may be framed, sniffed, cached by shared caches, or load sub-resources.
+const SECURITY_HEADERS = {
+  "cache-control": "private, no-store",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "referrer-policy": "no-referrer",
+  "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+};
+
 export const app = new Elysia()
   .use(errorHandler)
   // Every response is per-user (session, paid lessons, locked flags): no shared/CDN/browser caching.
   // A route may override this explicitly.
   .onRequest(({ set }) => {
-    set.headers["cache-control"] = "private, no-store";
+    Object.assign(set.headers, SECURITY_HEADERS);
   })
   .use(routes);
 

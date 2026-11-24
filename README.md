@@ -104,6 +104,19 @@ Set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain verified in Resend).
 development prints each email to the console; production logs only that it wasn't sent.
 Sending never throws, so auth and payments keep working if Resend is down.
 
+## Security
+
+- **Startup check (production):** the API refuses to boot if `BETTER_AUTH_SECRET` is under 32 chars,
+  `WEB_URL` isn't https (localhost allowed for DEV), Midtrans keys don't match `MIDTRANS_IS_PRODUCTION`,
+  or `TRUSTED_PROXY_HOPS` is outside 1–5. Missing Resend/Midtrans keys only warn.
+- **Headers on every response:** `no-store`, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`,
+  `CSP: default-src 'none'` (JSON only; the page CSP for Pyodide/Snap belongs to pyground-web).
+- **Limits:** 1 MB request bodies; per-IP rate limits on auth, checkout, webhook, progress and quiz.
+- **No account enumeration:** sign-up with an existing email and password reset for an unknown email
+  answer exactly like the normal case. Foreign `redirectTo` / `Origin` are refused.
+- **Shutdown:** SIGTERM finishes in-flight requests, then exits 0.
+- `bun audit` is clean (`effect` is pinned to a patched 3.x via `overrides` until Prisma bumps it).
+
 ## Cron jobs
 
 Both run as separate Railway cron services from the same image (schedules are UTC):
