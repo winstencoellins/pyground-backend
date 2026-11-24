@@ -122,3 +122,56 @@ released for the next run and make the job exit non-zero.
 `pyground/YYYY/MM/pyground-YYYYMMDD-HHMMSSZ.dump` to the bucket. `pg_dump` must match the server's
 major version (Postgres 17 locally). Set a lifecycle rule on the bucket to expire old dumps.
 Restore: `pg_restore --clean --no-owner -d "$DATABASE_PUBLIC_URL" pyground-….dump`.
+
+## Environments: DEV → staging → production
+
+|           | DEV (local)                                  | Staging (Railway)                        | Production (Railway)             |
+| --------- | -------------------------------------------- | ---------------------------------------- | -------------------------------- |
+| Runs      | `docker compose --profile app up -d --build` | Railway environment `staging`            | Railway environment `production` |
+| Database  | `pyground_dev` in the compose Postgres       | its own Railway Postgres                 | its own Railway Postgres         |
+| Midtrans  | sandbox                                      | sandbox (`MIDTRANS_IS_PRODUCTION=false`) | production keys (`true`)         |
+| `WEB_URL` | `http://localhost:3000`                      | staging web URL                          | production web URL               |
+
+Promote only what passed the previous stage: DEV runs the exact production image (same Dockerfile,
+`NODE_ENV=production`, pre-deploy migration, health check, cron commands), so if it works in DEV it
+deploys the same way on Railway.
+
+### DEV (local, production image)
+
+```bash
+cp .env.example .env                                  # Midtrans sandbox / Resend keys are read from here
+docker compose --profile app up -d --build --wait    # migrate (pre-deploy) -> api on http://localhost:3002
+docker compose --profile app run --rm api bun run db:seed   # admin from SEED_ADMIN_* (no sample data: NODE_ENV=production)
+docker compose --profile app run --rm reminders      # cron: expiry reminders
+docker compose --profile app run --rm backup         # cron: needs BACKUP_S3_* in .env
+docker compose --profile app down                    # stop (data stays in the volume)
+```
+
+## Deployment (Railway)
+
+One Railway project with environments `staging` and `production`. Each environment has:
+
+| Service                   | Source                    | Config file (Settings → Config-as-code)                                                                                       |
+| ------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Postgres                  | Railway Postgres template | —                                                                                                                             |
+| `pyground-api`            | this repo                 | `railway.json`: Dockerfile build, pre-deploy `bunx --bun prisma migrate deploy` (never `migrate dev`), health check `/health` |
+| `pyground-cron-reminders` | this repo                 | `railway.cron-reminders.json`: `bun run cron:reminders` at `0 1 * * *` (08:00 WIB)                                            |
+| `pyground-cron-backup`    | this repo                 | `railway.cron-backup.json`: `bun run cron:backup` at `0 20 * * *` (03:00 WIB)                                                 |
+| `pyground-web`            | pyground-frontend repo    | proxies `/api/*` to `pyground-api` over the private network                                                                   |
+
+**Variables** (set per environment; see `.env.example` for all of them):
+
+- All three backend services: `DATABASE_URL=${{Postgres.DATABASE_URL}}` (private network), `WEB_URL`,
+  `BETTER_AUTH_SECRET` (`openssl rand -base64 32`, different per environment), `RESEND_API_KEY`, `EMAIL_FROM`.
+- `pyground-api`: `MIDTRANS_SERVER_KEY`, `MIDTRANS_IS_PRODUCTION`, `ACCESS_PASS_PRICE_IDR`,
+  `TRUSTED_PROXY_HOPS`, optional `COOKIE_DOMAIN`. Railway sets `PORT`; the API listens on `::`.
+- `pyground-cron-backup`: `BACKUP_S3_*`.
+- `DATABASE_PUBLIC_URL` is only for running migrations or restores from your machine:
+  `DATABASE_URL="$DATABASE_PUBLIC_URL" bun run db:deploy`.
+
+After the first deploy of an environment: seed the admin once (`railway run --service pyground-api bun run db:seed`
+with `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD`), then set the Midtrans Notification URL for that environment's
+dashboard (sandbox for staging, production for production) to `https://<api-domain>/api/payments/midtrans/notification`.
+
+The image pins Bun 1.4.4 (CI uses the same). Bun 1.3.x can't load react-dom's production server build, which
+breaks every email when `NODE_ENV=production`; `tests/emails.test.ts` guards this.

@@ -1,4 +1,6 @@
-# Local development only. Railway provides Postgres in production.
+# Local development. Railway provides Postgres in staging/production.
+#   docker compose up -d --wait                 -> Postgres only (run the API with `bun run dev`)
+#   docker compose --profile app up -d --build  -> DEV: the production image, wired like Railway
 services:
   postgres:
     image: postgres:17-alpine
@@ -15,6 +17,63 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # --- DEV profile: same image + commands as Railway, against a separate `pyground_dev` database ---
+
+  # Railway's pre-deploy step.
+  migrate:
+    profiles: [app]
+    build: .
+    image: pyground-api:dev
+    command: ["bunx", "--bun", "prisma", "migrate", "deploy"]
+    env_file: .env # copy from .env.example; DATABASE_URL etc. below take precedence
+    environment: &dev-env
+      NODE_ENV: production
+      DATABASE_URL: postgresql://pyground:pyground@postgres:5432/pyground_dev
+      WEB_URL: ${DEV_WEB_URL:-http://localhost:3000}
+      BETTER_AUTH_SECRET: dev-only-secret-not-for-staging-or-production-0000
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    profiles: [app]
+    image: pyground-api:dev
+    env_file: .env # copy from .env.example; DATABASE_URL etc. below take precedence
+    environment: *dev-env
+    ports:
+      - "${DEV_API_PORT:-3002}:3001"
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "fetch('http://localhost:3001/health').then(r => process.exit(r.ok ? 0 : 1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cron jobs, run on demand: docker compose --profile app run --rm reminders | backup
+  reminders:
+    profiles: [app]
+    image: pyground-api:dev
+    command: ["bun", "run", "cron:reminders"]
+    env_file: .env # copy from .env.example; DATABASE_URL etc. below take precedence
+    environment: *dev-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  backup:
+    profiles: [app]
+    image: pyground-api:dev
+    command: ["bun", "run", "cron:backup"]
+    env_file: .env # copy from .env.example; DATABASE_URL etc. below take precedence
+    environment: *dev-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
 
 volumes:
   pgdata:

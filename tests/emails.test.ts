@@ -137,3 +137,32 @@ describe("sendEmail", () => {
     info.mockRestore();
   });
 });
+
+describe("production mode", () => {
+  // React loads different builds when NODE_ENV=production (Bun 1.3.5 couldn't load react-dom's).
+  // A fresh process is needed: the mode is fixed when React is first imported.
+  it.skipIf(Bun.semver.order(Bun.version, "1.4.4") < 0)(
+    "renders every email with NODE_ENV=production",
+    () => {
+      const script = `
+      const { authEmail, receiptEmail, expiryEmail } = await import("./src/emails/index.tsx");
+      const { render } = await import("@react-email/render");
+      const u = { email: "a@b.c", name: "A", locale: "EN" };
+      const mails = [
+        authEmail("verification", u, "http://x/verify"),
+        authEmail("passwordReset", u, "http://x/reset"),
+        receiptEmail(u, { orderId: "PYG-1", amount: 49000, paidAt: new Date(), paymentType: "qris", accessUntil: new Date() }),
+        expiryEmail("expiresSoon", u, new Date()),
+        expiryEmail("expiresToday", u, new Date()),
+      ];
+      for (const m of mails) if (!(await render(m.react)).includes("Supported by Trixync")) throw new Error(m.subject);
+      console.log("rendered", mails.length);`;
+      const proc = Bun.spawnSync([process.execPath, "-e", script], {
+        env: { ...process.env, NODE_ENV: "production" },
+        cwd: `${import.meta.dir}/..`,
+      });
+      expect(proc.stderr.toString()).toBe("");
+      expect(proc.stdout.toString().trim()).toBe("rendered 5");
+    },
+  );
+});
