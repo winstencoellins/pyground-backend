@@ -1,0 +1,199 @@
+---
+title: Raising Exceptions with raise
+slug: raising-exceptions
+stage: 3
+module: Error Handling
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Use else and finally well, raise your own errors with raise, and create named error types for your program.
+---
+
+# Raising Exceptions with `raise`
+
+In the previous lesson you learned to **catch** errors. Now we flip it around: sometimes your
+own code should **raise** an error, for example when a function receives data that makes no
+sense. We will also take a closer look at how `else` and `finally` work.
+
+## The order of `try`, `except`, `else`, `finally`
+
+Remember the rules: `else` runs only when `try` succeeds, while `finally` always runs. Watch
+the order of the printed lines in these two attempts:
+
+<Playground initialCode={`def calculate_change(paid, price):
+    try:
+        print("Calculating...")
+        change = int(paid) - price
+    except ValueError:
+        print("The amount paid must be a number")
+    else:
+        print("Change: Rp", change)
+    finally:
+        print("Cashier ready for the next customer")
+    print()
+
+calculate_change("50000", 32000)
+calculate_change("fifty thousand", 32000)`} />
+
+Why not put `print("Change...")` straight inside `try`? Because `try` should only hold the
+lines that **might fail**. The less you put in `try`, the clearer it is which error you are
+catching.
+
+## Raising an error with `raise`
+
+A function that receives bad data should **refuse firmly** instead of quietly returning a
+strange result. Write `raise`, then the exception name and a message:
+
+<Playground initialCode={`def discounted_price(price, percent):
+    if price < 0:
+        raise ValueError("Price cannot be negative")
+    if percent < 0 or percent > 100:
+        raise ValueError("Discount must be between 0 and 100 percent")
+    return price - price * percent // 100
+
+print(discounted_price(20000, 10))
+
+try:
+    print(discounted_price(20000, 150))
+except ValueError as e:
+    print("Failed:", e)`} />
+
+If an error from `raise` is not caught, the program stops and shows your message:
+
+<Playground expectError initialCode={`def set_score(score):
+    if score > 100:
+        raise ValueError("The maximum score is 100")
+    return score
+
+set_score(120)`} />
+
+<Callout type="tip">
+  Pick the exception that fits. `ValueError` for a wrong value (a negative age), `TypeError`
+  for a wrong type (text where a number belongs). A clear message helps whoever uses your
+  function.
+</Callout>
+
+## Passing an error on (re-raise)
+
+Sometimes you want to **log** that an error happened, but still let it travel up to the code
+that called you. To do that, write a bare `raise` inside `except`:
+
+<Playground initialCode={`def read_price(text):
+    try:
+        return int(text)
+    except ValueError:
+        print("Note: invalid price ->", text)
+        raise
+
+prices = ["15000", "8000", "two thousand"]
+total = 0
+try:
+    for text in prices:
+        total += read_price(text)
+except ValueError:
+    print("Total cancelled because one price is wrong")
+else:
+    print("Total:", total)`} />
+
+`read_price()` logs the problem, then hands the decision to the caller. The caller knows the
+context and decides what to do.
+
+## Your own error types
+
+`ValueError` can mean many things. To be clearer, you can create your own **named** error
+type. For now, think of the `class` line below as just a way to name a new kind of error. You
+will learn `class` properly in the OOP module later.
+
+<Playground initialCode={`class InsufficientBalance(Exception):
+    pass
+
+def withdraw(balance, amount):
+    if amount > balance:
+        raise InsufficientBalance(f"Balance Rp{balance} is not enough to withdraw Rp{amount}")
+    return balance - amount
+
+balance = 150000
+for amount in [50000, 200000]:
+    try:
+        balance = withdraw(balance, amount)
+        print("Success, remaining balance Rp", balance)
+    except InsufficientBalance as e:
+        print("Declined:", e)`} />
+
+With the name `InsufficientBalance`, the code that catches it reads clearly, and it will not
+get mixed up with a `ValueError` from somewhere else.
+
+## Don't catch everything
+
+`except:` without an exception name catches **every** error, including typos in your own
+code. Look at this example: there is a typo `totl`, yet the message blames the user.
+
+<Playground initialCode={`price = "12000"
+try:
+    total = int(price) * 2
+    print("Total:", totl)
+except:
+    print("Wrong price input!")`} />
+
+A `NameError` bug is hidden behind a misleading message. Compare it with catching a specific
+exception:
+
+<Playground expectError initialCode={`price = "12000"
+try:
+    total = int(price) * 2
+    print("Total:", totl)
+except ValueError:
+    print("Wrong price input!")`} />
+
+Now Python honestly tells you there is a `NameError`, and you can fix it right away.
+
+<Callout type="warning">
+  Catch only the errors you actually expect and know how to handle. Let the others surface so
+  bugs are found quickly.
+</Callout>
+
+## Exercise
+
+Complete the `book_ojek()` function: raise a `ValueError` if the distance is 0 or less, then
+charge Rp2500 per km. Catch the error at the bottom.
+
+<Playground initialCode={`def book_ojek(distance_km):
+    # TODO: raise ValueError if distance_km <= 0
+    return distance_km * 2500
+
+for distance in [4, 0, -2]:
+    # TODO: wrap this in try/except ValueError and print the message
+    print("Fare:", book_ojek(distance))`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What does a bare raise inside an except block do?",
+      options: ["Passes the error being handled on to the caller", "Deletes the error", "Runs the try block again"],
+      answer: 0,
+      explanation: "A bare raise inside except raises the same error again, so the caller can still handle it.",
+    },
+    {
+      question: "Why should you avoid except: without an exception name?",
+      options: ["It makes the program slower", "It cannot be used together with finally", "It also catches bugs like NameError, so they stay hidden"],
+      answer: 2,
+      explanation: "except: catches every error, including typos in your code, which makes bugs hard to find.",
+    },
+    {
+      question: "When does the else block of a try run?",
+      options: ["Always, error or not", "Only if try finishes without an error", "Only if there is an error"],
+      answer: 1,
+      explanation: "else is the success path. The block that always runs is finally.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Keep `try` as small as possible; put the success path in `else` and clean-up in `finally`.
+- `raise ValueError("message")` rejects data that makes no sense inside a function.
+- A bare `raise` inside `except` passes the error on to the caller.
+- `class MyError(Exception): pass` creates your own named error type.
+- Avoid a bare `except:`; catch only the errors you expect.

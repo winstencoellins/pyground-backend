@@ -1,0 +1,143 @@
+---
+title: Getting to Know Sets
+slug: sets
+stage: 2
+module: Dictionaries and Sets
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Use sets for unique data and for union and intersection, then pick the right data structure.
+---
+
+# Getting to Know Sets
+
+A **set** is a collection where every item is **unique** (no duplicates) and **unordered**.
+Sets are perfect for removing duplicates and comparing two groups of data.
+
+## Creating a set
+
+A set is written with curly braces but without key pairs, for example `{"Ani", "Budi"}`.
+Duplicates are dropped automatically:
+
+<Playground initialCode={`colours = {"red", "blue", "red", "green", "blue"}
+print(colours)
+print("Unique colours:", len(colours))
+
+empty = set()
+print(empty)`} />
+
+<Callout type="warning">
+  For an empty set, write `set()`. If you write `{}`, you get an empty dictionary instead.
+  Also remember: a set's order can differ from the order you wrote it in, and sets have no
+  index.
+</Callout>
+
+## Removing duplicates from a list
+
+Turn a list into a set with `set()`, then back into a list if you need to. `sorted()` puts the
+result in order:
+
+<Playground initialCode={`visitors = ["Ani", "Budi", "Ani", "Citra", "Budi", "Ani"]
+
+unique = set(visitors)
+print("Different visitors:", len(unique))
+print(sorted(unique))`} />
+
+## Adding, removing, and checking
+
+- `add(x)` adds one item (if it's already there, nothing happens).
+- `remove(x)` removes it, but raises an error if `x` is missing. `discard(x)` removes without an error.
+- `x in my_set` checks membership, and it's very fast even for a big set.
+
+<Playground initialCode={`present = {"Ani", "Budi"}
+present.add("Citra")
+present.add("Ani")      # already there, no change
+present.remove("Budi")
+present.discard("Dodi") # not there, but no error
+
+print(sorted(present))
+print("Ani present?", "Ani" in present)
+print("Budi present?", "Budi" in present)`} />
+
+## Union, intersection, and difference
+
+Say your sekolah has two extracurriculars. Sets can answer questions like "who joined
+both?" with a single operator:
+
+- `a | b` (union): every student in either club or both.
+- `a & b` (intersection): students in **both** clubs.
+- `a - b` (difference): students in `a` but **not** in `b`.
+
+<Playground initialCode={`futsal = {"Budi", "Dodi", "Eka", "Fajar"}
+music = {"Ani", "Citra", "Dodi", "Eka"}
+
+print("Everyone:", sorted(futsal | music))
+print("In both:", sorted(futsal & music))
+print("Futsal only:", sorted(futsal - music))
+print("Music only:", sorted(music - futsal))`} />
+
+You can also use the methods: `futsal.union(music)`, `futsal.intersection(music)`, and
+`futsal.difference(music)` give the same results.
+
+## Choosing a list, tuple, dictionary, or set
+
+| Structure | Written as | Use it when |
+| --- | --- | --- |
+| list | `[1, 2, 3]` | ordered data that can change, duplicates allowed |
+| tuple | `(1, 2, 3)` | ordered data that stays fixed, such as coordinates |
+| dictionary | `{"a": 1}` | looking up a value by name or key |
+| set | `{1, 2, 3}` | unique data, membership checks, comparing groups |
+
+<Playground initialCode={`queue = ["Ani", "Budi", "Ani"]             # order matters, duplicates allowed
+school_location = (-6.2, 106.8)           # fixed, never changes
+prices = {"bakso": 15000, "es teh": 4000} # look up by name
+paid = {"Ani", "Citra"}                   # unique, often checked with in
+
+print(queue[0], school_location[1], prices["bakso"], "Ani" in paid)`} />
+
+## Exercise
+
+Two classes bring lists of fruit to a school event. Find the fruit both classes brought, the
+fruit only class A brought, and every kind of fruit without duplicates.
+
+<Playground initialCode={`class_a = ["apple", "orange", "mango", "apple"]
+class_b = ["mango", "banana", "orange", "banana"]
+
+# 1. Turn both lists into sets
+
+# 2. Print the intersection, the difference (class A only), and the union
+
+print(class_a, class_b)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is len({'a', 'b', 'a', 'c', 'b'})?",
+      options: ["5", "2", "3"],
+      answer: 2,
+      explanation: "A set drops duplicates, so it only holds 'a', 'b', and 'c'.",
+    },
+    {
+      question: "If a = {1, 2, 3} and b = {2, 3, 4}, what is a & b?",
+      options: ["{2, 3}", "{1, 2, 3, 4}", "{1}"],
+      answer: 0,
+      explanation: "& is the intersection: the items found in both sets, which are 2 and 3.",
+    },
+    {
+      question: "Which data structure best stores menu prices so you can look them up by dish name?",
+      options: ["set", "dictionary", "tuple"],
+      answer: 1,
+      explanation: "A dictionary pairs a key (the dish name) with a value (the price).",
+    },
+  ]}
+/>
+
+## Summary
+
+- A set holds unique, unordered data; an empty set is written `set()`.
+- `set(my_list)` removes duplicates from a list.
+- `add()`, `remove()`, `discard()`, and `in` manage what's in a set.
+- `|` union, `&` intersection, `-` difference.
+- Pick a list for order, a tuple for fixed data, a dictionary for lookup by key, a set for unique data.

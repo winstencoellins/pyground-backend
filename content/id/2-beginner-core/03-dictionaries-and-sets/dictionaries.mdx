@@ -1,0 +1,147 @@
+---
+title: Mengenal Dictionary
+slug: dictionaries
+stage: 2
+module: Dictionary dan Set
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Simpan data berpasangan kunci dan nilai dengan dictionary, lalu baca, ubah, dan hapus isinya.
+---
+
+# Mengenal Dictionary
+
+List cocok untuk data berurutan, tapi kadang kamu ingin mencari data lewat **nama**, bukan
+nomor urut. Misalnya harga menu di warung: kamu ingin tahu harga "nasi goreng", bukan harga
+"menu nomor 2". Untuk itu Python punya **dictionary** (sering disingkat *dict*).
+
+## Membuat dictionary
+
+Dictionary ditulis dengan kurung kurawal. Setiap isinya berupa pasangan **kunci: nilai**,
+misalnya `{"nasi goreng": 15000}`:
+
+<Playground initialCode={`harga_menu = {
+    "nasi goreng": 15000,
+    "mie ayam": 12000,
+    "es teh": 4000,
+}
+
+siswa = {"nama": "Ani", "kelas": 10, "aktif": True}
+kosong = {}
+
+print(harga_menu)
+print(siswa)
+print(kosong)
+print("Jumlah menu:", len(harga_menu))`} />
+
+Kunci biasanya berupa string, dan setiap kunci dalam satu dictionary harus **unik**.
+Nilainya boleh apa saja: angka, string, boolean, bahkan list.
+
+## Membaca nilai lewat kunci
+
+Untuk mengambil nilai, tulis kuncinya di dalam kurung siku, mirip indeks pada list:
+
+<Playground initialCode={`harga_menu = {"nasi goreng": 15000, "mie ayam": 12000, "es teh": 4000}
+
+print(harga_menu["mie ayam"])
+total = harga_menu["nasi goreng"] + harga_menu["es teh"]
+print(f"Nasi goreng + es teh = Rp{total}")`} />
+
+## Menambah, mengubah, dan menghapus
+
+- Menulis `dict[kunci] = nilai` dengan kunci **baru** akan menambah pasangan baru.
+- Kalau kuncinya **sudah ada**, nilainya diganti.
+- `del dict[kunci]` menghapus pasangan itu.
+
+<Playground initialCode={`harga_menu = {"nasi goreng": 15000, "mie ayam": 12000, "es teh": 4000}
+
+harga_menu["soto"] = 13000        # kunci baru: ditambah
+harga_menu["es teh"] = 5000       # kunci lama: diubah
+del harga_menu["mie ayam"]        # dihapus
+
+print(harga_menu)`} />
+
+## KeyError dan cara mengecek kunci
+
+Kalau kamu membaca kunci yang tidak ada, Python berhenti dengan `KeyError`:
+
+<Playground expectError initialCode={`harga_menu = {"nasi goreng": 15000, "es teh": 4000}
+print(harga_menu["bakso"])`} />
+
+Cek dulu dengan `in`. Pada dictionary, `in` memeriksa **kunci**, bukan nilai:
+
+<Playground initialCode={`harga_menu = {"nasi goreng": 15000, "es teh": 4000}
+pesanan = "bakso"
+
+if pesanan in harga_menu:
+    print("Harga:", harga_menu[pesanan])
+else:
+    print(f"Maaf, {pesanan} tidak ada di menu")
+
+print(15000 in harga_menu)  # False, karena 15000 itu nilai, bukan kunci`} />
+
+## Membaca dengan aman lewat `get()`
+
+`get(kunci)` mengembalikan nilainya, atau `None` kalau kunci tidak ada. Kamu juga bisa
+memberi nilai bawaan: `get(kunci, bawaan)`.
+
+<Playground initialCode={`stok = {"beras": 10, "telur": 30}
+
+print(stok.get("telur"))
+print(stok.get("gula"))
+print(stok.get("gula", 0))
+
+barang = "minyak"
+print(f"Stok {barang}: {stok.get(barang, 0)}")`} />
+
+<Callout type="tip">
+  Pakai `dict[kunci]` kalau kunci pasti ada, dan `get()` kalau kunci mungkin tidak ada.
+  Dengan `get()` programmu tidak berhenti karena `KeyError`.
+</Callout>
+
+## Latihan
+
+Buat data kos milik Budi. Tambahkan kunci `"wifi"`, naikkan harga sewa, lalu tampilkan
+nomor kamar dengan `get()` (pakai nilai bawaan kalau tidak ada).
+
+<Playground initialCode={`kos = {"nama": "Budi", "kamar": "A3", "sewa": 800000}
+
+# 1. Tambahkan kunci "wifi" dengan nilai True
+
+# 2. Naikkan sewa menjadi 850000
+
+# 3. Tampilkan nomor kamar dengan get(), nilai bawaan "belum ada"
+
+print(kos)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kalau d = {'a': 1, 'b': 2}, apa yang terjadi saat menjalankan d['c']?",
+      options: ["Hasilnya None", "Hasilnya 0", "Muncul KeyError"],
+      answer: 2,
+      explanation: "Membaca kunci yang tidak ada dengan kurung siku menghasilkan KeyError. Pakai get() kalau ingin aman.",
+    },
+    {
+      question: "Kalau d = {'a': 1}, apa isi d setelah d['a'] = 5?",
+      options: ["{'a': 5}", "{'a': 1, 'a': 5}", "Error"],
+      answer: 0,
+      explanation: "Kunci 'a' sudah ada, jadi nilainya diganti. Kunci dalam dictionary selalu unik.",
+    },
+    {
+      question: "Apa hasil 'teh' in {'kopi': 5000, 'teh': 4000}?",
+      options: ["False", "True", "4000"],
+      answer: 1,
+      explanation: "in pada dictionary memeriksa kunci, dan 'teh' adalah salah satu kuncinya.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Dictionary menyimpan pasangan kunci dan nilai, misalnya `{"es teh": 4000}`.
+- Baca dengan `d[kunci]`; tambah atau ubah dengan `d[kunci] = nilai`; hapus dengan `del d[kunci]`.
+- Kunci yang tidak ada menghasilkan `KeyError`.
+- `kunci in d` mengecek kunci, dan `d.get(kunci, bawaan)` membaca dengan aman.

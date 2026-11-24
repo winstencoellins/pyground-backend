@@ -1,0 +1,401 @@
+---
+title: Expense Tracker Project
+slug: expense-tracker-project
+stage: 3
+module: Project
+order: 1
+isFree: false
+estimatedMinutes: 30
+description: Build an expense tracker step by step with a dataclass, a custom exception, a generator, datetime, and a JSON file.
+---
+
+# Expense Tracker Project
+
+Pocket money, kos rent, ojek rides, phone credit... suddenly it's the end of the month, your
+wallet is empty, and you have no idea where the money went. In this final Stage 3 project, you
+build an **expense tracker** (pencatat pengeluaran) that brings together almost everything
+you've learned:
+
+- `@dataclass` and type hints for expense data,
+- `date` from the `datetime` module for its date,
+- a custom exception for invalid amounts,
+- a class with methods and a dict comprehension for per-category totals,
+- a generator to find big expenses,
+- a JSON file to save and load the data.
+
+We build it one step at a time. Each playground stands on its own, so code from earlier steps
+is repeated.
+
+## Step 1: one expense
+
+An expense has a date, a description, a category, and an amount in Rupiah. `@dataclass`
+writes the `__init__` and a tidy display for us:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+@dataclass
+class Expense:
+    spent_on: date
+    description: str
+    category: str
+    amount: int
+
+lunch = Expense(date(2026, 11, 2), "Nasi padang", "food", 25000)
+rent = Expense(date(2026, 11, 1), "Kos rent", "housing", 900000)
+
+print(lunch)
+print(f"{rent.description}: Rp{rent.amount:,} on {rent.spent_on.strftime('%d/%m/%Y')}")`} />
+
+## Step 2: reject invalid amounts
+
+An expense of zero or a negative amount is clearly a typo. We create our own exception, then
+check it in `__post_init__`, a method the dataclass runs right after `__init__`:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+class InvalidAmountError(Exception):
+    pass
+
+@dataclass
+class Expense:
+    spent_on: date
+    description: str
+    category: str
+    amount: int
+
+    def __post_init__(self) -> None:
+        if self.amount <= 0:
+            raise InvalidAmountError(f"Amount must be more than 0, not {self.amount}")
+
+print(Expense(date(2026, 11, 2), "Phone credit", "other", 50000))
+
+try:
+    Expense(date(2026, 11, 2), "Typo", "food", -15000)
+except InvalidAmountError as e:
+    print("Rejected:", e)`} />
+
+With a custom exception, code that uses this class can catch exactly this mistake without
+also catching unrelated errors.
+
+## Step 3: the tracker class
+
+Now create `ExpenseTracker` to hold many expenses. It has three main methods: `add()`,
+`total()`, and `by_category()`. The last one uses a dict comprehension to add up each
+category:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+class InvalidAmountError(Exception):
+    pass
+
+@dataclass
+class Expense:
+    spent_on: date
+    description: str
+    category: str
+    amount: int
+
+    def __post_init__(self) -> None:
+        if self.amount <= 0:
+            raise InvalidAmountError(f"Amount must be more than 0, not {self.amount}")
+
+class ExpenseTracker:
+    def __init__(self) -> None:
+        self.expenses: list[Expense] = []
+
+    def add(self, expense: Expense) -> None:
+        self.expenses.append(expense)
+
+    def total(self) -> int:
+        return sum(e.amount for e in self.expenses)
+
+    def by_category(self) -> dict[str, int]:
+        categories = sorted({e.category for e in self.expenses})
+        return {c: sum(e.amount for e in self.expenses if e.category == c) for c in categories}
+
+tracker = ExpenseTracker()
+tracker.add(Expense(date(2026, 11, 1), "Kos rent", "housing", 900000))
+tracker.add(Expense(date(2026, 11, 2), "Nasi padang", "food", 25000))
+tracker.add(Expense(date(2026, 11, 3), "Ojek to campus", "transport", 12000))
+tracker.add(Expense(date(2026, 11, 3), "Bakso", "food", 15000))
+
+print(f"Total: Rp{tracker.total():,}")
+for category, amount in tracker.by_category().items():
+    print(f"- {category}: Rp{amount:,}")`} />
+
+Calling `sorted()` on the set of categories keeps the order the same every time, so the report
+stays tidy.
+
+## Step 4: a generator for big expenses
+
+Want to know which expenses go over a certain limit? A generator fits nicely here: it hands
+out results one at a time with `yield`, without building a new list:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+from typing import Iterator
+
+@dataclass
+class Expense:
+    spent_on: date
+    description: str
+    category: str
+    amount: int
+
+class ExpenseTracker:
+    def __init__(self) -> None:
+        self.expenses: list[Expense] = []
+
+    def add(self, expense: Expense) -> None:
+        self.expenses.append(expense)
+
+    def over(self, limit: int) -> Iterator[Expense]:
+        for e in self.expenses:
+            if e.amount > limit:
+                yield e
+
+tracker = ExpenseTracker()
+tracker.add(Expense(date(2026, 11, 1), "Kos rent", "housing", 900000))
+tracker.add(Expense(date(2026, 11, 2), "Nasi padang", "food", 25000))
+tracker.add(Expense(date(2026, 11, 5), "Shoes", "shopping", 350000))
+
+print("Expenses over Rp100,000:")
+for e in tracker.over(100000):
+    print(f"- {e.description}: Rp{e.amount:,}")`} />
+
+`Iterator[Expense]` is the type hint for "something you can loop over that produces
+`Expense` objects", which suits a generator.
+
+## Step 5: save to and load from JSON
+
+So the data isn't lost when the program closes, save it to a JSON file. The catch: JSON
+doesn't know about `date`. The fix: turn the date into a string with `isoformat()` when
+saving, and turn it back with `date.fromisoformat()` when loading. `asdict()` from
+`dataclasses` turns a dataclass into a dict:
+
+<Playground initialCode={`import json
+from dataclasses import dataclass, asdict
+from datetime import date
+
+@dataclass
+class Expense:
+    spent_on: date
+    description: str
+    category: str
+    amount: int
+
+def to_dict(e: Expense) -> dict:
+    data = asdict(e)
+    data["spent_on"] = e.spent_on.isoformat()  # date becomes "2026-11-02"
+    return data
+
+def from_dict(data: dict) -> Expense:
+    data["spent_on"] = date.fromisoformat(data["spent_on"])
+    return Expense(**data)
+
+expenses = [
+    Expense(date(2026, 11, 2), "Nasi padang", "food", 25000),
+    Expense(date(2026, 11, 3), "Ojek to campus", "transport", 12000),
+]
+
+with open("expenses.json", "w") as f:
+    json.dump([to_dict(e) for e in expenses], f, indent=2)
+
+with open("expenses.json") as f:
+    print(f.read())
+
+with open("expenses.json") as f:
+    loaded = [from_dict(d) for d in json.load(f)]
+
+print(loaded[0])
+print("Same as the original?", loaded == expenses)`} />
+
+`Expense(**data)` unpacks the dict into keyword arguments, exactly like the `**kwargs` you've
+already learned.
+
+<Callout type="info">
+  When loading the file, the JSON data also goes through `__post_init__`. So if someone edits
+  the file and writes a negative amount, `InvalidAmountError` will still be raised.
+</Callout>
+
+## The full program
+
+Here are all the steps combined into one program. Read it from top to bottom, then run it:
+
+<Playground initialCode={`import json
+from dataclasses import dataclass, asdict
+from datetime import date
+from typing import Iterator
+
+class InvalidAmountError(Exception):
+    pass
+
+@dataclass
+class Expense:
+    spent_on: date
+    description: str
+    category: str
+    amount: int
+
+    def __post_init__(self) -> None:
+        if self.amount <= 0:
+            raise InvalidAmountError(f"Amount must be more than 0, not {self.amount}")
+
+class ExpenseTracker:
+    def __init__(self) -> None:
+        self.expenses: list[Expense] = []
+
+    def add(self, expense: Expense) -> None:
+        self.expenses.append(expense)
+
+    def total(self) -> int:
+        return sum(e.amount for e in self.expenses)
+
+    def by_category(self) -> dict[str, int]:
+        categories = sorted({e.category for e in self.expenses})
+        return {c: sum(e.amount for e in self.expenses if e.category == c) for c in categories}
+
+    def over(self, limit: int) -> Iterator[Expense]:
+        for e in self.expenses:
+            if e.amount > limit:
+                yield e
+
+    def save(self, filename: str) -> None:
+        data = []
+        for e in self.expenses:
+            row = asdict(e)
+            row["spent_on"] = e.spent_on.isoformat()
+            data.append(row)
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=2)
+
+    def load(self, filename: str) -> None:
+        with open(filename) as f:
+            data = json.load(f)
+        self.expenses = []
+        for row in data:
+            row["spent_on"] = date.fromisoformat(row["spent_on"])
+            self.add(Expense(**row))
+
+# Recording November's expenses
+tracker = ExpenseTracker()
+records = [
+    (date(2026, 11, 1), "Kos rent", "housing", 900000),
+    (date(2026, 11, 2), "Nasi padang", "food", 25000),
+    (date(2026, 11, 3), "Ojek to campus", "transport", 12000),
+    (date(2026, 11, 3), "Bakso", "food", 15000),
+    (date(2026, 11, 4), "Typo", "food", 0),
+    (date(2026, 11, 5), "Shoes", "shopping", 350000),
+]
+for day, description, category, amount in records:
+    try:
+        tracker.add(Expense(day, description, category, amount))
+    except InvalidAmountError as e:
+        print(f"Skipped ({description}): {e}")
+
+# Save, then load into a new tracker as if the program had been reopened
+tracker.save("expenses.json")
+new_tracker = ExpenseTracker()
+new_tracker.load("expenses.json")
+
+print()
+print("=== Expense Report ===")
+print(f"Number of records: {len(new_tracker.expenses)}")
+print(f"Total: Rp{new_tracker.total():,}")
+print()
+print("By category:")
+for category, amount in new_tracker.by_category().items():
+    print(f"- {category}: Rp{amount:,}")
+print()
+print("Over Rp100,000:")
+for e in new_tracker.over(100000):
+    print(f"- {e.spent_on.strftime('%d/%m/%Y')} {e.description}: Rp{e.amount:,}")`} />
+
+## Ideas for extending it
+
+Your program works. If you want to go further, try one of these ideas on your own computer:
+
+- **Export to CSV**: add an `export_csv(filename)` method that uses `csv.writer` so the data
+  can be opened in a spreadsheet.
+- **Test it with pytest**: create `test_tracker.py` that checks `total()`, `by_category()`,
+  and that `InvalidAmountError` is raised, using `pytest.raises`.
+- **Filter by month**: add a method that only counts expenses in a given month using
+  `e.spent_on.month`.
+- **Interactive menu**: use `input()` and `while` so users can add their own expenses, with
+  `strptime` to read the date they type.
+
+## Exercise
+
+Add a `largest()` method that returns the expense with the biggest amount, and an `average()`
+method that returns the average expense amount. If the list is empty, `largest()` returns
+`None` and `average()` returns `0`.
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+@dataclass
+class Expense:
+    spent_on: date
+    description: str
+    category: str
+    amount: int
+
+class ExpenseTracker:
+    def __init__(self) -> None:
+        self.expenses: list[Expense] = []
+
+    def add(self, expense: Expense) -> None:
+        self.expenses.append(expense)
+
+    def largest(self) -> Expense | None:
+        # TODO: hint: max() with key=lambda e: e.amount
+        pass
+
+    def average(self) -> float:
+        # TODO: the total divided by the number of expenses
+        return 0
+
+tracker = ExpenseTracker()
+tracker.add(Expense(date(2026, 11, 2), "Nasi padang", "food", 25000))
+tracker.add(Expense(date(2026, 11, 5), "Shoes", "shopping", 350000))
+tracker.add(Expense(date(2026, 11, 6), "Phone credit", "other", 50000))
+
+print("Largest:", tracker.largest())
+print("Average:", tracker.average())`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Why is the date converted with isoformat() before saving to JSON?",
+      options: ["To make the JSON file smaller", "So the date automatically uses WIB", "Because JSON can't store date objects directly"],
+      answer: 2,
+      explanation: "JSON only knows strings, numbers, booleans, null, lists, and objects. The date is saved as a string and turned back with date.fromisoformat().",
+    },
+    {
+      question: "When does a dataclass run __post_init__?",
+      options: ["Right after the dataclass's generated __init__ finishes", "When the object is deleted", "Only when the object is printed with print()"],
+      answer: 0,
+      explanation: "__post_init__ runs automatically after __init__, which makes it a good place to validate data such as invalid amounts.",
+    },
+    {
+      question: "What's the benefit of writing over() as a generator with yield?",
+      options: ["The results are sorted automatically", "Expenses are handed out one at a time without building a new list", "A generator can be reused endlessly"],
+      answer: 1,
+      explanation: "A generator produces values one at a time as you loop, so there's no need to store every result in a new list.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `@dataclass` with type hints makes a tidy data class, and `__post_init__` can validate its
+  contents.
+- A custom exception like `InvalidAmountError` makes errors clearer and easier to catch.
+- Dict comprehensions and generators summarise and filter data with little code.
+- Dates are saved to JSON as `isoformat()` strings and read back with `date.fromisoformat()`.
+- Congratulations, you've finished Stage 3!

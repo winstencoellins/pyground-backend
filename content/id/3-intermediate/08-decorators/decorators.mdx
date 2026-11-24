@@ -1,0 +1,195 @@
+---
+title: Membuat Decorator
+slug: decorators
+stage: 3
+module: Decorator
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Tambahkan perilaku baru ke fungsi tanpa mengubah isinya dengan decorator dan sintaks @.
+---
+
+# Membuat Decorator
+
+Bayangkan kamu punya banyak fungsi di aplikasi warung, dan ingin setiap fungsi mencatat
+kapan ia dipanggil. Menambah `print()` di setiap fungsi itu merepotkan. **Decorator** adalah
+fungsi yang "membungkus" fungsi lain untuk menambah perilaku baru, tanpa menyentuh isinya.
+
+## Langkah 1: fungsi pembungkus
+
+Dengan bekal dari pelajaran sebelumnya (fungsi bisa dikirim dan dikembalikan), kita buat
+fungsi yang menerima fungsi, lalu mengembalikan fungsi baru yang membungkusnya:
+
+<Playground initialCode={`def catat(fungsi):
+    def pembungkus():
+        print("Mulai menjalankan", fungsi.__name__)
+        fungsi()
+        print("Selesai")
+    return pembungkus
+
+def buka_warung():
+    print("Warung Bu Ani buka!")
+
+buka_warung = catat(buka_warung)
+buka_warung()`} />
+
+Baris `buka_warung = catat(buka_warung)` mengganti fungsi asli dengan versi yang sudah
+dibungkus.
+
+## Langkah 2: sintaks `@`
+
+Menulis `buka_warung = catat(buka_warung)` setiap kali itu panjang. Python menyediakan
+sintaks `@` yang artinya persis sama:
+
+<Playground initialCode={`def catat(fungsi):
+    def pembungkus():
+        print("Mulai menjalankan", fungsi.__name__)
+        fungsi()
+        print("Selesai")
+    return pembungkus
+
+@catat
+def buka_warung():
+    print("Warung Bu Ani buka!")
+
+@catat
+def tutup_warung():
+    print("Warung tutup, sampai besok.")
+
+buka_warung()
+tutup_warung()`} />
+
+## Mendukung argumen dan nilai kembali
+
+Pembungkus di atas tidak bisa dipakai untuk fungsi yang punya parameter. Solusinya adalah
+`*args` dan `**kwargs` dari modul sebelumnya, ditambah `return` hasilnya:
+
+<Playground initialCode={`def catat(fungsi):
+    def pembungkus(*args, **kwargs):
+        print(f"Memanggil {fungsi.__name__} dengan {args} {kwargs}")
+        hasil = fungsi(*args, **kwargs)
+        print("Hasil:", hasil)
+        return hasil
+    return pembungkus
+
+@catat
+def total(harga, jumlah, diskon=0):
+    return harga * jumlah - diskon
+
+bayar = total(12000, 3, diskon=5000)
+print("Bayar:", bayar)`} />
+
+Sekarang decorator ini bisa membungkus fungsi apa pun, berapa pun argumennya.
+
+## Decorator pengukur waktu dan `functools.wraps`
+
+Contoh decorator yang sering dipakai di dunia nyata: mengukur berapa lama fungsi berjalan.
+Perhatikan juga `@functools.wraps`:
+
+<Playground initialCode={`import functools
+import time
+
+def ukur_waktu(fungsi):
+    @functools.wraps(fungsi)
+    def pembungkus(*args, **kwargs):
+        mulai = time.perf_counter()
+        hasil = fungsi(*args, **kwargs)
+        durasi = time.perf_counter() - mulai
+        print(f"{fungsi.__name__} selesai dalam {durasi:.4f} detik")
+        return hasil
+    return pembungkus
+
+@ukur_waktu
+def jumlah_sampai(n):
+    """Menjumlahkan 1 sampai n."""
+    return sum(range(1, n + 1))
+
+print(jumlah_sampai(1000000))
+print(jumlah_sampai.__name__)
+print(jumlah_sampai.__doc__)`} />
+
+<Callout type="info">
+  Tanpa `@functools.wraps(fungsi)`, `jumlah_sampai.__name__` akan bernilai `"pembungkus"` dan
+  docstring-nya hilang. `wraps` menyalin nama dan docstring fungsi asli ke pembungkusnya.
+  Biasakan selalu memakainya.
+</Callout>
+
+## Decorator dengan argumen
+
+Bagaimana kalau decorator-nya butuh pengaturan, misalnya "ulangi n kali"? Kita tambah satu
+lapis fungsi lagi: fungsi luar menerima argumen, lalu mengembalikan decorator:
+
+<Playground initialCode={`import functools
+
+def ulangi(n):
+    def decorator(fungsi):
+        @functools.wraps(fungsi)
+        def pembungkus(*args, **kwargs):
+            for _ in range(n):
+                fungsi(*args, **kwargs)
+        return pembungkus
+    return decorator
+
+@ulangi(3)
+def panggil_pembeli(nama):
+    print(f"Pesanan atas nama {nama} sudah siap!")
+
+panggil_pembeli("Dodi")`} />
+
+`@ulangi(3)` dijalankan dulu dan menghasilkan decorator, baru decorator itu membungkus
+`panggil_pembeli`. Pola tiga lapis ini memang terlihat rumit, jadi cukup kenali bentuknya
+dulu.
+
+## Latihan
+
+Buat decorator `wajib_positif` yang mengecek argumen pertama. Kalau angkanya negatif atau
+nol, cetak pesan peringatan dan jangan jalankan fungsinya.
+
+<Playground initialCode={`import functools
+
+def wajib_positif(fungsi):
+    @functools.wraps(fungsi)
+    def pembungkus(*args, **kwargs):
+        # TODO: kalau args[0] <= 0, cetak peringatan dan return None
+        return fungsi(*args, **kwargs)
+    return pembungkus
+
+@wajib_positif
+def bayar_kos(jumlah):
+    print(f"Membayar kos Rp{jumlah:,}")
+
+bayar_kos(900000)
+bayar_kos(-5000)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Menulis @catat di atas def f() sama artinya dengan apa?",
+      options: ["f = catat(f)", "catat = f(catat)", "f = catat"],
+      answer: 0,
+      explanation: "Sintaks @ adalah singkatan untuk mengganti f dengan hasil catat(f).",
+    },
+    {
+      question: "Mengapa pembungkus biasanya ditulis def pembungkus(*args, **kwargs)?",
+      options: ["Supaya lebih cepat", "Supaya bisa membungkus fungsi dengan argumen apa pun", "Karena wajib untuk semua fungsi"],
+      answer: 1,
+      explanation: "Dengan *args dan **kwargs, pembungkus menerima dan meneruskan argumen apa pun ke fungsi asli.",
+    },
+    {
+      question: "Apa guna @functools.wraps(fungsi) di dalam decorator?",
+      options: ["Mempercepat fungsi", "Menjalankan fungsi dua kali", "Menyalin nama dan docstring fungsi asli ke pembungkus"],
+      answer: 2,
+      explanation: "wraps menjaga __name__ dan __doc__ fungsi asli supaya tidak berubah menjadi milik pembungkus.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Decorator adalah fungsi yang menerima fungsi dan mengembalikan fungsi pembungkus.
+- `@decorator` di atas `def` sama dengan `f = decorator(f)`.
+- Pakai `*args`, `**kwargs`, dan `return hasil` supaya pembungkus cocok untuk fungsi apa pun.
+- Selalu tambahkan `@functools.wraps(fungsi)` untuk menjaga nama dan docstring.
+- Decorator dengan argumen butuh satu lapis fungsi tambahan, contohnya `@ulangi(3)`.

@@ -1,0 +1,157 @@
+---
+title: Getting to Know Functions
+slug: functions
+stage: 2
+module: Functions
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Wrap code you use often in a function with def, then call it whenever you need it.
+---
+
+# Getting to Know Functions
+
+You already use Python's built-in functions such as `print()`, `len()`, and `sum()` all the time.
+Now it is time to make your own. A **function** is a named block of code, so you can use it again
+and again without rewriting it.
+
+## Why do we need functions?
+
+Look at the code below. The part that prints the warung receipt header is written twice, exactly
+the same:
+
+<Playground initialCode={`print("================")
+print("  Warung Bu Ani")
+print("================")
+print("Fried rice   Rp15.000")
+
+print("================")
+print("  Warung Bu Ani")
+print("================")
+print("Iced tea     Rp5.000")`} />
+
+If the warung changes its name, you have to edit every copy. The more copies, the bigger the
+chance you miss one. Functions solve this: write it once, use it many times.
+
+## Creating a function with `def`
+
+A function is created with the `def` keyword, then the function name, parentheses, and a colon.
+The body is indented, just like the body of an `if` or a `for`:
+
+<Playground initialCode={`def print_receipt_header():
+    print("================")
+    print("  Warung Bu Ani")
+    print("================")
+
+print_receipt_header()
+print("Fried rice   Rp15.000")
+print()
+print_receipt_header()
+print("Iced tea     Rp5.000")`} />
+
+Creating a function with `def` does not run its body yet. The body only runs when the function is
+**called**, that is, when you write its name followed by parentheses: `print_receipt_header()`.
+
+<Callout type="warning">
+  Don't forget the parentheses. Writing `print_receipt_header` without `()` does not run anything.
+  Also, a function must be created before it is called, because Python reads code from top to
+  bottom.
+</Callout>
+
+## Naming functions
+
+Function names follow the same rules as variable names: lowercase, words separated by
+underscores, and no leading digit. Get used to starting with a **verb** that says what the
+function does, such as `print_menu`, `calculate_total`, or `greet_customer`.
+
+<Playground initialCode={`def greet_customer():
+    print("Welcome to Warung Bu Ani!")
+    print("Please choose from the menu.")
+
+for i in range(3):
+    greet_customer()`} />
+
+You can call a function anywhere, including inside a loop.
+
+## Docstrings: a short note for your function
+
+A line of text at the start of a function body, wrapped in triple quotes, is called a
+**docstring**. It explains what the function is for to anyone reading your code, including
+future you:
+
+<Playground initialCode={`def print_opening_hours():
+    """Show the warung's opening hours."""
+    print("Open every day, 07.00 - 21.00")
+
+print_opening_hours()
+help(print_opening_hours)`} />
+
+`help()` shows a function's docstring. One short sentence is usually enough.
+
+## Functions calling functions
+
+A function's body can call other functions. That way a big task can be split into small tasks,
+each with a clear name:
+
+<Playground initialCode={`def print_line():
+    print("================")
+
+def print_receipt_header():
+    print_line()
+    print("  Warung Bu Ani")
+    print_line()
+
+def print_footer():
+    print_line()
+    print("     Thank you!")
+    print_line()
+
+print_receipt_header()
+print("Chicken soto Rp12.000")
+print_footer()`} />
+
+Now, if you want to change the line style, you only need to edit one line in `print_line()`.
+
+## Exercise
+
+Write a function `print_ojek_schedule()` that prints three lines of a pick-up schedule (for
+example "Monday: pick up Citra at 07.00"). Then call the function twice.
+
+<Playground initialCode={`def print_ojek_schedule():
+    # TODO: replace pass with three print() schedule lines
+    pass
+
+# TODO: call print_ojek_schedule() twice here`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which keyword is used to create a function?",
+      options: ["func", "def", "function"],
+      answer: 1,
+      explanation: "In Python, functions are created with def, followed by the name, parentheses, and a colon.",
+    },
+    {
+      question: "The code def hello(): print('Hello') runs with no other lines. What is printed?",
+      options: ["Nothing", "Hello", "An error"],
+      answer: 0,
+      explanation: "def only creates the function. Its body runs only when the function is called with hello().",
+    },
+    {
+      question: "Which function name best follows Python conventions?",
+      options: ["CalculateTotal", "2calculate", "calculate_total"],
+      answer: 2,
+      explanation: "Function names use lowercase with underscores, and cannot start with a digit.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Functions wrap code so you can reuse it without rewriting it.
+- Create a function with `def name():`, then indent its body.
+- The body only runs when the function is called: `name()`.
+- A docstring in triple quotes explains what the function is for.
+- Functions can call other functions to split a big task into small ones.

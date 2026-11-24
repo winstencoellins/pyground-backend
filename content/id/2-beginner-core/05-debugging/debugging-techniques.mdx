@@ -1,0 +1,165 @@
+---
+title: Teknik Debugging
+slug: debugging-techniques
+stage: 2
+module: Debugging
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Temukan bug lebih cepat dengan print debugging, assert, memperkecil masalah, dan teknik bebek karet.
+---
+
+# Teknik Debugging
+
+Debugging adalah pekerjaan detektif: kamu mengumpulkan petunjuk sampai tahu di mana kenyataan
+berbeda dari dugaanmu. Pelajaran ini memberi kamu alat-alat detektif yang paling sering
+dipakai.
+
+## Print debugging
+
+Cara paling sederhana dan paling ampuh: tampilkan nilai variabel di tengah program supaya
+kamu bisa melihat apa yang sebenarnya terjadi.
+
+<Playground initialCode={`harga = [12000, 8000, 15000]
+total = 0
+for h in harga:
+    total = total + h
+    print("debug: h =", h, "total =", total)
+
+print("Total belanja:", total)`} />
+
+Dengan begitu kamu bisa melihat nilai `total` berubah di setiap putaran. Kalau ada yang aneh,
+kamu tahu tepat di putaran keberapa masalahnya mulai.
+
+## Trik `f"{x=}"`
+
+Menulis nama variabel dua kali itu melelahkan. f-string punya jalan pintas: tambahkan `=`
+setelah nama variabel, dan Python menampilkan nama sekaligus nilainya.
+
+<Playground initialCode={`nama = "Ani"
+uang_saku = 25000
+jajan = [5000, 7000, 3000]
+
+print(f"{nama=}")
+print(f"{uang_saku=}")
+print(f"{sum(jajan)=}")
+print(f"{uang_saku - sum(jajan)=}")`} />
+
+Cara ini juga bekerja untuk ekspresi seperti `sum(jajan)`. Setelah bug ketemu, jangan lupa
+hapus print debug-nya.
+
+## Mengecek dugaan dengan `assert`
+
+`assert` menulis dugaanmu sebagai kode. Kalau dugaannya benar, tidak terjadi apa-apa. Kalau
+salah, program berhenti dengan `AssertionError` tepat di situ, bukan jauh di belakang.
+
+<Playground initialCode={`def rata_rata(daftar):
+    return sum(daftar) / len(daftar)
+
+hasil = rata_rata([80, 90, 70])
+assert hasil == 80, "rata-rata seharusnya 80"
+print("Aman, rata-ratanya", hasil)`} />
+
+Sekarang lihat apa yang terjadi kalau dugaannya meleset:
+
+<Playground expectError initialCode={`def diskon(harga, persen):
+    return harga * persen
+
+harga_akhir = 50000 - diskon(50000, 10)
+assert harga_akhir >= 0, "harga akhir tidak boleh negatif"
+print("Harga akhir:", harga_akhir)`} />
+
+Pesan setelah koma ikut muncul di traceback, jadi tulis pesan yang menjelaskan dugaanmu. Di
+sini bugnya: `persen` seharusnya dibagi 100.
+
+## Memperkecil masalah
+
+Kalau programmu panjang dan kamu tidak tahu bagian mana yang salah, **perkecil**. Salin
+bagian yang mencurigakan ke tempat terpisah, beri data sekecil mungkin, lalu uji sendiri.
+
+<Playground initialCode={`def huruf_nilai(skor):
+    if skor >= 90:
+        return "A"
+    elif skor >= 80:
+        return "B"
+    elif skor > 70:
+        return "C"
+    else:
+        return "D"
+
+# Uji fungsi ini sendirian dengan beberapa nilai batas
+for skor in [95, 90, 80, 75, 70, 50]:
+    print(skor, huruf_nilai(skor))`} />
+
+Dengan menguji nilai batas satu per satu, langsung kelihatan: skor 70 dapat `D`, padahal
+seharusnya `C`. Bug kecil seperti `>` yang seharusnya `>=` jauh lebih mudah dilihat di kode
+sependek ini daripada di program seratus baris.
+
+## Bebek karet dan membaca pesan error
+
+**Rubber duck debugging** (debugging bebek karet): jelaskan kodemu baris demi baris, dengan
+suara, ke benda apa saja, misalnya bebek mainan, kucing kos, atau temanmu. Saat memaksa diri
+menjelaskan "baris ini melakukan X", kamu sering sadar sendiri bahwa baris itu sebenarnya
+melakukan Y.
+
+<Callout type="tip">
+  Sebelum mencari di Google, baca dulu baris terakhir traceback. Jenis error dan pesannya
+  sering sudah cukup. Kalau tetap perlu mencari, salin **jenis error dan pesannya** saja,
+  tanpa nama variabelmu sendiri, supaya hasil pencariannya relevan.
+</Callout>
+
+Urutan yang bisa kamu ikuti setiap kali buntu:
+
+1. Baca traceback dari bawah ke atas.
+2. Tampilkan nilai yang dicurigai dengan `f"{x=}"`.
+3. Tulis dugaanmu dengan `assert`.
+4. Perkecil masalahnya sampai tinggal beberapa baris.
+5. Jelaskan ke bebek karet. Baru setelah itu, cari di internet.
+
+## Latihan
+
+Fungsi `hitung_kembalian` memberi hasil yang salah. Pakai `f"{x=}"` untuk melihat nilainya,
+tambahkan `assert` untuk dugaanmu, lalu perbaiki fungsinya.
+
+<Playground initialCode={`def hitung_kembalian(bayar, belanja):
+    total = 0
+    for harga in belanja:
+        total = harga
+    return bayar - total
+
+kembalian = hitung_kembalian(50000, [12000, 15000, 8000])
+# TODO: tampilkan nilai dengan f-string debug, misalnya print(f"{kembalian=}")
+# TODO: tambahkan assert kembalian == 15000 setelah fungsinya diperbaiki
+print("Kembalian:", kembalian)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Jika x = 5, apa yang ditampilkan print(f'{x=}')?",
+      options: ["5", "x=5", "x"],
+      answer: 1,
+      explanation: "Tanda = di dalam kurung kurawal f-string menampilkan nama sekaligus nilainya.",
+    },
+    {
+      question: "Apa yang terjadi jika kondisi pada assert bernilai False?",
+      options: ["Program berhenti dengan AssertionError", "Program lanjut seperti biasa", "Python memperbaiki nilainya"],
+      answer: 0,
+      explanation: "assert menghentikan program dengan AssertionError, beserta pesan yang kamu tulis.",
+    },
+    {
+      question: "Apa langkah pertama yang paling tepat saat bertemu error?",
+      options: ["Langsung mencari di Google", "Menghapus kode yang error", "Membaca baris terakhir traceback"],
+      answer: 2,
+      explanation: "Jenis error dan pesannya di baris terakhir sering sudah menjelaskan masalahnya.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Print debugging menunjukkan apa yang benar-benar terjadi; `f"{x=}"` mempersingkatnya.
+- `assert kondisi, "pesan"` menghentikan program tepat saat dugaanmu salah.
+- Perkecil masalah: uji bagian kecil dengan data sederhana dan nilai batas.
+- Jelaskan kodemu ke bebek karet, dan baca pesan error sebelum mencari di internet.

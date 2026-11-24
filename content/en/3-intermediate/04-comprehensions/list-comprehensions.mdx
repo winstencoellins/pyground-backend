@@ -1,0 +1,154 @@
+---
+title: List Comprehensions
+slug: list-comprehensions
+stage: 3
+module: Comprehensions
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Turn the loop and append pattern into a one-line list comprehension, with an if filter and an if/else expression.
+---
+
+# List Comprehensions
+
+You've written this pattern many times: make an empty list, loop, then `append()`. It's so
+common that Python has a shortcut for it, the **list comprehension**.
+
+## From loop + `append` to a comprehension
+
+Say you want each warung menu price after a Rp2,000 increase:
+
+<Playground initialCode={`prices = [10000, 15000, 8000, 12000]
+
+# The old way: loop + append
+new_prices = []
+for p in prices:
+    new_prices.append(p + 2000)
+print(new_prices)
+
+# The new way: a list comprehension
+new_prices = [p + 2000 for p in prices]
+print(new_prices)`} />
+
+Read it from the left: "`p + 2000`, **for** each `p` **in** `prices`". The general form is:
+
+```python
+[expression for item in collection]
+```
+
+The collection can be anything you can loop over, including `range()` and strings:
+
+<Playground initialCode={`squares = [n * n for n in range(1, 6)]
+print(squares)
+
+names = ["budi", "ani", "citra"]
+print([n.title() for n in names])
+
+print([letter for letter in "kos"])`} />
+
+## Filtering with `if`
+
+Add an `if` at the end to keep only the items that meet a condition:
+
+<Playground initialCode={`scores = [78, 45, 92, 60, 88, 55]
+
+passed = [s for s in scores if s >= 70]
+print("Passing scores:", passed)
+
+names = ["Budi", "Ani", "Citra", "Dodi", "Eka"]
+short_names = [n for n in names if len(n) <= 3]
+print(short_names)`} />
+
+Items that fail the `if` don't go into the new list at all.
+
+## Choosing a value with `if`/`else`
+
+If you want **every** item to stay, but its value depends on a condition, put an
+`if`/`else` expression **before** the `for`:
+
+<Playground initialCode={`scores = [78, 45, 92, 60, 88, 55]
+
+status = ["Pass" if s >= 70 else "Retake" for s in scores]
+print(status)
+
+prices = [10000, 25000, 8000, 40000]
+# 10% discount only for prices above Rp20,000
+to_pay = [p * 0.9 if p > 20000 else p for p in prices]
+print(to_pay)`} />
+
+<Callout type="tip">
+  Mind the position. A lone `if` (filtering) goes at the **end**: `[x for x in data if condition]`.
+  An `if`/`else` (choosing a value) goes at the **front**: `[a if condition else b for x in data]`.
+</Callout>
+
+## When not to use a comprehension
+
+A comprehension reads well when it's short. Once it gets long, nested, or needs several
+steps, a regular loop is clearer:
+
+<Playground initialCode={`orders = [("Budi", 3), ("Ani", 0), ("Citra", 5)]
+
+# Hard to read: too much crammed into one line
+result = [f"{n}: {q} portions" if q > 0 else f"{n}: cancelled" for n, q in orders if n != "Dodi"]
+print(result)
+
+# Clearer with a regular loop
+result = []
+for name, quantity in orders:
+    if quantity > 0:
+        result.append(f"{name}: {quantity} portions")
+    else:
+        result.append(f"{name}: cancelled")
+print(result)`} />
+
+Rule of thumb: if you have to read a comprehension twice to understand it, rewrite it as a
+loop. And don't use a comprehension just for its side effects, like
+`[print(x) for x in data]`. A plain `for` does that job.
+
+## Exercise
+
+From the monthly kos prices below, build two lists with comprehensions: only the prices
+under Rp1,000,000, and a "cheap"/"pricey" label for every price.
+
+<Playground initialCode={`kos_prices = [850000, 1200000, 950000, 1500000, 700000]
+
+# TODO: only prices under 1000000
+cheap = []
+
+# TODO: "cheap" if under 1000000, otherwise "pricey"
+labels = []
+
+print(cheap)
+print(labels)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is [n * 2 for n in range(4)]?",
+      options: ["[0, 2, 4, 6]", "[2, 4, 6, 8]", "[0, 1, 2, 3]"],
+      answer: 0,
+      explanation: "range(4) gives 0, 1, 2, 3, and each number is multiplied by 2.",
+    },
+    {
+      question: "Which one keeps only the even numbers from data?",
+      options: ["[x if x % 2 == 0 for x in data]", "[x for x in data if x % 2 == 0]", "[for x in data if x % 2 == 0]"],
+      answer: 1,
+      explanation: "A filtering if goes at the end, after the for part.",
+    },
+    {
+      question: "What is ['yes' if x > 0 else 'no' for x in [3, -1]]?",
+      options: ["['yes']", "['no', 'yes']", "['yes', 'no']"],
+      answer: 2,
+      explanation: "An if/else at the front chooses a value for each item: 3 becomes 'yes' and -1 becomes 'no'.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A list comprehension shortens the loop + `append` pattern: `[expression for item in collection]`.
+- An `if` at the end filters items: `[x for x in data if condition]`.
+- An `if`/`else` at the front chooses a value: `[a if condition else b for x in data]`.
+- If a comprehension gets long or hard to read, use a regular loop.

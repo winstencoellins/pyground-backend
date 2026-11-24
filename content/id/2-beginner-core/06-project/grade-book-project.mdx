@@ -1,0 +1,253 @@
+---
+title: Proyek Buku Nilai Siswa
+slug: grade-book-project
+stage: 2
+module: Proyek
+order: 1
+isFree: false
+estimatedMinutes: 25
+description: Bangun buku nilai siswa langkah demi langkah dengan dict, list, fungsi, if/elif, f-string, dan menu input.
+---
+
+# Proyek: Buku Nilai Siswa
+
+Saatnya menggabungkan semua yang sudah kamu pelajari di Tahap 2. Kamu akan membuat **buku
+nilai** untuk wali kelas: menyimpan nilai ulangan setiap siswa, menghitung rata-rata,
+memberi huruf nilai, mencetak laporan yang rapi, dan menyediakan menu sederhana.
+
+Kita bangun sedikit demi sedikit. Setiap langkah bisa kamu jalankan sendiri.
+
+## Langkah 1: Menyimpan data
+
+Setiap siswa punya beberapa nilai. Bentuk yang cocok adalah **dict** dengan nama siswa
+sebagai key dan **list** nilai sebagai value:
+
+<Playground initialCode={`buku_nilai = {
+    "Ani": [85, 92, 78],
+    "Budi": [70, 65, 80],
+    "Citra": [95, 88, 91],
+}
+
+print(buku_nilai)
+print("Nilai Budi:", buku_nilai["Budi"])
+print("Jumlah siswa:", len(buku_nilai))`} />
+
+## Langkah 2: Menambah nilai
+
+Fungsi `tambah_nilai` menerima buku nilai, nama, dan skor. Kalau siswanya belum ada, kita
+buatkan list kosong dulu. Skor di luar 0 sampai 100 ditolak.
+
+<Playground initialCode={`def tambah_nilai(buku, nama, skor):
+    if skor < 0 or skor > 100:
+        print(f"Skor {skor} tidak valid, harus 0 sampai 100")
+        return
+    if nama not in buku:
+        buku[nama] = []
+    buku[nama].append(skor)
+
+buku_nilai = {"Ani": [85, 92]}
+tambah_nilai(buku_nilai, "Ani", 78)
+tambah_nilai(buku_nilai, "Dodi", 88)
+tambah_nilai(buku_nilai, "Dodi", 120)
+print(buku_nilai)`} />
+
+Perhatikan bahwa fungsi ini mengubah dict yang dikirim kepadanya, jadi tidak perlu `return`
+nilai baru.
+
+## Langkah 3: Rata-rata dan huruf nilai
+
+Dua fungsi kecil, masing-masing satu tugas. `rata_rata` harus aman untuk siswa yang belum
+punya nilai (ingat `ZeroDivisionError`!), dan `huruf_nilai` memakai `if/elif`.
+
+<Playground initialCode={`def rata_rata(daftar_skor):
+    if len(daftar_skor) == 0:
+        return 0
+    return sum(daftar_skor) / len(daftar_skor)
+
+def huruf_nilai(rata):
+    if rata >= 90:
+        return "A"
+    elif rata >= 80:
+        return "B"
+    elif rata >= 70:
+        return "C"
+    elif rata >= 60:
+        return "D"
+    else:
+        return "E"
+
+print(rata_rata([85, 92, 78]), huruf_nilai(rata_rata([85, 92, 78])))
+print(rata_rata([]), huruf_nilai(rata_rata([])))
+
+# Cek nilai batas, seperti di pelajaran debugging
+assert huruf_nilai(90) == "A"
+assert huruf_nilai(89.9) == "B"
+assert huruf_nilai(60) == "D"
+print("Semua cek lolos")`} />
+
+<Callout type="tip">
+  Tiga `assert` di akhir adalah tes kecil. Kalau nanti kamu mengubah batas nilai dan ada yang
+  salah, kamu langsung tahu.
+</Callout>
+
+## Langkah 4: Laporan yang rapi
+
+f-string bisa mengatur lebar kolom. `:<8` artinya rata kiri selebar 8 karakter, `:>6.1f`
+artinya rata kanan selebar 6 dengan satu angka di belakang koma.
+
+<Playground initialCode={`def rata_rata(daftar_skor):
+    if len(daftar_skor) == 0:
+        return 0
+    return sum(daftar_skor) / len(daftar_skor)
+
+def huruf_nilai(rata):
+    if rata >= 90:
+        return "A"
+    elif rata >= 80:
+        return "B"
+    elif rata >= 70:
+        return "C"
+    elif rata >= 60:
+        return "D"
+    else:
+        return "E"
+
+def cetak_laporan(buku):
+    print(f"{'Nama':<8}{'Jumlah':>7}{'Rata':>7}{'Huruf':>7}")
+    print("-" * 29)
+    for nama in sorted(buku):
+        skor = buku[nama]
+        rata = rata_rata(skor)
+        print(f"{nama:<8}{len(skor):>7}{rata:>7.1f}{huruf_nilai(rata):>7}")
+
+buku_nilai = {
+    "Citra": [95, 88, 91],
+    "Ani": [85, 92, 78],
+    "Budi": [70, 65, 80],
+    "Dodi": [],
+}
+cetak_laporan(buku_nilai)`} />
+
+`sorted(buku)` mengurutkan key dict, jadi laporan selalu urut abjad.
+
+## Langkah 5: Menu dengan `input()`
+
+Terakhir, kita gabungkan semuanya dalam loop `while`. Pengguna memilih menu sampai mengetik
+`keluar`. Karena belum belajar menangani error, kita cek dulu dengan `.isdigit()` sebelum
+memanggil `int()` supaya tidak terjadi `ValueError`.
+
+<Playground initialCode={`def tambah_nilai(buku, nama, skor):
+    if skor < 0 or skor > 100:
+        print(f"Skor {skor} tidak valid, harus 0 sampai 100")
+        return
+    if nama not in buku:
+        buku[nama] = []
+    buku[nama].append(skor)
+
+def rata_rata(daftar_skor):
+    if len(daftar_skor) == 0:
+        return 0
+    return sum(daftar_skor) / len(daftar_skor)
+
+def huruf_nilai(rata):
+    if rata >= 90:
+        return "A"
+    elif rata >= 80:
+        return "B"
+    elif rata >= 70:
+        return "C"
+    elif rata >= 60:
+        return "D"
+    else:
+        return "E"
+
+def cetak_laporan(buku):
+    print(f"{'Nama':<8}{'Jumlah':>7}{'Rata':>7}{'Huruf':>7}")
+    print("-" * 29)
+    for nama in sorted(buku):
+        skor = buku[nama]
+        rata = rata_rata(skor)
+        print(f"{nama:<8}{len(skor):>7}{rata:>7.1f}{huruf_nilai(rata):>7}")
+
+buku_nilai = {"Ani": [85, 92, 78], "Budi": [70, 65, 80]}
+
+while True:
+    print()
+    print("1. Tambah nilai")
+    print("2. Lihat laporan")
+    pilihan = input("Pilih 1, 2, atau ketik keluar: ").strip().lower()
+
+    if pilihan == "keluar":
+        print("Sampai jumpa!")
+        break
+    elif pilihan == "1":
+        nama = input("Nama siswa: ").strip().title()
+        teks_skor = input("Skor: ").strip()
+        if teks_skor.isdigit():
+            tambah_nilai(buku_nilai, nama, int(teks_skor))
+        else:
+            print("Skor harus berupa angka")
+    elif pilihan == "2":
+        cetak_laporan(buku_nilai)
+    else:
+        print("Pilihan tidak dikenal")`} />
+
+Coba tambahkan nilai untuk siswa baru, lalu lihat laporannya, lalu ketik `keluar`.
+
+## Latihan
+
+Tambahkan fungsi `siswa_terbaik` yang mengembalikan **nama** siswa dengan rata-rata
+tertinggi. Lalu, kalau kamu masih semangat, coba salah satu ide pengembangan ini:
+
+- Menu untuk **menghapus** siswa.
+- Menampilkan rata-rata **seluruh kelas** di bawah laporan.
+- Menampilkan nilai tertinggi dan terendah setiap siswa dengan `max()` dan `min()`.
+- Memakai **set** untuk mencatat siswa yang rata-ratanya di bawah 70 (perlu remedial).
+
+<Playground initialCode={`def rata_rata(daftar_skor):
+    if len(daftar_skor) == 0:
+        return 0
+    return sum(daftar_skor) / len(daftar_skor)
+
+def siswa_terbaik(buku):
+    # TODO: loop setiap siswa, simpan nama dengan rata-rata tertinggi
+    pass
+
+buku_nilai = {
+    "Ani": [85, 92, 78],
+    "Budi": [70, 65, 80],
+    "Citra": [95, 88, 91],
+}
+print("Siswa terbaik:", siswa_terbaik(buku_nilai))  # seharusnya Citra`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Mengapa buku nilai disimpan sebagai dict berisi list?",
+      options: ["Supaya setiap nama siswa terhubung ke banyak nilai", "Karena list tidak bisa berisi angka", "Karena dict selalu terurut abjad"],
+      answer: 0,
+      explanation: "Key dict adalah nama siswa dan value-nya list, sehingga satu siswa bisa punya banyak nilai.",
+    },
+    {
+      question: "Kenapa rata_rata mengecek len(daftar_skor) == 0 lebih dulu?",
+      options: ["Supaya lebih cepat", "Supaya hasilnya bulat", "Supaya tidak terjadi ZeroDivisionError"],
+      answer: 2,
+      explanation: "Siswa tanpa nilai punya list kosong; membaginya dengan len() yang nol akan memunculkan ZeroDivisionError.",
+    },
+    {
+      question: "Apa arti format :>7.1f di dalam f-string?",
+      options: ["Rata kiri, 7 angka di belakang koma", "Rata kanan selebar 7, satu angka di belakang koma", "Dikali 7 lalu dibulatkan"],
+      answer: 1,
+      explanation: "Tanda > berarti rata kanan, 7 adalah lebar kolom, dan .1f berarti satu angka desimal.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Dict berisi list cocok untuk data "satu nama, banyak nilai".
+- Pecah program menjadi fungsi kecil: `tambah_nilai`, `rata_rata`, `huruf_nilai`, `cetak_laporan`.
+- Jaga kasus khusus seperti list kosong, dan uji nilai batas dengan `assert`.
+- f-string dengan lebar kolom membuat laporan rapi, dan loop `while` dengan `input()` membuat menu.

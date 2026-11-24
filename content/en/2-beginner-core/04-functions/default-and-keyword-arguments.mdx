@@ -1,0 +1,125 @@
+---
+title: Default Values and Keyword Arguments
+slug: default-and-keyword-arguments
+stage: 2
+module: Functions
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Give parameters default values so they can be skipped, and call functions by naming their parameters.
+---
+
+# Default Values and Keyword Arguments
+
+The more parameters a function has, the more tedious it is to call, especially when most values
+are almost always the same. Python has two features to help: **default values** and **keyword
+arguments**.
+
+## Default values
+
+You can give a parameter a built-in value with `=` in the function definition. If the caller does
+not send an argument for that parameter, the default is used:
+
+<Playground initialCode={`def order_coffee(menu, sugar="normal"):
+    print(f"One {menu}, {sugar} sugar")
+
+order_coffee("kopi susu")
+order_coffee("black coffee", "a little")`} />
+
+`print()` itself uses this trick. Its `sep` and `end` parameters have default values, which is why
+you rarely need to mention them.
+
+## Keyword arguments
+
+When calling a function, you can name the parameter: `parameter_name=value`. This is called a
+**keyword argument**. The order becomes free, and the code is easier to read:
+
+<Playground initialCode={`def ojek_fare(distance_km, rate_per_km=2500, night=False):
+    fare = distance_km * rate_per_km
+    if night:
+        fare = fare + 5000
+    return fare
+
+print(ojek_fare(6))
+print(ojek_fare(6, night=True))
+print(ojek_fare(rate_per_km=3000, distance_km=6))`} />
+
+Compare `ojek_fare(6, 2500, True)` with `ojek_fare(6, night=True)`. The second one is clear right
+away, without opening the function definition.
+
+## Ordering rules
+
+There are two rules to remember.
+
+**When defining a function:** parameters without defaults must come first, then the ones with
+defaults. If you swap them, Python refuses immediately:
+
+<Playground expectError initialCode={`def register_student(grade="10A", name):
+    print(name, grade)`} />
+
+**When calling a function:** plain (positional) arguments must come before keyword arguments:
+
+<Playground expectError initialCode={`def register_student(name, grade="10A"):
+    print(name, grade)
+
+register_student(grade="11B", "Citra")`} />
+
+The correct version:
+
+<Playground initialCode={`def register_student(name, grade="10A"):
+    print(f"{name} joins class {grade}")
+
+register_student("Citra")
+register_student("Dodi", grade="11B")
+register_student(name="Ani", grade="12C")`} />
+
+<Callout type="warning">
+  Don't use an empty list or dict as a default value, for example `def add(item, cart=[])`. The
+  default is created only once, so the same list is reused on every call and its items pile up.
+  Use `cart=None`, then create a new list inside the function when it is `None`.
+</Callout>
+
+## Exercise
+
+Complete `make_receipt()`. The `discount` parameter (a percentage) defaults to `0`, and `tax`
+defaults to `True` (add 10%). Then call the function using keyword arguments.
+
+<Playground initialCode={`def make_receipt(total, discount=0, tax=True):
+    # TODO: reduce total by the discount percentage
+    # TODO: if tax is True, add 10%
+    return total
+
+print(make_receipt(100000))
+# TODO: call make_receipt with discount=20 and tax=False`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Given def greet(name, greeting='Hi') whose body is print(greeting, name), what does greet('Budi') print?",
+      options: ["Hi Budi", "Budi Hi", "An error because greeting was not sent"],
+      answer: 0,
+      explanation: "greeting has the default value 'Hi', so it can be skipped.",
+    },
+    {
+      question: "Which function definition does Python reject?",
+      options: ["def f(a, b=1):", "def f(a, b):", "def f(a=1, b):"],
+      answer: 2,
+      explanation: "A parameter without a default (b) cannot come after one with a default (a=1).",
+    },
+    {
+      question: "Which call is valid for def send(item, destination)?",
+      options: ["send(destination='Bandung', 'rice')", "send('rice', destination='Bandung')", "Both are valid"],
+      answer: 1,
+      explanation: "Positional arguments must come before keyword arguments.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `def f(x, y=10):` gives `y` a default value, so it can be skipped when calling.
+- Keyword arguments (`y=5`) name the parameter, so the order is free and the call reads clearly.
+- In a definition, parameters without defaults come first; in a call, positional arguments come first.
+- Avoid a list or dict as a default value; use `None`.

@@ -1,0 +1,229 @@
+---
+title: Pewarisan (Inheritance)
+slug: inheritance
+stage: 3
+module: OOP Bagian 2
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Buat class turunan yang mewarisi atribut dan method induknya, lalu ubah perilakunya dengan override dan super().
+---
+
+# Pewarisan (Inheritance)
+
+Motor dan mobil sama-sama kendaraan: punya plat nomor, punya pemilik, dan bisa jalan. Tapi
+motor punya dua roda dan mobil empat. Daripada menulis kode yang sama dua kali, kamu bisa
+membuat class **induk** `Kendaraan`, lalu class **turunan** `Motor` dan `Mobil` yang mewarisinya.
+
+## Membuat class turunan
+
+Tulis nama class induk di dalam kurung. Class turunan otomatis mendapat semua atribut dan
+method induknya.
+
+<Playground initialCode={`class Kendaraan:
+    def __init__(self, plat, pemilik):
+        self.plat = plat
+        self.pemilik = pemilik
+
+    def info(self):
+        print(self.plat, "milik", self.pemilik)
+
+class Motor(Kendaraan):
+    pass
+
+motor_budi = Motor("AB 1234 XY", "Budi")
+motor_budi.info()`} />
+
+`Motor` tidak menulis `__init__` atau `info` sendiri, tapi keduanya bisa dipakai karena
+diwarisi dari `Kendaraan`.
+
+## Menambah atribut dengan `super().__init__`
+
+Class turunan sering butuh data tambahan. Tulis `__init__` baru, lalu panggil
+`super().__init__(...)` supaya bagian induk tetap diisi.
+
+<Playground initialCode={`class Kendaraan:
+    def __init__(self, plat, pemilik):
+        self.plat = plat
+        self.pemilik = pemilik
+
+class Mobil(Kendaraan):
+    def __init__(self, plat, pemilik, jumlah_kursi):
+        super().__init__(plat, pemilik)
+        self.jumlah_kursi = jumlah_kursi
+
+mobil_ani = Mobil("B 5678 CD", "Ani", 7)
+print(mobil_ani.plat, mobil_ani.pemilik, mobil_ani.jumlah_kursi)`} />
+
+<Callout type="warning">
+  Kalau kamu lupa memanggil `super().__init__(...)`, `__init__` milik induk tidak dijalankan.
+  Akibatnya atribut seperti `plat` tidak pernah dibuat, dan kamu akan mendapat `AttributeError`
+  saat membacanya.
+</Callout>
+
+## Override: mengganti perilaku method
+
+Class turunan boleh menulis ulang method dengan nama yang sama. Ini disebut **override**. Python
+selalu memakai versi yang paling dekat dengan object-nya.
+
+<Playground initialCode={`class Kendaraan:
+    def __init__(self, plat):
+        self.plat = plat
+
+    def jumlah_roda(self):
+        return 0
+
+    def suara(self):
+        return "..."
+
+class Motor(Kendaraan):
+    def jumlah_roda(self):
+        return 2
+
+    def suara(self):
+        return "Brem brem"
+
+class Mobil(Kendaraan):
+    def jumlah_roda(self):
+        return 4
+
+garasi = [Motor("AB 1111 AA"), Mobil("B 2222 BB")]
+for k in garasi:
+    print(k.plat, k.jumlah_roda(), "roda,", k.suara())`} />
+
+`Mobil` tidak meng-override `suara`, jadi ia memakai versi dari `Kendaraan`. Kamu juga bisa
+memakai `super()` di dalam method override untuk menambah, bukan mengganti, perilaku induk.
+
+<Playground initialCode={`class Kendaraan:
+    def __init__(self, plat):
+        self.plat = plat
+
+    def info(self):
+        return "Plat: " + self.plat
+
+class Ojek(Kendaraan):
+    def __init__(self, plat, pengemudi):
+        super().__init__(plat)
+        self.pengemudi = pengemudi
+
+    def info(self):
+        return super().info() + ", pengemudi: " + self.pengemudi
+
+print(Ojek("D 3333 CC", "Dodi").info())`} />
+
+## Mengecek jenis object dengan `isinstance`
+
+`isinstance(obj, Class)` bernilai `True` kalau object itu dibuat dari class tersebut **atau**
+turunannya.
+
+<Playground initialCode={`class Kendaraan:
+    pass
+
+class Motor(Kendaraan):
+    pass
+
+class Mobil(Kendaraan):
+    pass
+
+m = Motor()
+print(isinstance(m, Motor))
+print(isinstance(m, Kendaraan))
+print(isinstance(m, Mobil))
+print(issubclass(Mobil, Kendaraan))`} />
+
+## Hierarki kecil yang utuh
+
+Berikut contoh lengkap: tarif parkir dihitung berbeda untuk setiap jenis kendaraan, tapi
+kode pemakainya cukup satu loop.
+
+<Playground initialCode={`class Kendaraan:
+    tarif_per_jam = 0
+
+    def __init__(self, plat, jam):
+        self.plat = plat
+        self.jam = jam
+
+    def biaya_parkir(self):
+        return self.tarif_per_jam * self.jam
+
+class Motor(Kendaraan):
+    tarif_per_jam = 2000
+
+class Mobil(Kendaraan):
+    tarif_per_jam = 5000
+
+    def biaya_parkir(self):
+        biaya = super().biaya_parkir()
+        if self.jam > 5:
+            biaya = biaya - 5000
+        return biaya
+
+parkiran = [Motor("AB 1234 XY", 3), Mobil("B 5678 CD", 2), Mobil("D 9999 EE", 6)]
+total = 0
+for k in parkiran:
+    biaya = k.biaya_parkir()
+    total += biaya
+    print(type(k).__name__, k.plat, "Rp", biaya)
+print("Total pemasukan: Rp", total)`} />
+
+<Callout type="info">
+  **Komposisi vs pewarisan.** Pakai pewarisan kalau hubungannya "adalah": motor *adalah*
+  kendaraan. Kalau hubungannya "punya", misalnya mobil *punya* mesin, lebih baik simpan object
+  `Mesin` sebagai atribut (`self.mesin = Mesin()`). Ini disebut **komposisi**, dan sering lebih
+  mudah diubah daripada hierarki class yang dalam.
+</Callout>
+
+## Latihan
+
+Buat class induk `Karyawan` dengan atribut `nama` dan `gaji_pokok`, serta method `gaji()` yang
+mengembalikan gaji pokok. Lalu buat `Manajer` yang menambah atribut `tunjangan` dan
+meng-override `gaji()` menjadi gaji pokok ditambah tunjangan.
+
+<Playground initialCode={`class Karyawan:
+    def __init__(self, nama, gaji_pokok):
+        self.nama = nama
+        self.gaji_pokok = gaji_pokok
+
+    def gaji(self):
+        return self.gaji_pokok
+
+class Manajer(Karyawan):
+    # TODO: __init__ yang memanggil super().__init__ dan menyimpan tunjangan
+    # TODO: override gaji()
+    pass
+
+budi = Karyawan("Budi", 5000000)
+print(budi.nama, budi.gaji())`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Bagaimana cara membuat class Motor yang mewarisi Kendaraan?",
+      options: ["class Motor extends Kendaraan:", "class Kendaraan(Motor):", "class Motor(Kendaraan):"],
+      answer: 2,
+      explanation: "Class induk ditulis di dalam kurung setelah nama class turunan.",
+    },
+    {
+      question: "Apa gunanya super().__init__(plat, pemilik) di __init__ class turunan?",
+      options: ["Menjalankan __init__ milik induk supaya atribut induk ikut diisi", "Membuat object induk yang terpisah", "Menghapus __init__ milik induk"],
+      answer: 0,
+      explanation: "super() memberi akses ke method induk, jadi atribut seperti plat dan pemilik tetap dibuat.",
+    },
+    {
+      question: "Kalau Motor turunan Kendaraan dan m = Motor(), apa hasil isinstance(m, Kendaraan)?",
+      options: ["False", "True", "Error"],
+      answer: 1,
+      explanation: "isinstance juga bernilai True untuk class induk, karena motor adalah kendaraan.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `class Anak(Induk):` membuat class turunan yang mewarisi atribut dan method induk.
+- Panggil `super().__init__(...)` di `__init__` turunan supaya bagian induk tetap diisi.
+- Override berarti menulis ulang method induk; `super().nama_method()` memanggil versi induk.
+- `isinstance(obj, Class)` juga bernilai `True` untuk class induk.
+- Pewarisan untuk hubungan "adalah", komposisi untuk hubungan "punya".

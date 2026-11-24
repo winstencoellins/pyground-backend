@@ -1,0 +1,225 @@
+---
+title: Dataclass
+slug: dataclasses
+stage: 3
+module: OOP Bagian 2
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Pakai @dataclass untuk membuat class penyimpan data tanpa menulis __init__, __repr__, dan __eq__ sendiri.
+---
+
+# Dataclass
+
+Banyak class yang tugas utamanya hanya menyimpan data: produk, siswa, pesanan. Untuk class
+seperti itu, kamu terus menulis `__init__`, `__repr__`, dan `__eq__` yang isinya hampir sama.
+Modul `dataclasses` bisa menulisnya untukmu.
+
+## Class biasa vs `@dataclass`
+
+Bandingkan dua versi class `Produk` berikut.
+
+<Playground initialCode={`class ProdukBiasa:
+    def __init__(self, nama, harga, stok):
+        self.nama = nama
+        self.harga = harga
+        self.stok = stok
+
+    def __repr__(self):
+        return f"ProdukBiasa(nama={self.nama!r}, harga={self.harga}, stok={self.stok})"
+
+    def __eq__(self, lain):
+        return (self.nama, self.harga, self.stok) == (lain.nama, lain.harga, lain.stok)
+
+print(ProdukBiasa("Indomie", 3500, 40))`} />
+
+<Playground initialCode={`from dataclasses import dataclass
+
+@dataclass
+class Produk:
+    nama: str
+    harga: int
+    stok: int
+
+mie = Produk("Indomie", 3500, 40)
+print(mie)
+print(mie.harga)
+print(mie == Produk("Indomie", 3500, 40))`} />
+
+Cukup tulis nama field dan tipenya (`nama: str`). `@dataclass` otomatis membuat `__init__`,
+`__repr__`, dan `__eq__` untukmu.
+
+<Callout type="info">
+  Tulisan `: str` dan `: int` disebut **type hint**. Di dataclass, type hint wajib ada karena
+  dipakai untuk mengenali field. Tapi Python tidak memeriksa tipenya: `Produk("Teh", "mahal", 1)`
+  tetap berjalan.
+</Callout>
+
+## Field dengan nilai default
+
+Field boleh diberi nilai default. Aturannya sama seperti parameter fungsi: field dengan default
+harus ditulis **setelah** field tanpa default.
+
+<Playground initialCode={`from dataclasses import dataclass
+
+@dataclass
+class KamarKos:
+    nomor: str
+    harga: int
+    ada_ac: bool = False
+    kota: str = "Bandung"
+
+a1 = KamarKos("A1", 900000)
+b2 = KamarKos("B2", 1300000, ada_ac=True)
+print(a1)
+print(b2)`} />
+
+## `field(default_factory=list)` untuk list
+
+Kalau default-nya list, kamu tidak boleh menulis `= []`. Dataclass akan menolaknya dengan
+`ValueError`, justru untuk melindungimu dari jebakan list bersama.
+
+<Playground expectError initialCode={`from dataclasses import dataclass
+
+@dataclass
+class Siswa:
+    nama: str
+    nilai: list = []`} />
+
+Pakai `field(default_factory=list)`. Artinya: "setiap kali object dibuat, panggil `list()`
+untuk membuat list baru".
+
+<Playground initialCode={`from dataclasses import dataclass, field
+
+@dataclass
+class Siswa:
+    nama: str
+    nilai: list = field(default_factory=list)
+
+    def rata_rata(self):
+        if not self.nilai:
+            return 0
+        return sum(self.nilai) / len(self.nilai)
+
+budi = Siswa("Budi")
+ani = Siswa("Ani")
+budi.nilai.append(85)
+budi.nilai.append(95)
+
+print(budi, budi.rata_rata())
+print(ani, ani.rata_rata())`} />
+
+Dataclass tetap class biasa, jadi kamu boleh menambah method seperti `rata_rata`, property,
+bahkan pewarisan.
+
+## `frozen=True`: data yang tidak bisa diubah
+
+Dengan `@dataclass(frozen=True)`, field tidak bisa diubah setelah object dibuat. Cocok untuk data
+yang memang tetap, seperti koordinat atau kode wilayah.
+
+<Playground expectError initialCode={`from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Lokasi:
+    kota: str
+    lintang: float
+    bujur: float
+
+jogja = Lokasi("Yogyakarta", -7.80, 110.36)
+print(jogja)
+jogja.kota = "Solo"`} />
+
+Bonus: object frozen bisa dipakai sebagai kunci dict atau isi set.
+
+<Playground initialCode={`from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Lokasi:
+    kota: str
+    lintang: float
+    bujur: float
+
+ongkir = {
+    Lokasi("Yogyakarta", -7.80, 110.36): 10000,
+    Lokasi("Jakarta", -6.20, 106.82): 25000,
+}
+print(ongkir[Lokasi("Jakarta", -6.20, 106.82)])`} />
+
+## Kapan pakai dataclass, class biasa, atau dict?
+
+| Pilihan | Cocok untuk |
+| --- | --- |
+| dict | Data sementara atau yang bentuknya berubah-ubah, misalnya hasil baca JSON |
+| `@dataclass` | Data dengan field yang jelas dan tetap, ditambah sedikit method |
+| class biasa | Object dengan banyak aturan dan perilaku, misalnya `RekeningBank` yang menjaga saldo |
+
+Contoh: data pesanan dari form cukup dict. Setelah dipakai di banyak tempat, ubah jadi
+dataclass supaya salah ketik nama field langsung ketahuan.
+
+<Playground initialCode={`from dataclasses import dataclass
+
+data = {"pelanggan": "Citra", "menu": "Bakso", "jumlah": 2}
+
+@dataclass
+class Pesanan:
+    pelanggan: str
+    menu: str
+    jumlah: int = 1
+
+p = Pesanan(**data)
+print(p)
+print(p.menu, "x", p.jumlah)`} />
+
+`Pesanan(**data)` membongkar dict menjadi argumen bernama. Kamu akan mempelajari `**` lebih
+dalam di modul berikutnya.
+
+## Latihan
+
+Buat dataclass `Menu` untuk warung dengan field `nama`, `harga`, dan `pedas` (default `False`).
+Lalu buat dataclass `Struk` dengan field `pelanggan` dan `daftar` (list `Menu`, pakai
+`default_factory`), serta method `total()`.
+
+<Playground initialCode={`from dataclasses import dataclass, field
+
+@dataclass
+class Menu:
+    nama: str
+    # TODO: tambahkan harga dan pedas (default False)
+
+# TODO: buat dataclass Struk dengan pelanggan, daftar, dan method total()
+
+soto = Menu("Soto ayam")
+print(soto)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Method apa saja yang otomatis dibuat oleh @dataclass?",
+      options: ["Hanya __init__", "__str__ dan __len__", "__init__, __repr__, dan __eq__"],
+      answer: 2,
+      explanation: "Secara bawaan @dataclass membuat __init__, __repr__, dan __eq__ dari daftar field.",
+    },
+    {
+      question: "Bagaimana cara benar memberi default list kosong pada field dataclass?",
+      options: ["nilai: list = field(default_factory=list)", "nilai: list = []", "nilai: list = list"],
+      answer: 0,
+      explanation: "default_factory=list membuat list baru untuk setiap object. Menulis = [] ditolak dengan ValueError.",
+    },
+    {
+      question: "Apa akibat @dataclass(frozen=True)?",
+      options: ["Object tidak bisa dibuat", "Field tidak bisa diubah setelah object dibuat", "Semua field wajib punya default"],
+      answer: 1,
+      explanation: "Mengubah field object frozen memberi FrozenInstanceError, dan object-nya bisa jadi kunci dict.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `@dataclass` membuat `__init__`, `__repr__`, dan `__eq__` dari field yang kamu tulis dengan type hint.
+- Field dengan default ditulis setelah field tanpa default.
+- Untuk default list atau dict, pakai `field(default_factory=list)`.
+- `frozen=True` membuat object tidak bisa diubah dan bisa dipakai sebagai kunci dict.
+- Dict untuk data lepas, dataclass untuk data berbentuk tetap, class biasa untuk object dengan banyak aturan.

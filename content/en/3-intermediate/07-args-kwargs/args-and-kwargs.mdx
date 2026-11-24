@@ -1,0 +1,132 @@
+---
+title: Meet args and kwargs
+slug: args-and-kwargs
+stage: 3
+module: Flexible Arguments
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Write functions that accept any number of arguments with args and kwargs.
+---
+
+# Meet args and kwargs
+
+So far, every function you have written had a fixed number of parameters. But what if you
+want to add up shopping prices when there might be 2, 5, or 20 items? Python has two tools
+for that: `*args` and `**kwargs`.
+
+## Any number of positional arguments with `*args`
+
+A star `*` in front of a parameter name means "collect all remaining positional arguments
+into one **tuple**":
+
+<Playground initialCode={`def total_price(*prices):
+    print("prices contains:", prices)
+    return sum(prices)
+
+print(total_price(5000, 12000))
+print(total_price(3000, 7500, 2500, 15000))
+print(total_price())`} />
+
+The name `args` is just a convention. What matters is the `*`. Here we use the name
+`prices` to make it clearer. Since it is a tuple, you can loop over it, use `len()`, or
+`sum()` as usual.
+
+## Any number of named arguments with `**kwargs`
+
+Two stars `**` collect all **keyword arguments** (named arguments) into one **dict**:
+
+<Playground initialCode={`def build_profile(**data):
+    print("data contains:", data)
+    for key, value in data.items():
+        print(f"- {key}: {value}")
+
+build_profile(name="Ani", city="Bandung", age=17)
+print()
+build_profile(name="Dodi", hobby="futsal")`} />
+
+The argument names become the dict keys, and their values become the dict values. This is
+handy for data whose fields can vary, like a user profile.
+
+## Combining with normal parameters
+
+`*args` and `**kwargs` can be used together with normal and default parameters:
+
+<Playground initialCode={`def book_ojek(name, *stops, fare=10000, **notes):
+    print("Passenger:", name)
+    print("Stops:", stops)
+    print("Fare per stop:", fare)
+    print("Notes:", notes)
+    print("Total:", fare * len(stops))
+
+book_ojek("Citra", "school", "warung", fare=12000, helmet="bring own")`} />
+
+`"Citra"` goes into `name`, the remaining positional arguments go into `stops`,
+`fare=12000` fills the default parameter, and any unknown named argument (`helmet`) goes
+into `notes`.
+
+## The parameter order rule
+
+When writing function parameters, use this order:
+
+1. Normal parameters (`name`)
+2. `*args`
+3. Default parameters (`fare=10000`)
+4. `**kwargs`
+
+Because it comes after `*args`, the `fare` parameter can only be filled by name
+(`fare=12000`). One thing is mandatory: `**kwargs` must always be last. Otherwise
+Python refuses straight away:
+
+<Playground expectError initialCode={`def wrong(**data, name):
+    print(name, data)`} />
+
+<Callout type="tip">
+  An easy way to remember it: normal ones first, then the "leftovers". `**kwargs` holds all
+  leftover named arguments, so it always goes at the very end.
+</Callout>
+
+## Exercise
+
+Complete the `receipt` function so it prints the buyer's name, the total of all prices, and
+every extra note.
+
+<Playground initialCode={`def receipt(buyer, *prices, **notes):
+    print("Buyer:", buyer)
+    # TODO: print the total of all prices
+    # TODO: print each note in the format "key: value"
+    pass
+
+receipt("Budi", 5000, 12000, 3500, table=4, takeaway="no")`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Inside def f(*numbers), what is the type of numbers?",
+      options: ["tuple", "list", "dict"],
+      answer: 0,
+      explanation: "The * collects positional arguments into a tuple.",
+    },
+    {
+      question: "What does data contain if you call profile(name='Ani', age=17) with def profile(**data)?",
+      options: ["('Ani', 17)", "['name', 'age']", "{'name': 'Ani', 'age': 17}"],
+      answer: 2,
+      explanation: "The ** collects named arguments into a dict, with the argument names as keys.",
+    },
+    {
+      question: "Which parameter order is valid?",
+      options: ["def f(**kw, *args, a)", "def f(a, *args, b=1, **kw)", "def f(*args, **kw, a)"],
+      answer: 1,
+      explanation: "The order is: normal parameters, *args, default parameters, then **kwargs last.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `*args` collects the remaining positional arguments into a tuple.
+- `**kwargs` collects the remaining named arguments into a dict.
+- The names `args` and `kwargs` are just conventions; what matters is `*` and `**`.
+- Parameter order: normal, `*args`, default, then `**kwargs`.

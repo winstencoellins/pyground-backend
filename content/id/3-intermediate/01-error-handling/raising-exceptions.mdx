@@ -1,0 +1,199 @@
+---
+title: Memunculkan Exception dengan raise
+slug: raising-exceptions
+stage: 3
+module: Penanganan Error
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Pakai else dan finally dengan tepat, munculkan error sendiri dengan raise, dan buat jenis error bernama untuk programmu.
+---
+
+# Memunculkan Exception dengan `raise`
+
+Di pelajaran sebelumnya kamu belajar **menangkap** error. Sekarang kita balik posisinya:
+kadang justru kodemu yang harus **memunculkan** error, misalnya ketika fungsi menerima data
+yang tidak masuk akal. Kita juga akan melihat lebih dalam cara kerja `else` dan `finally`.
+
+## Urutan `try`, `except`, `else`, `finally`
+
+Ingat lagi aturannya: `else` hanya berjalan kalau `try` sukses, sedangkan `finally` selalu
+berjalan. Perhatikan urutan cetakannya di dua percobaan ini:
+
+<Playground initialCode={`def hitung_kembalian(bayar, harga):
+    try:
+        print("Mulai menghitung...")
+        kembalian = int(bayar) - harga
+    except ValueError:
+        print("Uang bayar harus angka")
+    else:
+        print("Kembalian: Rp", kembalian)
+    finally:
+        print("Kasir siap melayani pembeli berikutnya")
+    print()
+
+hitung_kembalian("50000", 32000)
+hitung_kembalian("lima puluh ribu", 32000)`} />
+
+Kenapa tidak menaruh `print("Kembalian...")` langsung di dalam `try`? Karena `try` sebaiknya
+hanya berisi baris yang **mungkin gagal**. Semakin sedikit isi `try`, semakin jelas error mana
+yang sedang kamu tangkap.
+
+## Memunculkan error dengan `raise`
+
+Fungsi yang menerima data salah sebaiknya **menolak dengan tegas**, bukan diam-diam memberi
+hasil aneh. Tulis `raise`, lalu nama exception dan pesannya:
+
+<Playground initialCode={`def harga_setelah_diskon(harga, persen):
+    if harga < 0:
+        raise ValueError("Harga tidak boleh negatif")
+    if persen < 0 or persen > 100:
+        raise ValueError("Diskon harus antara 0 dan 100 persen")
+    return harga - harga * persen // 100
+
+print(harga_setelah_diskon(20000, 10))
+
+try:
+    print(harga_setelah_diskon(20000, 150))
+except ValueError as e:
+    print("Gagal:", e)`} />
+
+Kalau error dari `raise` tidak ditangkap, program berhenti dan menampilkan pesanmu:
+
+<Playground expectError initialCode={`def set_nilai(nilai):
+    if nilai > 100:
+        raise ValueError("Nilai maksimal 100")
+    return nilai
+
+set_nilai(120)`} />
+
+<Callout type="tip">
+  Pilih exception yang sesuai. `ValueError` untuk nilai yang salah (umur negatif), `TypeError`
+  untuk tipe yang salah (teks padahal harusnya angka). Pesan yang jelas sangat membantu orang
+  yang memakai fungsimu.
+</Callout>
+
+## Meneruskan error (re-raise)
+
+Kadang kamu ingin **mencatat** bahwa ada error, tapi tetap membiarkan error itu naik ke kode
+yang memanggil. Caranya: tulis `raise` saja, tanpa apa pun, di dalam `except`:
+
+<Playground initialCode={`def baca_harga(teks):
+    try:
+        return int(teks)
+    except ValueError:
+        print("Catatan: harga tidak valid ->", teks)
+        raise
+
+daftar = ["15000", "8000", "dua ribu"]
+total = 0
+try:
+    for teks in daftar:
+        total += baca_harga(teks)
+except ValueError:
+    print("Total dibatalkan karena ada harga yang salah")
+else:
+    print("Total:", total)`} />
+
+`baca_harga()` mencatat masalahnya, lalu menyerahkan keputusan ke pemanggil. Pemanggil yang
+tahu konteksnya memutuskan apa yang harus dilakukan.
+
+## Jenis error buatan sendiri
+
+`ValueError` bisa berarti banyak hal. Supaya lebih jelas, kamu bisa membuat jenis error
+**bernama** sendiri. Untuk sekarang, anggap baris `class` di bawah ini hanya cara memberi nama
+pada jenis error baru. Kamu akan belajar `class` secara lengkap di modul OOP nanti.
+
+<Playground initialCode={`class SaldoTidakCukup(Exception):
+    pass
+
+def tarik_tunai(saldo, jumlah):
+    if jumlah > saldo:
+        raise SaldoTidakCukup(f"Saldo Rp{saldo} tidak cukup untuk menarik Rp{jumlah}")
+    return saldo - jumlah
+
+saldo = 150000
+for jumlah in [50000, 200000]:
+    try:
+        saldo = tarik_tunai(saldo, jumlah)
+        print("Berhasil, sisa saldo Rp", saldo)
+    except SaldoTidakCukup as e:
+        print("Ditolak:", e)`} />
+
+Dengan nama `SaldoTidakCukup`, kode yang menangkapnya langsung terbaca jelas, dan tidak akan
+tertukar dengan `ValueError` dari tempat lain.
+
+## Jangan tangkap semuanya
+
+`except:` tanpa nama exception menangkap **semua** error, termasuk salah ketik di kodemu
+sendiri. Lihat contoh ini: ada salah ketik `totl`, tapi pesannya malah menyalahkan pengguna.
+
+<Playground initialCode={`harga = "12000"
+try:
+    total = int(harga) * 2
+    print("Total:", totl)
+except:
+    print("Input harga salah!")`} />
+
+Bug `NameError` tersembunyi di balik pesan yang menyesatkan. Bandingkan dengan menangkap
+exception yang spesifik:
+
+<Playground expectError initialCode={`harga = "12000"
+try:
+    total = int(harga) * 2
+    print("Total:", totl)
+except ValueError:
+    print("Input harga salah!")`} />
+
+Sekarang Python jujur memberi tahu ada `NameError`, dan kamu bisa langsung memperbaikinya.
+
+<Callout type="warning">
+  Tangkap hanya error yang memang kamu harapkan dan tahu cara menanganinya. Error lain biarkan
+  muncul supaya bug cepat ketahuan.
+</Callout>
+
+## Latihan
+
+Lengkapi fungsi `pesan_ojek()`: munculkan `ValueError` kalau jarak 0 atau kurang, lalu hitung
+ongkos Rp2500 per km. Tangkap error-nya di bagian bawah.
+
+<Playground initialCode={`def pesan_ojek(jarak_km):
+    # TODO: raise ValueError kalau jarak_km <= 0
+    return jarak_km * 2500
+
+for jarak in [4, 0, -2]:
+    # TODO: bungkus dengan try/except ValueError dan cetak pesannya
+    print("Ongkos:", pesan_ojek(jarak))`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang dilakukan raise tanpa apa pun di dalam blok except?",
+      options: ["Meneruskan error yang sedang ditangani ke pemanggil", "Menghapus error", "Menjalankan ulang blok try"],
+      answer: 0,
+      explanation: "raise saja di dalam except memunculkan lagi error yang sama, jadi pemanggil tetap bisa menanganinya.",
+    },
+    {
+      question: "Kenapa except: tanpa nama exception sebaiknya dihindari?",
+      options: ["Karena membuat program lebih lambat", "Karena tidak bisa dipakai bersama finally", "Karena ikut menangkap bug seperti NameError sehingga tersembunyi"],
+      answer: 2,
+      explanation: "except: menangkap semua error, termasuk salah ketik di kodemu, sehingga bug sulit ditemukan.",
+    },
+    {
+      question: "Kapan blok else pada try dijalankan?",
+      options: ["Selalu, ada error atau tidak", "Hanya jika try selesai tanpa error", "Hanya jika ada error"],
+      answer: 1,
+      explanation: "else adalah jalur sukses. Yang selalu berjalan adalah finally.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Isi `try` sesedikit mungkin; taruh jalur sukses di `else` dan beres-beres di `finally`.
+- `raise ValueError("pesan")` menolak data yang tidak masuk akal di dalam fungsi.
+- `raise` saja di dalam `except` meneruskan error ke pemanggil.
+- `class NamaError(Exception): pass` membuat jenis error bernama sendiri.
+- Hindari `except:` kosong; tangkap hanya error yang kamu harapkan.

@@ -1,0 +1,158 @@
+---
+title: Fungsi Juga Sebuah Nilai
+slug: functions-as-objects
+stage: 3
+module: Decorator
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Simpan, kirim, dan kembalikan fungsi seperti nilai biasa, lalu kenali lambda dan closure.
+---
+
+# Fungsi Juga Sebuah Nilai
+
+Di Python, fungsi bukan sesuatu yang istimewa. Fungsi adalah **objek**, sama seperti angka,
+string, atau list. Artinya fungsi bisa disimpan di variabel, dikirim ke fungsi lain, dan
+dikembalikan dari fungsi. Ini adalah bekal utama untuk memahami decorator di pelajaran
+berikutnya.
+
+## Menyimpan fungsi di variabel
+
+Perhatikan bedanya `sapa` (fungsinya) dan `sapa()` (hasil memanggil fungsinya):
+
+<Playground initialCode={`def sapa(nama):
+    return f"Halo, {nama}!"
+
+panggil = sapa          # tanpa (), fungsinya tidak dijalankan
+print(panggil)
+print(panggil("Budi"))
+
+daftar_fungsi = [len, str.upper, sapa]
+for f in daftar_fungsi:
+    print(f("ani"))`} />
+
+`panggil` dan `sapa` sekarang menunjuk ke fungsi yang sama. Fungsi bahkan bisa disimpan di
+dalam list.
+
+## Mengirim fungsi ke fungsi lain
+
+Fungsi yang menerima fungsi lain sebagai argumen sangat berguna. Contohnya, satu fungsi
+untuk menerapkan aturan harga apa pun ke semua menu:
+
+<Playground initialCode={`def diskon_10(harga):
+    return harga * 90 // 100
+
+def tambah_pajak(harga):
+    return harga * 111 // 100
+
+def terapkan(aturan, daftar_harga):
+    return [aturan(h) for h in daftar_harga]
+
+harga = [10000, 25000, 8000]
+print(terapkan(diskon_10, harga))
+print(terapkan(tambah_pajak, harga))`} />
+
+## Fungsi kecil dengan `lambda`
+
+Untuk fungsi pendek satu baris, kamu bisa memakai `lambda` tanpa perlu `def`. Paling sering
+dipakai sebagai `key` di `sorted()`, untuk menentukan apa yang dibandingkan:
+
+<Playground initialCode={`siswa = [("Budi", 78), ("Ani", 92), ("Citra", 85), ("Dodi", 66)]
+
+urut_nilai = sorted(siswa, key=lambda s: s[1], reverse=True)
+print(urut_nilai)
+
+urut_nama = sorted(siswa, key=lambda s: s[0])
+print(urut_nama)
+
+kuadrat = lambda x: x * x
+print(kuadrat(7))`} />
+
+`lambda s: s[1]` sama dengan fungsi yang menerima `s` lalu mengembalikan `s[1]`.
+
+<Callout type="tip">
+  Pakai `lambda` hanya untuk fungsi yang sangat pendek. Kalau logikanya lebih dari satu
+  ekspresi, tulis dengan `def` supaya mudah dibaca.
+</Callout>
+
+## Fungsi di dalam fungsi dan closure
+
+Fungsi boleh dibuat **di dalam** fungsi lain, lalu dikembalikan. Fungsi dalam itu tetap
+**mengingat** variabel dari fungsi luarnya, walaupun fungsi luarnya sudah selesai. Inilah
+yang disebut **closure**:
+
+<Playground initialCode={`def buat_diskon(persen):
+    def hitung(harga):
+        return harga - harga * persen // 100
+    return hitung
+
+diskon_pelajar = buat_diskon(20)
+diskon_lebaran = buat_diskon(50)
+
+print(diskon_pelajar(15000))
+print(diskon_lebaran(15000))`} />
+
+`buat_diskon` adalah "pabrik fungsi". Setiap fungsi yang dihasilkan menyimpan nilai `persen`
+miliknya sendiri.
+
+Closure juga bisa menyimpan keadaan yang berubah. Gunakan `nonlocal` untuk mengubah variabel
+milik fungsi luar:
+
+<Playground initialCode={`def buat_penghitung():
+    jumlah = 0
+    def tambah():
+        nonlocal jumlah
+        jumlah += 1
+        return jumlah
+    return tambah
+
+antrean_warung = buat_penghitung()
+print(antrean_warung())
+print(antrean_warung())
+print(antrean_warung())`} />
+
+## Latihan
+
+Buat fungsi `buat_ongkir(tarif_per_km)` yang mengembalikan fungsi untuk menghitung ongkos
+ojek dari jarak. Lalu urutkan daftar pesanan berdasarkan jaraknya dengan `sorted` dan
+`lambda`.
+
+<Playground initialCode={`def buat_ongkir(tarif_per_km):
+    # TODO: buat fungsi dalam yang menerima jarak dan mengembalikan ongkos
+    pass
+
+pesanan = [("Ani", 7), ("Budi", 3), ("Citra", 12)]
+# TODO: urutkan pesanan berdasarkan jarak (indeks 1)
+print(pesanan)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Jika f = sapa (tanpa kurung), apa yang terjadi?",
+      options: ["sapa langsung dijalankan", "f menunjuk ke fungsi sapa", "Error karena kurang kurung"],
+      answer: 1,
+      explanation: "Tanpa (), fungsi tidak dipanggil. f hanya menjadi nama lain untuk fungsi yang sama.",
+    },
+    {
+      question: "Apa hasil sorted([3, -5, 1], key=lambda x: abs(x))?",
+      options: ["[1, 3, -5]", "[-5, 1, 3]", "[3, 1, -5]"],
+      answer: 0,
+      explanation: "Yang dibandingkan adalah abs(x), yaitu 3, 5, 1. Urutan dari kecil: 1, 3, -5.",
+    },
+    {
+      question: "Apa yang dimaksud closure?",
+      options: ["Fungsi tanpa nama", "Fungsi yang menutup file", "Fungsi dalam yang mengingat variabel dari fungsi luarnya"],
+      answer: 2,
+      explanation: "Closure adalah fungsi dalam yang tetap membawa variabel dari tempat ia dibuat.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Fungsi adalah objek: bisa disimpan di variabel, dikirim, dan dikembalikan.
+- `nama_fungsi` merujuk fungsinya, `nama_fungsi()` menjalankannya.
+- `lambda` membuat fungsi satu ekspresi, sering dipakai sebagai `key` di `sorted()`.
+- Closure adalah fungsi dalam yang mengingat variabel fungsi luarnya; pakai `nonlocal` untuk mengubahnya.

@@ -1,0 +1,217 @@
+---
+title: Fetching Data from the Internet with requests
+slug: http-requests
+stage: 3
+module: datetime and requests
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Learn what an HTTP API is, then fetch JSON data from the internet with the requests library and handle its errors safely.
+---
+
+# Fetching Data from the Internet with requests
+
+Weather apps, Rupiah exchange rates, and the menus in ojek apps all fetch data from a server
+over the internet. In this lesson you learn to do the same from Python with the
+**`requests`** library.
+
+## What is an HTTP API?
+
+Every time a browser opens a page, it sends a **request** to a server and receives a
+**response**. (You'll dig into this in the *How the Web Works* lesson in Stage 4.) An
+**HTTP API** works the same way, except the server doesn't reply with a web page but with
+**data**, usually in **JSON** format.
+
+An API response has two important parts:
+
+- **Status code**: a number that tells you the result. `200` means success, `404` means not
+  found, `500` means the server has a problem.
+- **Body**: the content, for example JSON text.
+
+You process that JSON text with the `json` module you already know. Imagine a warung API
+sends this text:
+
+<Playground initialCode={`import json
+
+# Pretend this is the response body from a warung API
+body = '{"warung": "Warung Bu Ani", "open": true, "menu": [{"name": "Nasi goreng", "price": 15000}, {"name": "Es teh", "price": 5000}]}'
+
+data = json.loads(body)
+
+print("Name:", data["warung"])
+print("Open?", data["open"])
+for item in data["menu"]:
+    print(f"- {item['name']}: Rp{item['price']:,}")`} />
+
+`json.loads()` turns JSON text into Python dicts and lists. Notice that `true` in JSON becomes
+`True` in Python.
+
+<Callout type="warning">
+  Browser playgrounds can't access the internet. All the `requests` examples below are in
+  regular code blocks, with sample output. Run them on your own computer to try them.
+</Callout>
+
+## Installing requests
+
+`requests` isn't part of the standard library, so install it with pip first (ideally inside a
+virtual environment):
+
+<TerminalBlock command="pip install requests" output={`Collecting requests
+  Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+...
+Successfully installed certifi charset-normalizer idna requests urllib3`} />
+
+## Your first request with `requests.get`
+
+`requests.get(url)` sends a GET request and returns a **response** object. This example uses
+JSONPlaceholder, a free API for practice:
+
+```python
+import requests
+
+response = requests.get("https://jsonplaceholder.typicode.com/todos/1", timeout=10)
+
+print(response.status_code)
+data = response.json()
+print(data)
+print(data["title"])
+```
+
+Sample output:
+
+```text
+200
+{'userId': 1, 'id': 1, 'title': 'delectus aut autem', 'completed': False}
+delectus aut autem
+```
+
+- `response.status_code` is the status code (`200` means success).
+- `response.json()` turns the JSON body straight into a dict or list, just like
+  `json.loads(response.text)`.
+
+## Sending parameters and setting a `timeout`
+
+Many APIs accept **parameters** in the URL, such as `?userId=1`. Instead of building the URL
+yourself, pass a dict to `params`:
+
+```python
+import requests
+
+response = requests.get(
+    "https://jsonplaceholder.typicode.com/posts",
+    params={"userId": 1},
+    timeout=10,
+)
+
+print(response.url)
+posts = response.json()
+print("Number of posts:", len(posts))
+print("First title:", posts[0]["title"])
+```
+
+```text
+https://jsonplaceholder.typicode.com/posts?userId=1
+Number of posts: 10
+First title: sunt aut facere repellat provident occaecati excepturi optio reprehenderit
+```
+
+`timeout=10` means: if the server doesn't reply within 10 seconds, stop waiting. Without a
+`timeout`, your program could wait forever if the server hangs. Make a habit of always
+setting one.
+
+## Handling errors
+
+Plenty can go wrong: the internet drops, the server is slow, or the address is wrong. A `404`
+or `500` status code does **not** automatically become an error. Call `raise_for_status()` so
+4xx and 5xx status codes turn into exceptions, then catch them with `try`/`except`:
+
+```python
+import requests
+
+try:
+    response = requests.get("https://jsonplaceholder.typicode.com/todos/99999", timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    print(data)
+except requests.exceptions.Timeout:
+    print("The server took too long to reply.")
+except requests.exceptions.ConnectionError:
+    print("Couldn't connect. Check your internet connection.")
+except requests.exceptions.HTTPError as e:
+    print("The server replied with an error:", e.response.status_code)
+```
+
+```text
+The server replied with an error: 404
+```
+
+To catch every error from `requests` at once, use their parent,
+`requests.exceptions.RequestException`.
+
+A body that isn't valid JSON can also break your program. You can practise the same handling
+pattern here with `json.loads()`:
+
+<Playground initialCode={`import json
+
+responses = [
+    '{"city": "Bandung", "temperature": 22}',
+    'Sorry, the server is under maintenance',
+]
+
+for body in responses:
+    try:
+        data = json.loads(body)
+        print(f"Temperature in {data['city']}: {data['temperature']} degrees")
+    except json.JSONDecodeError:
+        print("Response is not valid JSON:", body)`} />
+
+## Exercise
+
+An exchange rate API sends the response below. Work out how many Rupiah you get for 50 US
+dollars and 20 Singapore dollars, then print the results. Don't forget to check the
+`status_code` first.
+
+<Playground initialCode={`import json
+
+status_code = 200
+body = '{"base": "IDR", "rates": {"USD": 16000, "SGD": 12000, "MYR": 3500}}'
+
+foreign_money = {"USD": 50, "SGD": 20}
+
+# TODO: if status_code isn't 200, print an error message
+# TODO: turn body into a dict with json.loads()
+# TODO: for each currency in foreign_money, work out its value in Rupiah
+pass`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What does response.json() do?",
+      options: ["Sends JSON data to the server", "Turns a JSON response body into a dict or list", "Saves the response to a JSON file"],
+      answer: 1,
+      explanation: "response.json() reads the response body and turns it into a Python object, just like json.loads(response.text).",
+    },
+    {
+      question: "The server replies with status code 404. What happens if you DON'T call raise_for_status()?",
+      options: ["The program stops with an error right away", "Python retries the request", "No exception is raised, so you have to check status_code yourself"],
+      answer: 2,
+      explanation: "requests doesn't treat 404 as an error. raise_for_status() is what turns 4xx and 5xx statuses into an HTTPError.",
+    },
+    {
+      question: "Why should you always pass a timeout to requests.get()?",
+      options: ["So the program doesn't wait forever if the server never replies", "So the request is faster", "So the response becomes JSON automatically"],
+      answer: 0,
+      explanation: "Without a timeout, requests can wait indefinitely. With one, you get a Timeout exception you can handle.",
+    },
+  ]}
+/>
+
+## Summary
+
+- An HTTP API answers requests with data, usually JSON, plus a status code.
+- Install it with `pip install requests`, then use `requests.get(url, params=..., timeout=...)`.
+- `status_code` gives the result, and `.json()` turns the body into a dict or list.
+- Call `raise_for_status()` and catch `requests.exceptions.RequestException` to handle errors
+  safely.

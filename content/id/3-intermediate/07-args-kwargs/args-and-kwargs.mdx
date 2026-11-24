@@ -1,0 +1,132 @@
+---
+title: Mengenal args dan kwargs
+slug: args-and-kwargs
+stage: 3
+module: Argumen Fleksibel
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Buat fungsi yang menerima argumen sebanyak apa pun dengan args dan kwargs.
+---
+
+# Mengenal args dan kwargs
+
+Sejauh ini, setiap fungsi yang kamu buat punya jumlah parameter yang tetap. Tapi bagaimana
+kalau kamu ingin menjumlahkan harga belanjaan yang jumlahnya bisa 2, 5, atau 20 barang?
+Python punya dua alat untuk itu: `*args` dan `**kwargs`.
+
+## Argumen posisi sebanyak apa pun dengan `*args`
+
+Tanda bintang `*` di depan nama parameter berarti "kumpulkan semua argumen posisi yang
+tersisa ke dalam satu **tuple**":
+
+<Playground initialCode={`def total_harga(*harga):
+    print("Isi harga:", harga)
+    return sum(harga)
+
+print(total_harga(5000, 12000))
+print(total_harga(3000, 7500, 2500, 15000))
+print(total_harga())`} />
+
+Nama `args` hanyalah kebiasaan. Yang penting adalah tanda `*`-nya. Di sini kita pakai nama
+`harga` supaya lebih jelas. Karena isinya tuple, kamu bisa melakukan loop, `len()`, atau
+`sum()` seperti biasa.
+
+## Argumen bernama sebanyak apa pun dengan `**kwargs`
+
+Dua bintang `**` mengumpulkan semua **argumen bernama** (keyword argument) ke dalam satu
+**dict**:
+
+<Playground initialCode={`def buat_profil(**data):
+    print("Isi data:", data)
+    for kunci, nilai in data.items():
+        print(f"- {kunci}: {nilai}")
+
+buat_profil(nama="Ani", kota="Bandung", umur=17)
+print()
+buat_profil(nama="Dodi", hobi="futsal")`} />
+
+Nama argumen menjadi kunci dict, dan nilainya menjadi isi dict. Cocok untuk data yang
+kolomnya bisa berbeda-beda, seperti profil pengguna.
+
+## Menggabungkan dengan parameter biasa
+
+`*args` dan `**kwargs` bisa dipakai bersama parameter biasa dan parameter default:
+
+<Playground initialCode={`def pesan_ojek(nama, *tujuan, ongkos=10000, **catatan):
+    print("Penumpang:", nama)
+    print("Tujuan:", tujuan)
+    print("Ongkos per tujuan:", ongkos)
+    print("Catatan:", catatan)
+    print("Total:", ongkos * len(tujuan))
+
+pesan_ojek("Citra", "sekolah", "warung", ongkos=12000, helm="bawa sendiri")`} />
+
+`"Citra"` masuk ke `nama`, sisa argumen posisi masuk ke `tujuan`, `ongkos=12000` mengisi
+parameter default, dan argumen bernama yang tidak dikenal (`helm`) masuk ke `catatan`.
+
+## Aturan urutan parameter
+
+Saat menulis parameter fungsi, pakai urutan ini:
+
+1. Parameter biasa (`nama`)
+2. `*args`
+3. Parameter default (`ongkos=10000`)
+4. `**kwargs`
+
+Karena letaknya setelah `*args`, parameter `ongkos` hanya bisa diisi dengan namanya
+(`ongkos=12000`). Satu hal yang wajib: `**kwargs` harus selalu paling akhir. Kalau tidak,
+Python langsung menolak:
+
+<Playground expectError initialCode={`def salah(**data, nama):
+    print(nama, data)`} />
+
+<Callout type="tip">
+  Gampang mengingatnya: yang biasa dulu, lalu yang "sisa". `**kwargs` menampung semua
+  sisa argumen bernama, jadi ia selalu berada di paling belakang.
+</Callout>
+
+## Latihan
+
+Lengkapi fungsi `struk` supaya mencetak nama pembeli, total semua harga, dan setiap
+catatan tambahan.
+
+<Playground initialCode={`def struk(pembeli, *harga, **catatan):
+    print("Pembeli:", pembeli)
+    # TODO: cetak total semua harga
+    # TODO: cetak setiap catatan dengan format "kunci: nilai"
+    pass
+
+struk("Budi", 5000, 12000, 3500, meja=4, bungkus="tidak")`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Di dalam def f(*angka), apa tipe data angka?",
+      options: ["tuple", "list", "dict"],
+      answer: 0,
+      explanation: "Tanda * mengumpulkan argumen posisi ke dalam sebuah tuple.",
+    },
+    {
+      question: "Apa isi data jika kamu memanggil profil(nama='Ani', umur=17) dengan def profil(**data)?",
+      options: ["('Ani', 17)", "['nama', 'umur']", "{'nama': 'Ani', 'umur': 17}"],
+      answer: 2,
+      explanation: "Tanda ** mengumpulkan argumen bernama ke dalam dict, dengan nama argumen sebagai kunci.",
+    },
+    {
+      question: "Urutan parameter mana yang valid?",
+      options: ["def f(**kw, *args, a)", "def f(a, *args, b=1, **kw)", "def f(*args, **kw, a)"],
+      answer: 1,
+      explanation: "Urutannya: parameter biasa, *args, parameter default, lalu **kwargs paling akhir.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `*args` mengumpulkan argumen posisi yang tersisa ke dalam tuple.
+- `**kwargs` mengumpulkan argumen bernama yang tersisa ke dalam dict.
+- Nama `args` dan `kwargs` hanya kebiasaan; yang penting tanda `*` dan `**`.
+- Urutan parameter: biasa, `*args`, default, lalu `**kwargs`.

@@ -1,0 +1,143 @@
+---
+title: Mengenal Set
+slug: sets
+stage: 2
+module: Dictionary dan Set
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Pakai set untuk data unik, operasi gabungan dan irisan, lalu pilih struktur data yang tepat.
+---
+
+# Mengenal Set
+
+**Set** adalah kumpulan data yang setiap isinya **unik** (tidak ada yang kembar) dan **tidak
+berurutan**. Set sangat cocok untuk membuang duplikat dan membandingkan dua kelompok data.
+
+## Membuat set
+
+Set ditulis dengan kurung kurawal tanpa pasangan kunci, misalnya `{"Ani", "Budi"}`. Duplikat
+otomatis dibuang:
+
+<Playground initialCode={`warna = {"merah", "biru", "merah", "hijau", "biru"}
+print(warna)
+print("Jumlah warna unik:", len(warna))
+
+kosong = set()
+print(kosong)`} />
+
+<Callout type="warning">
+  Untuk set kosong, tulis `set()`. Kalau kamu menulis `{}`, yang terbentuk adalah dictionary
+  kosong. Ingat juga: urutan isi set bisa berbeda dari urutan saat kamu menulisnya, dan set
+  tidak punya indeks.
+</Callout>
+
+## Membuang duplikat dari list
+
+Ubah list menjadi set dengan `set()`, lalu kembalikan ke list kalau perlu. `sorted()` membuat
+hasilnya terurut:
+
+<Playground initialCode={`pengunjung = ["Ani", "Budi", "Ani", "Citra", "Budi", "Ani"]
+
+unik = set(pengunjung)
+print("Pengunjung berbeda:", len(unik))
+print(sorted(unik))`} />
+
+## Menambah, menghapus, dan mengecek isi
+
+- `add(x)` menambah satu isi (kalau sudah ada, tidak terjadi apa-apa).
+- `remove(x)` menghapus, tapi error kalau `x` tidak ada. `discard(x)` menghapus tanpa error.
+- `x in set` mengecek keanggotaan, dan ini sangat cepat walaupun setnya besar.
+
+<Playground initialCode={`hadir = {"Ani", "Budi"}
+hadir.add("Citra")
+hadir.add("Ani")      # sudah ada, tidak berubah
+hadir.remove("Budi")
+hadir.discard("Dodi") # tidak ada, tapi tidak error
+
+print(sorted(hadir))
+print("Ani hadir?", "Ani" in hadir)
+print("Budi hadir?", "Budi" in hadir)`} />
+
+## Gabungan, irisan, dan selisih
+
+Misalnya ada dua ekskul di sekolah. Set bisa menjawab pertanyaan seperti "siapa yang ikut
+keduanya?" dengan satu operator:
+
+- `a | b` (gabungan): semua siswa yang ikut salah satu atau keduanya.
+- `a & b` (irisan): siswa yang ikut **keduanya**.
+- `a - b` (selisih): siswa yang ikut `a` tapi **tidak** ikut `b`.
+
+<Playground initialCode={`futsal = {"Budi", "Dodi", "Eka", "Fajar"}
+musik = {"Ani", "Citra", "Dodi", "Eka"}
+
+print("Semua peserta:", sorted(futsal | musik))
+print("Ikut keduanya:", sorted(futsal & musik))
+print("Hanya futsal:", sorted(futsal - musik))
+print("Hanya musik:", sorted(musik - futsal))`} />
+
+Kamu juga bisa memakai method-nya: `futsal.union(musik)`, `futsal.intersection(musik)`, dan
+`futsal.difference(musik)` memberi hasil yang sama.
+
+## Memilih list, tuple, dictionary, atau set
+
+| Struktur | Ditulis | Pakai saat |
+| --- | --- | --- |
+| list | `[1, 2, 3]` | data berurutan yang bisa berubah, boleh kembar |
+| tuple | `(1, 2, 3)` | data berurutan yang tetap, misalnya koordinat |
+| dictionary | `{"a": 1}` | mencari nilai lewat nama atau kunci |
+| set | `{1, 2, 3}` | data unik, cek keanggotaan, bandingkan kelompok |
+
+<Playground initialCode={`antrean = ["Ani", "Budi", "Ani"]           # urutan penting, boleh kembar
+lokasi_sekolah = (-6.2, 106.8)             # tetap, tidak diubah
+harga = {"bakso": 15000, "es teh": 4000}   # cari lewat nama
+sudah_bayar = {"Ani", "Citra"}             # unik, sering dicek dengan in
+
+print(antrean[0], lokasi_sekolah[1], harga["bakso"], "Ani" in sudah_bayar)`} />
+
+## Latihan
+
+Dua kelas membawa daftar buah untuk acara sekolah. Cari buah yang dibawa kedua kelas, buah
+yang hanya dibawa kelas A, dan semua jenis buah tanpa duplikat.
+
+<Playground initialCode={`kelas_a = ["apel", "jeruk", "mangga", "apel"]
+kelas_b = ["mangga", "pisang", "jeruk", "pisang"]
+
+# 1. Ubah kedua list menjadi set
+
+# 2. Cetak irisan, selisih (hanya kelas A), dan gabungan
+
+print(kelas_a, kelas_b)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil len({'a', 'b', 'a', 'c', 'b'})?",
+      options: ["5", "2", "3"],
+      answer: 2,
+      explanation: "Set membuang duplikat, jadi isinya hanya 'a', 'b', dan 'c'.",
+    },
+    {
+      question: "Kalau a = {1, 2, 3} dan b = {2, 3, 4}, apa hasil a & b?",
+      options: ["{2, 3}", "{1, 2, 3, 4}", "{1}"],
+      answer: 0,
+      explanation: "& adalah irisan: isi yang ada di kedua set, yaitu 2 dan 3.",
+    },
+    {
+      question: "Struktur data mana yang paling cocok untuk menyimpan harga menu agar bisa dicari lewat nama menu?",
+      options: ["set", "dictionary", "tuple"],
+      answer: 1,
+      explanation: "Dictionary memasangkan kunci (nama menu) dengan nilai (harga).",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Set menyimpan data unik tanpa urutan; set kosong ditulis `set()`.
+- `set(list)` membuang duplikat dari list.
+- `add()`, `remove()`, `discard()`, dan `in` untuk mengelola isi set.
+- `|` gabungan, `&` irisan, `-` selisih.
+- Pilih list untuk urutan, tuple untuk data tetap, dictionary untuk pencarian lewat kunci, set untuk data unik.

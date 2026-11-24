@@ -1,0 +1,180 @@
+---
+title: Class dan Object
+slug: classes-and-objects
+stage: 3
+module: OOP Bagian 1
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Kenali class sebagai cetakan dan object sebagai hasilnya, lalu buat object pertamamu dengan __init__ dan self.
+---
+
+# Class dan Object
+
+Sejauh ini kamu menyimpan data di variabel, list, dan dict, lalu mengolahnya dengan fungsi.
+Cara itu bekerja, tapi saat program membesar, data dan fungsi yang mengolahnya mulai
+tercecer. **Class** membantu kamu mengumpulkan keduanya di satu tempat.
+
+## Kenapa butuh class?
+
+Bayangkan kamu mencatat data siswa dengan dict. Setiap siswa butuh dict sendiri, dan fungsi
+yang mengolahnya terpisah dari datanya.
+
+<Playground initialCode={`budi = {"nama": "Budi", "kelas": "XI IPA 1", "nilai": [80, 75, 90]}
+ani = {"nama": "Ani", "kelas": "XI IPA 2", "nilai": [88, 92, 85]}
+
+def rata_rata(siswa):
+    return sum(siswa["nilai"]) / len(siswa["nilai"])
+
+print(budi["nama"], rata_rata(budi))
+print(ani["nama"], rata_rata(ani))`} />
+
+Tidak ada yang menjamin setiap dict punya kunci yang sama, dan salah ketik `"nlai"` baru
+ketahuan saat program dijalankan. Class memberi bentuk yang jelas: data (**atribut**) dan
+perilaku (**method**) disatukan.
+
+## Class adalah cetakan, object adalah hasilnya
+
+Pikirkan cetakan kue. Cetakannya cuma satu, tapi kuenya bisa banyak, dan setiap kue boleh
+punya topping berbeda.
+
+- **Class** = cetakan. Menjelaskan data apa yang dimiliki dan apa yang bisa dilakukan.
+- **Object** (atau *instance*) = kue yang dibuat dari cetakan itu.
+
+<Playground initialCode={`class Kucing:
+    pass
+
+oyen = Kucing()
+belang = Kucing()
+
+print(oyen)
+print(type(oyen))
+print(oyen is belang)`} />
+
+`Kucing()` membuat object baru. `oyen` dan `belang` sama-sama `Kucing`, tapi keduanya object
+yang berbeda. Nama class biasanya ditulis dengan huruf besar di awal setiap kata, misalnya
+`RekeningBank`.
+
+## `__init__` dan `self`
+
+Method khusus `__init__` dijalankan otomatis setiap kali object baru dibuat. Di sinilah kamu
+mengisi data awal object.
+
+<Playground initialCode={`class Siswa:
+    def __init__(self, nama, kelas):
+        self.nama = nama
+        self.kelas = kelas
+
+budi = Siswa("Budi", "XI IPA 1")
+print(budi.nama)
+print(budi.kelas)`} />
+
+Parameter pertama, `self`, adalah object yang sedang dibuat. Kamu tidak mengirimnya sendiri:
+Python mengisinya otomatis. Jadi `Siswa("Budi", "XI IPA 1")` mengirim `"Budi"` ke `nama` dan
+`"XI IPA 1"` ke `kelas`. Baris `self.nama = nama` artinya "simpan nama ini di object ini".
+
+<Callout type="tip">
+  Nama `__init__` diawali dan diakhiri **dua** garis bawah. Kalau kamu menulis `_init_` atau
+  `__init`, Python tidak akan menjalankannya dan atributmu tidak pernah terisi.
+</Callout>
+
+## Atribut: data milik object
+
+Atribut dibaca dan diubah dengan titik, sama seperti memanggil method list.
+
+<Playground initialCode={`class Siswa:
+    def __init__(self, nama, kelas):
+        self.nama = nama
+        self.kelas = kelas
+        self.nilai = []
+
+citra = Siswa("Citra", "X IPS 2")
+citra.nilai.append(85)
+citra.nilai.append(90)
+citra.kelas = "XI IPS 2"
+
+print(citra.nama, citra.kelas, citra.nilai)`} />
+
+Atribut tidak harus berasal dari parameter. `self.nilai = []` memberi setiap siswa list
+kosong miliknya sendiri.
+
+Kalau kamu membaca atribut yang tidak ada, Python memberi `AttributeError`.
+
+<Playground expectError initialCode={`class Siswa:
+    def __init__(self, nama):
+        self.nama = nama
+
+dodi = Siswa("Dodi")
+print(dodi.umur)`} />
+
+## Banyak object dari satu class
+
+Inilah kekuatan class: tulis sekali, pakai berkali-kali. Setiap object menyimpan datanya
+sendiri.
+
+<Playground initialCode={`class Siswa:
+    def __init__(self, nama, nilai):
+        self.nama = nama
+        self.nilai = nilai
+
+    def rata_rata(self):
+        return sum(self.nilai) / len(self.nilai)
+
+kelas = [
+    Siswa("Budi", [80, 75, 90]),
+    Siswa("Ani", [88, 92, 85]),
+    Siswa("Citra", [70, 65, 80]),
+]
+
+for s in kelas:
+    print(s.nama, round(s.rata_rata(), 1))`} />
+
+`rata_rata` adalah **method**: fungsi yang ditulis di dalam class. Kamu akan mempelajarinya
+lebih dalam di pelajaran berikutnya.
+
+## Latihan
+
+Buat class `Motor` untuk data ojek. Setiap motor punya `plat`, `merek`, dan `pengemudi`. Buat
+dua object, lalu cetak datanya.
+
+<Playground initialCode={`class Motor:
+    def __init__(self, plat, merek, pengemudi):
+        # TODO: simpan ketiga data ke self
+        pass
+
+# TODO: buat dua object Motor, misalnya milik Budi dan Dodi
+
+# TODO: cetak plat dan pengemudi setiap motor
+print("Selesai")`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hubungan class dan object?",
+      options: ["Class adalah cetakan, object adalah hasil yang dibuat dari cetakan itu", "Object adalah cetakan, class adalah hasilnya", "Class dan object adalah dua nama untuk hal yang sama"],
+      answer: 0,
+      explanation: "Satu class bisa dipakai untuk membuat banyak object, masing-masing dengan datanya sendiri.",
+    },
+    {
+      question: "Kapan method __init__ dijalankan?",
+      options: ["Saat class ditulis", "Hanya saat kamu memanggil obj.__init__()", "Otomatis setiap kali object baru dibuat"],
+      answer: 2,
+      explanation: "Menulis Siswa('Budi', 'XI') membuat object baru dan langsung menjalankan __init__.",
+    },
+    {
+      question: "Di dalam method, self merujuk ke apa?",
+      options: ["Class itu sendiri", "Object yang sedang dipakai", "Parameter pertama yang kamu kirim"],
+      answer: 1,
+      explanation: "self adalah object yang sedang dibuat atau dipakai. Python mengisinya otomatis.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Class menyatukan data (atribut) dan perilaku (method) di satu tempat.
+- Class adalah cetakan; object (instance) dibuat dengan memanggil class, misalnya `Siswa()`.
+- `__init__` berjalan otomatis saat object dibuat dan mengisi atribut lewat `self`.
+- Setiap object menyimpan atributnya sendiri, jadi satu class bisa menghasilkan banyak object.

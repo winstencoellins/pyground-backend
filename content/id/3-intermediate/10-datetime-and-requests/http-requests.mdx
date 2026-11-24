@@ -1,0 +1,217 @@
+---
+title: Mengambil Data dari Internet dengan requests
+slug: http-requests
+stage: 3
+module: datetime dan requests
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Kenali HTTP API, lalu ambil data JSON dari internet dengan library requests dan tangani error-nya dengan aman.
+---
+
+# Mengambil Data dari Internet dengan requests
+
+Aplikasi cuaca, kurs Rupiah, dan daftar menu di aplikasi ojek online semuanya mengambil data
+dari server lewat internet. Di pelajaran ini kamu belajar melakukan hal yang sama dari
+Python dengan library **`requests`**.
+
+## Apa itu HTTP API?
+
+Setiap kali browser membuka halaman, ia mengirim **request** ke server dan menerima
+**response**. (Kamu akan membahas ini lebih dalam di pelajaran *Bagaimana Web Bekerja* pada
+Tahap 4.) Sebuah **HTTP API** bekerja dengan cara yang sama, bedanya server tidak membalas
+dengan halaman web, melainkan dengan **data**, biasanya dalam format **JSON**.
+
+Response dari API punya dua bagian penting:
+
+- **Status code**: angka yang memberi tahu hasilnya. `200` berarti berhasil, `404` berarti
+  tidak ditemukan, `500` berarti server sedang bermasalah.
+- **Body**: isinya, misalnya teks JSON.
+
+Teks JSON itu kamu olah dengan modul `json` yang sudah kamu kenal. Coba bayangkan sebuah API
+warung mengirim teks berikut:
+
+<Playground initialCode={`import json
+
+# Pura-puranya ini body response dari API warung
+body = '{"warung": "Warung Bu Ani", "buka": true, "menu": [{"nama": "Nasi goreng", "harga": 15000}, {"nama": "Es teh", "harga": 5000}]}'
+
+data = json.loads(body)
+
+print("Nama:", data["warung"])
+print("Buka?", data["buka"])
+for item in data["menu"]:
+    print(f"- {item['nama']}: Rp{item['harga']:,}")`} />
+
+`json.loads()` mengubah teks JSON menjadi dict dan list Python. Perhatikan juga `true` di JSON
+menjadi `True` di Python.
+
+<Callout type="warning">
+  Playground di browser tidak bisa mengakses internet. Semua contoh `requests` di bawah ditulis
+  di blok kode biasa, lengkap dengan contoh hasilnya. Jalankan di komputermu sendiri untuk
+  mencobanya.
+</Callout>
+
+## Memasang requests
+
+`requests` bukan bagian dari library standar, jadi pasang dulu dengan pip (sebaiknya di dalam
+virtual environment):
+
+<TerminalBlock command="pip install requests" output={`Collecting requests
+  Downloading requests-2.32.3-py3-none-any.whl (64 kB)
+...
+Successfully installed certifi charset-normalizer idna requests urllib3`} />
+
+## Request pertama dengan `requests.get`
+
+`requests.get(url)` mengirim request GET dan mengembalikan objek **response**. Contoh ini
+memakai JSONPlaceholder, API gratis untuk latihan:
+
+```python
+import requests
+
+response = requests.get("https://jsonplaceholder.typicode.com/todos/1", timeout=10)
+
+print(response.status_code)
+data = response.json()
+print(data)
+print(data["title"])
+```
+
+Contoh hasilnya:
+
+```text
+200
+{'userId': 1, 'id': 1, 'title': 'delectus aut autem', 'completed': False}
+delectus aut autem
+```
+
+- `response.status_code` adalah status code-nya (`200` artinya berhasil).
+- `response.json()` langsung mengubah body JSON menjadi dict atau list, sama seperti
+  `json.loads(response.text)`.
+
+## Mengirim parameter dan memasang `timeout`
+
+Banyak API menerima **parameter** di URL, misalnya `?userId=1`. Daripada menyusun URL
+sendiri, berikan dict ke `params`:
+
+```python
+import requests
+
+response = requests.get(
+    "https://jsonplaceholder.typicode.com/posts",
+    params={"userId": 1},
+    timeout=10,
+)
+
+print(response.url)
+posts = response.json()
+print("Jumlah post:", len(posts))
+print("Judul pertama:", posts[0]["title"])
+```
+
+```text
+https://jsonplaceholder.typicode.com/posts?userId=1
+Jumlah post: 10
+Judul pertama: sunt aut facere repellat provident occaecati excepturi optio reprehenderit
+```
+
+`timeout=10` artinya: kalau server tidak membalas dalam 10 detik, berhenti menunggu. Tanpa
+`timeout`, programmu bisa menunggu selamanya kalau server macet. Biasakan selalu memasangnya.
+
+## Menangani error
+
+Banyak hal bisa salah: internet putus, server lambat, atau alamatnya salah. Status code
+`404` atau `500` **tidak** otomatis menjadi error. Panggil `raise_for_status()` supaya status
+code 4xx dan 5xx berubah menjadi exception, lalu tangkap dengan `try`/`except`:
+
+```python
+import requests
+
+try:
+    response = requests.get("https://jsonplaceholder.typicode.com/todos/99999", timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    print(data)
+except requests.exceptions.Timeout:
+    print("Server terlalu lama membalas.")
+except requests.exceptions.ConnectionError:
+    print("Tidak bisa terhubung. Cek koneksi internetmu.")
+except requests.exceptions.HTTPError as e:
+    print("Server membalas dengan error:", e.response.status_code)
+```
+
+```text
+Server membalas dengan error: 404
+```
+
+Kalau ingin menangkap semua error dari `requests` sekaligus, pakai induknya,
+`requests.exceptions.RequestException`.
+
+Body yang bukan JSON yang valid juga bisa membuat program gagal. Pola penanganan yang sama
+bisa kamu latih di sini dengan `json.loads()`:
+
+<Playground initialCode={`import json
+
+responses = [
+    '{"kota": "Bandung", "suhu": 22}',
+    'Maaf, server sedang perbaikan',
+]
+
+for body in responses:
+    try:
+        data = json.loads(body)
+        print(f"Suhu di {data['kota']}: {data['suhu']} derajat")
+    except json.JSONDecodeError:
+        print("Response bukan JSON yang valid:", body)`} />
+
+## Latihan
+
+Sebuah API kurs mengirim response di bawah. Hitung berapa Rupiah yang kamu dapat untuk 50
+dolar AS dan 20 dolar Singapura, lalu tampilkan hasilnya. Jangan lupa periksa dulu
+`status_code`-nya.
+
+<Playground initialCode={`import json
+
+status_code = 200
+body = '{"dasar": "IDR", "kurs": {"USD": 16000, "SGD": 12000, "MYR": 3500}}'
+
+uang_asing = {"USD": 50, "SGD": 20}
+
+# TODO: kalau status_code bukan 200, tampilkan pesan error
+# TODO: ubah body menjadi dict dengan json.loads()
+# TODO: untuk setiap mata uang di uang_asing, hitung nilainya dalam Rupiah
+pass`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang dilakukan response.json()?",
+      options: ["Mengirim data JSON ke server", "Mengubah body response JSON menjadi dict atau list", "Menyimpan response ke file JSON"],
+      answer: 1,
+      explanation: "response.json() membaca body response dan mengubahnya menjadi objek Python, sama seperti json.loads(response.text).",
+    },
+    {
+      question: "Server membalas dengan status code 404. Apa yang terjadi kalau kamu TIDAK memanggil raise_for_status()?",
+      options: ["Program langsung berhenti dengan error", "Python mencoba ulang request-nya", "Tidak ada exception, kamu harus memeriksa status_code sendiri"],
+      answer: 2,
+      explanation: "requests tidak menganggap 404 sebagai error. raise_for_status() yang mengubah status 4xx dan 5xx menjadi HTTPError.",
+    },
+    {
+      question: "Kenapa sebaiknya selalu memberi timeout pada requests.get()?",
+      options: ["Supaya program tidak menunggu selamanya kalau server tidak membalas", "Supaya request lebih cepat", "Supaya response otomatis menjadi JSON"],
+      answer: 0,
+      explanation: "Tanpa timeout, requests bisa menunggu tanpa batas. Dengan timeout, kamu mendapat exception Timeout yang bisa ditangani.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- HTTP API membalas request dengan data, biasanya JSON, beserta status code.
+- Pasang dengan `pip install requests`, lalu pakai `requests.get(url, params=..., timeout=...)`.
+- `status_code` memberi hasilnya, dan `.json()` mengubah body menjadi dict atau list.
+- Panggil `raise_for_status()` dan tangkap `requests.exceptions.RequestException` untuk
+  menangani error dengan aman.

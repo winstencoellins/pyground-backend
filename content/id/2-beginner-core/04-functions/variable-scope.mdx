@@ -1,0 +1,143 @@
+---
+title: Ruang Lingkup Variabel
+slug: variable-scope
+stage: 2
+module: Fungsi
+order: 4
+isFree: false
+estimatedMinutes: 15
+description: Pahami beda variabel lokal dan global, dan kenapa sebaiknya data keluar-masuk fungsi lewat parameter dan return.
+---
+
+# Ruang Lingkup Variabel
+
+Setiap variabel punya "wilayah" tempat ia bisa dipakai. Wilayah ini disebut **scope** atau ruang
+lingkup. Memahami scope akan menyelamatkanmu dari error yang membingungkan saat mulai menulis
+banyak fungsi.
+
+## Variabel lokal
+
+Variabel yang dibuat di dalam fungsi, termasuk parameternya, adalah **variabel lokal**. Variabel
+ini hanya hidup selama fungsi berjalan, dan tidak bisa dipakai dari luar:
+
+<Playground expectError initialCode={`def hitung_belanja():
+    total = 15000 + 8000
+    print("Di dalam fungsi:", total)
+
+hitung_belanja()
+print("Di luar fungsi:", total)`} />
+
+Setelah `hitung_belanja()` selesai, `total` sudah hilang, sehingga baris terakhir memberi
+`NameError`.
+
+## Variabel global
+
+Variabel yang dibuat di luar semua fungsi disebut **variabel global**. Fungsi boleh **membaca**
+variabel global:
+
+<Playground initialCode={`nama_warung = "Warung Bu Ani"
+
+def cetak_judul():
+    print("Selamat datang di", nama_warung)
+
+cetak_judul()`} />
+
+Variabel lokal dan global boleh punya nama yang sama. Keduanya tetap variabel yang berbeda:
+
+<Playground initialCode={`harga = 10000
+
+def ubah_harga():
+    harga = 99999
+    print("harga lokal:", harga)
+
+ubah_harga()
+print("harga global:", harga)`} />
+
+Baris `harga = 99999` membuat variabel lokal baru. Variabel global `harga` tidak tersentuh.
+
+## Mengubah global dari dalam fungsi
+
+Sekarang coba menambah saldo global dari dalam fungsi:
+
+<Playground expectError initialCode={`saldo = 50000
+
+def isi_saldo(jumlah):
+    saldo = saldo + jumlah
+
+isi_saldo(20000)
+print(saldo)`} />
+
+Hasilnya `UnboundLocalError`. Karena ada `saldo = ...` di dalam fungsi, Python menganggap `saldo`
+adalah variabel **lokal** di seluruh fungsi itu. Lalu saat menghitung `saldo + jumlah`, variabel
+lokal `saldo` belum punya isi.
+
+<Callout type="info">
+  Python punya kata kunci `global` untuk memaksa fungsi mengubah variabel global. Tapi cara ini
+  membuat kode sulit dilacak, karena fungsi mana pun bisa diam-diam mengubah datamu. Sebaiknya
+  hindari.
+</Callout>
+
+## Cara yang lebih baik: masuk lewat parameter, keluar lewat return
+
+Kirim data yang dibutuhkan lewat parameter, lalu kembalikan hasil barunya dengan `return`. Yang
+memanggil fungsi memutuskan mau menyimpan hasilnya di mana:
+
+<Playground initialCode={`def isi_saldo(saldo, jumlah):
+    return saldo + jumlah
+
+saldo_budi = 50000
+saldo_budi = isi_saldo(saldo_budi, 20000)
+saldo_budi = isi_saldo(saldo_budi, 15000)
+print("Saldo Budi:", saldo_budi)`} />
+
+Fungsi seperti ini mudah diuji dan dipakai ulang. `isi_saldo()` bisa dipakai untuk saldo Ani,
+Citra, atau siapa saja, tanpa bergantung pada variabel di luar.
+
+## Latihan
+
+Kode di bawah memakai variabel global `poin` dan belum berjalan dengan benar. Ubah
+`tambah_poin()` supaya menerima `poin` lewat parameter dan mengembalikan poin barunya, lalu
+perbaiki cara memanggilnya.
+
+<Playground initialCode={`poin = 0
+
+def tambah_poin(jumlah):
+    # TODO: tambahkan parameter poin, lalu return poin + jumlah
+    pass
+
+# TODO: simpan hasil tambah_poin ke poin
+tambah_poin(10)
+tambah_poin(5)
+print("Poin Dodi:", poin)  # harusnya 15`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Variabel yang dibuat di dalam fungsi disebut apa?",
+      options: ["Variabel global", "Variabel lokal", "Parameter default"],
+      answer: 1,
+      explanation: "Variabel yang dibuat di dalam fungsi adalah variabel lokal, dan hanya ada selama fungsi berjalan.",
+    },
+    {
+      question: "x = 1, lalu def f(): x = 5. Setelah f() dipanggil, berapa isi x di luar fungsi?",
+      options: ["5", "Error", "1"],
+      answer: 2,
+      explanation: "x = 5 di dalam fungsi membuat variabel lokal baru, jadi x global tetap 1.",
+    },
+    {
+      question: "Kenapa saldo = saldo + 1 di dalam fungsi memberi UnboundLocalError?",
+      options: ["Karena ada assignment ke saldo, Python menganggap saldo lokal yang belum diisi", "Karena saldo global tidak boleh dibaca dari fungsi", "Karena + tidak bisa dipakai di dalam fungsi"],
+      answer: 0,
+      explanation: "Assignment di mana pun dalam fungsi membuat nama itu lokal di seluruh fungsi, termasuk di sisi kanan =.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Variabel di dalam fungsi bersifat lokal dan hilang setelah fungsi selesai.
+- Fungsi boleh membaca variabel global, tapi assignment di dalam fungsi membuat variabel lokal baru.
+- Mengubah global dengan `x = x + 1` di dalam fungsi memberi `UnboundLocalError`.
+- Kirim data masuk lewat parameter dan keluarkan hasilnya dengan `return`, bukan dengan `global`.

@@ -1,0 +1,195 @@
+---
+title: Writing Decorators
+slug: decorators
+stage: 3
+module: Decorators
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Add new behaviour to a function without changing its body using decorators and the @ syntax.
+---
+
+# Writing Decorators
+
+Imagine you have many functions in a warung app, and you want each one to log when it is
+called. Adding `print()` to every function is tedious. A **decorator** is a function that
+"wraps" another function to add new behaviour, without touching its body.
+
+## Step 1: a wrapper function
+
+Using what you learned in the previous lesson (functions can be passed and returned), we
+write a function that takes a function and returns a new function that wraps it:
+
+<Playground initialCode={`def log(func):
+    def wrapper():
+        print("Starting", func.__name__)
+        func()
+        print("Done")
+    return wrapper
+
+def open_warung():
+    print("Bu Ani's warung is open!")
+
+open_warung = log(open_warung)
+open_warung()`} />
+
+The line `open_warung = log(open_warung)` replaces the original function with the wrapped
+version.
+
+## Step 2: the `@` syntax
+
+Writing `open_warung = log(open_warung)` every time is long. Python provides the `@` syntax,
+which means exactly the same thing:
+
+<Playground initialCode={`def log(func):
+    def wrapper():
+        print("Starting", func.__name__)
+        func()
+        print("Done")
+    return wrapper
+
+@log
+def open_warung():
+    print("Bu Ani's warung is open!")
+
+@log
+def close_warung():
+    print("Warung closed, see you tomorrow.")
+
+open_warung()
+close_warung()`} />
+
+## Supporting arguments and return values
+
+The wrapper above cannot be used for functions that take parameters. The fix is `*args` and
+`**kwargs` from the previous module, plus returning the result:
+
+<Playground initialCode={`def log(func):
+    def wrapper(*args, **kwargs):
+        print(f"Calling {func.__name__} with {args} {kwargs}")
+        result = func(*args, **kwargs)
+        print("Result:", result)
+        return result
+    return wrapper
+
+@log
+def total(price, quantity, discount=0):
+    return price * quantity - discount
+
+to_pay = total(12000, 3, discount=5000)
+print("To pay:", to_pay)`} />
+
+Now this decorator can wrap any function, whatever its arguments.
+
+## A timing decorator and `functools.wraps`
+
+A decorator often used in real projects: measuring how long a function runs. Notice
+`@functools.wraps` as well:
+
+<Playground initialCode={`import functools
+import time
+
+def timed(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        duration = time.perf_counter() - start
+        print(f"{func.__name__} finished in {duration:.4f} seconds")
+        return result
+    return wrapper
+
+@timed
+def sum_up_to(n):
+    """Add up 1 to n."""
+    return sum(range(1, n + 1))
+
+print(sum_up_to(1000000))
+print(sum_up_to.__name__)
+print(sum_up_to.__doc__)`} />
+
+<Callout type="info">
+  Without `@functools.wraps(func)`, `sum_up_to.__name__` would be `"wrapper"` and its
+  docstring would be lost. `wraps` copies the original function's name and docstring onto
+  the wrapper. Make a habit of always using it.
+</Callout>
+
+## Decorators with arguments
+
+What if the decorator needs a setting, like "repeat n times"? We add one more layer of
+function: the outer function takes the argument and returns the decorator:
+
+<Playground initialCode={`import functools
+
+def repeat(n):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(n):
+                func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+@repeat(3)
+def call_customer(name):
+    print(f"Order for {name} is ready!")
+
+call_customer("Dodi")`} />
+
+`@repeat(3)` runs first and produces a decorator, and then that decorator wraps
+`call_customer`. This three-layer pattern does look complicated, so for now just recognise
+its shape.
+
+## Exercise
+
+Write a decorator `must_be_positive` that checks the first argument. If the number is
+negative or zero, print a warning and do not run the function.
+
+<Playground initialCode={`import functools
+
+def must_be_positive(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # TODO: if args[0] <= 0, print a warning and return None
+        return func(*args, **kwargs)
+    return wrapper
+
+@must_be_positive
+def pay_kos(amount):
+    print(f"Paying kos Rp{amount:,}")
+
+pay_kos(900000)
+pay_kos(-5000)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Writing @log above def f() means the same as what?",
+      options: ["f = log(f)", "log = f(log)", "f = log"],
+      answer: 0,
+      explanation: "The @ syntax is shorthand for replacing f with the result of log(f).",
+    },
+    {
+      question: "Why is a wrapper usually written as def wrapper(*args, **kwargs)?",
+      options: ["To make it faster", "So it can wrap functions with any arguments", "Because every function requires it"],
+      answer: 1,
+      explanation: "With *args and **kwargs, the wrapper accepts any arguments and passes them on to the original function.",
+    },
+    {
+      question: "What does @functools.wraps(func) do inside a decorator?",
+      options: ["Speeds up the function", "Runs the function twice", "Copies the original function's name and docstring onto the wrapper"],
+      answer: 2,
+      explanation: "wraps keeps the original __name__ and __doc__ so they do not turn into the wrapper's.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A decorator is a function that takes a function and returns a wrapper function.
+- `@decorator` above a `def` is the same as `f = decorator(f)`.
+- Use `*args`, `**kwargs`, and `return result` so the wrapper fits any function.
+- Always add `@functools.wraps(func)` to keep the name and docstring.
+- A decorator with arguments needs one extra layer of function, for example `@repeat(3)`.

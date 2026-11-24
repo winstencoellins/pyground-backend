@@ -1,0 +1,158 @@
+---
+title: Jalan-jalan di Standard Library
+slug: standard-library
+stage: 3
+module: Modul, pip, dan venv
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Kenali modul bawaan Python yang sering dipakai, yaitu math, random, statistics, collections, dan string, serta cara membaca dokumentasinya.
+---
+
+# Jalan-jalan di Standard Library
+
+Python datang dengan "baterai sudah terpasang": ratusan modul bawaan yang disebut
+**standard library**. Kamu tidak perlu meng-install apa pun untuk memakainya. Di pelajaran
+ini kita mampir ke beberapa modul yang paling sering dipakai.
+
+## `math`: hitung-hitungan
+
+<Playground initialCode={`import math
+
+print(math.sqrt(225))       # akar kuadrat
+print(math.pow(2, 10))      # pangkat, hasilnya float
+print(math.floor(9.99))     # bulatkan ke bawah
+print(math.ceil(9.01))      # bulatkan ke atas
+print(round(math.pi, 4))
+
+# Berapa kotak telur (isi 10) untuk 47 butir?
+print(math.ceil(47 / 10), "kotak")`} />
+
+## `random`: angka acak yang bisa diulang
+
+`random` memilih angka atau isi list secara acak. Kalau kamu memanggil `random.seed()` dengan
+angka yang sama, urutan "acak"-nya akan selalu sama. Ini berguna saat menguji program:
+
+<Playground initialCode={`import random
+
+random.seed(42)
+
+print(random.randint(1, 6))  # lempar dadu
+print(random.choice(["Budi", "Ani", "Citra", "Dodi"]))  # siapa piket hari ini
+
+antrean = ["Budi", "Ani", "Citra", "Dodi"]
+random.shuffle(antrean)
+print(antrean)`} />
+
+Jalankan beberapa kali: hasilnya selalu sama. Hapus baris `random.seed(42)`, dan hasilnya
+akan berubah-ubah setiap kali dijalankan.
+
+<Callout type="warning">
+  Jangan pakai `random` untuk hal yang menyangkut keamanan, seperti membuat password atau
+  token. Untuk itu Python punya modul `secrets`.
+</Callout>
+
+## `statistics`: rata-rata dan kawan-kawan
+
+<Playground initialCode={`import statistics
+
+nilai = [78, 85, 92, 66, 85, 70]
+
+print("Rata-rata:", statistics.mean(nilai))
+print("Median:", statistics.median(nilai))
+print("Modus:", statistics.mode(nilai))
+print("Simpangan baku:", round(statistics.stdev(nilai), 2))`} />
+
+## `collections.Counter`: menghitung kemunculan
+
+`Counter` menghitung berapa kali setiap isi muncul, jadi kamu tidak perlu membuat dict
+penghitung sendiri:
+
+<Playground initialCode={`from collections import Counter
+
+pesanan = ["es teh", "kopi", "es teh", "nasi goreng", "es teh", "kopi"]
+hitung = Counter(pesanan)
+
+print(hitung)
+print("Es teh dipesan", hitung["es teh"], "kali")
+print("Dua menu terlaris:", hitung.most_common(2))
+
+print(Counter("banana"))`} />
+
+## `string`: kumpulan karakter siap pakai
+
+<Playground initialCode={`import string
+
+print(string.ascii_lowercase)
+print(string.digits)
+print(string.punctuation)
+
+kalimat = "selamat pagi, warga kos melati"
+print(string.capwords(kalimat))`} />
+
+## Mencari tahu sendiri: `dir()` dan `help()`
+
+Kamu tidak perlu menghafal isi setiap modul. `dir()` menampilkan daftar nama di dalam modul,
+dan `help()` menampilkan penjelasannya:
+
+<Playground initialCode={`import math
+
+print(dir(math))
+print()
+help(math.ceil)`} />
+
+Untuk penjelasan lengkap dengan contoh, buka dokumentasi resmi di docs.python.org, bagian
+"The Python Standard Library".
+
+## Latihan
+
+Simulasikan 20 kali lempar dadu dengan seed `7`, lalu hitung angka mana yang paling sering
+keluar dengan `Counter`, dan rata-ratanya dengan `statistics`.
+
+<Playground initialCode={`import random
+from collections import Counter
+import statistics
+
+random.seed(7)
+
+lemparan = []
+for _ in range(20):
+    lemparan.append(random.randint(1, 6))
+
+print(lemparan)
+# TODO: hitung kemunculan tiap angka dengan Counter
+# TODO: tampilkan angka yang paling sering keluar (most_common)
+# TODO: tampilkan rata-rata lemparan dengan statistics.mean`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa gunanya random.seed(42)?",
+      options: ["Membuat angka acak jadi lebih acak", "Membuat urutan angka acak selalu sama setiap dijalankan", "Membatasi angka acak sampai 42"],
+      answer: 1,
+      explanation: "Seed yang sama menghasilkan urutan angka acak yang sama, sehingga hasilnya bisa diulang.",
+    },
+    {
+      question: "Apa hasil Counter(['a', 'b', 'a']).most_common(1)?",
+      options: ["[('a', 2)]", "['a']", "{'a': 2}"],
+      answer: 0,
+      explanation: "most_common(n) mengembalikan list berisi n pasangan (isi, jumlah) yang paling sering muncul.",
+    },
+    {
+      question: "Fungsi apa yang menampilkan daftar nama di dalam sebuah modul?",
+      options: ["help()", "list()", "dir()"],
+      answer: 2,
+      explanation: "dir(modul) menampilkan nama-nama di dalam modul, sedangkan help() menampilkan penjelasannya.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Standard library adalah modul bawaan Python, tanpa perlu di-install.
+- `math` untuk hitungan, `random` untuk acak (pakai `seed()` agar bisa diulang), `statistics`
+  untuk rata-rata, median, dan modus.
+- `collections.Counter` menghitung kemunculan, dan `string` berisi kumpulan karakter siap pakai.
+- `dir()` dan `help()` membantumu menjelajah modul tanpa menghafal.

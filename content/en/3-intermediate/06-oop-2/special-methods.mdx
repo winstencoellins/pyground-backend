@@ -1,0 +1,209 @@
+---
+title: Special Methods
+slug: special-methods
+stage: 3
+module: OOP Part 2
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Make your objects print nicely, compare, report their length, and add together with special methods.
+---
+
+# Special Methods
+
+You already know `__init__`. Python has many other methods with two underscores before and
+after their names, often called **dunder methods** (*double underscore*). Python calls them
+automatically when you use `print()`, `==`, `len()`, or `+` on your objects.
+
+## `__str__`: the human-friendly view
+
+Try printing a plain object. The result isn't very useful.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, amount):
+        self.amount = amount
+
+price = Rupiah(15000)
+print(price)`} />
+
+`print()` calls `str()` on the object, and `str()` looks for a `__str__` method. If you write
+one, you decide how it looks.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, amount):
+        self.amount = amount
+
+    def __str__(self):
+        return f"Rp{self.amount:,}".replace(",", ".")
+
+price = Rupiah(15000)
+print(price)
+print("Nasi padang price:", price)
+text = str(Rupiah(2500000))
+print(text)`} />
+
+`__str__` must **return** a string with `return`, not print it.
+
+## `__repr__`: the programmer's view
+
+`__repr__` is used when an object is shown for debugging, for example when it sits inside a
+list. It usually looks like the code that would create the object.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, amount):
+        self.amount = amount
+
+    def __str__(self):
+        return f"Rp{self.amount:,}".replace(",", ".")
+
+    def __repr__(self):
+        return f"Rupiah({self.amount})"
+
+prices = [Rupiah(5000), Rupiah(12000)]
+print(prices)
+print(prices[0])
+print(repr(prices[0]))`} />
+
+<Callout type="tip">
+  If you only have time to write one, write `__repr__`. When `__str__` is missing, `print()`
+  falls back to `__repr__`.
+</Callout>
+
+## `__eq__`: comparing with `==`
+
+By default, `==` on objects is only `True` when both are the *exact same* object. Two separate
+Rp5,000 notes count as different. `__eq__` changes that rule.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, amount):
+        self.amount = amount
+
+print("Without __eq__:", Rupiah(5000) == Rupiah(5000))
+
+class Rupiah:
+    def __init__(self, amount):
+        self.amount = amount
+
+    def __eq__(self, other):
+        return self.amount == other.amount
+
+print("With __eq__:", Rupiah(5000) == Rupiah(5000))
+print(Rupiah(5000) == Rupiah(2000))`} />
+
+## `__len__` and `__add__`
+
+`__len__` is called by `len()`, and `__add__` is called by the `+` operator. Here's a warung
+shopping cart.
+
+<Playground initialCode={`class Cart:
+    def __init__(self, items=None):
+        if items is None:
+            items = []
+        self.items = items
+
+    def add(self, name):
+        self.items.append(name)
+
+    def __len__(self):
+        return len(self.items)
+
+    def __add__(self, other):
+        return Cart(self.items + other.items)
+
+    def __str__(self):
+        return "Cart: " + ", ".join(self.items)
+
+budi_cart = Cart()
+budi_cart.add("Coffee")
+budi_cart.add("Sugar")
+
+ani_cart = Cart(["Tea", "Bread"])
+
+combined = budi_cart + ani_cart
+print(combined)
+print("Number of items:", len(combined))
+print(len(budi_cart))`} />
+
+`__add__` returns a **new** object, so Budi's and Ani's carts stay unchanged. That's just like
+`1 + 2`, which doesn't change the number 1.
+
+Notice `items=None` in `__init__`: if we wrote `items=[]`, every cart created without an
+argument would share the same list, much like the class attribute trap you learned about.
+
+## Putting it all together
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, amount):
+        self.amount = amount
+
+    def __str__(self):
+        return f"Rp{self.amount:,}".replace(",", ".")
+
+    def __repr__(self):
+        return f"Rupiah({self.amount})"
+
+    def __eq__(self, other):
+        return self.amount == other.amount
+
+    def __add__(self, other):
+        return Rupiah(self.amount + other.amount)
+
+rice = Rupiah(12000)
+iced_tea = Rupiah(4000)
+crackers = Rupiah(2000)
+
+total = rice + iced_tea + crackers
+print("Total to pay:", total)
+print(total == Rupiah(18000))`} />
+
+## Exercise
+
+Complete the `Playlist` class. Add `__len__` (number of songs), `__str__` (for example
+`Playlist Ani (3 songs)`), and `__add__` that combines two playlists into a new one.
+
+<Playground initialCode={`class Playlist:
+    def __init__(self, name, songs):
+        self.name = name
+        self.songs = songs
+
+    # TODO: __len__
+
+    # TODO: __str__
+
+    # TODO: __add__ that returns a new Playlist
+
+morning = Playlist("Morning", ["Song A", "Song B"])
+night = Playlist("Night", ["Song C"])
+print(morning.name, morning.songs)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which method is called when you write print(obj)?",
+      options: ["__print__", "__str__", "__init__"],
+      answer: 1,
+      explanation: "print() calls str(obj), which uses __str__ (or __repr__ if __str__ is missing).",
+    },
+    {
+      question: "What does Python call for a + b when a is your own object?",
+      options: ["a.__add__(b)", "b.__add__(a)", "a.__plus__(b)"],
+      answer: 0,
+      explanation: "The + operator calls __add__ on the left object, with the right object as the argument.",
+    },
+    {
+      question: "Without __eq__, what is Rupiah(5000) == Rupiah(5000)?",
+      options: ["True", "An error", "False"],
+      answer: 2,
+      explanation: "By default == compares object identity, and these are two different objects.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Special (dunder) methods are called automatically by Python, not directly by you.
+- `__str__` serves `print()` and `str()`; `__repr__` serves debugging and list contents.
+- `__eq__` controls `==`, `__len__` controls `len()`, and `__add__` controls `+`.
+- Special methods must return a value with `return`; `__add__` should return a new object.

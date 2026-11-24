@@ -1,0 +1,146 @@
+---
+title: Membaca Traceback
+slug: reading-tracebacks
+stage: 2
+module: Debugging
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Pahami pesan error Python dengan membaca traceback dari bawah ke atas, termasuk saat error terjadi di dalam fungsi.
+---
+
+# Membaca Traceback
+
+Setiap programmer pasti bertemu error, bahkan yang sudah bertahun-tahun ngoding. Bedanya,
+programmer berpengalaman tidak panik: mereka **membaca** pesan errornya. Pesan itu disebut
+**traceback**, dan isinya hampir selalu memberi tahu apa yang salah dan di mana.
+
+## Traceback pertamamu
+
+Jalankan kode di bawah ini. Kode ini sengaja salah:
+
+<Playground expectError initialCode={`harga = 15000
+jumlah = 3
+print("Total:", harga * jumlh)`} />
+
+Python berhenti dan menampilkan sesuatu seperti ini:
+
+```text
+Traceback (most recent call last):
+  File "main.py", line 3, in <module>
+    print("Total:", harga * jumlh)
+NameError: name 'jumlh' is not defined
+```
+
+Nama file di layarmu bisa berbeda (misalnya `<exec>`), tapi susunannya selalu sama.
+
+## Baca dari bawah ke atas
+
+Baris paling penting justru ada di **paling bawah**. Baca dengan urutan ini:
+
+1. **Jenis error**: `NameError`. Ini memberi tahu kategori masalahnya.
+2. **Pesan**: `name 'jumlh' is not defined`. Python tidak kenal nama `jumlh`.
+3. **Lokasi**: `line 3`, lengkap dengan isi baris tersebut.
+
+Dari tiga hal itu, perbaikannya jelas: `jumlh` salah ketik, seharusnya `jumlah`.
+
+<Callout type="tip">
+  Jangan langsung menutup atau menghapus traceback. Baca baris terakhirnya dulu, keras-keras
+  kalau perlu. Sering kali jawabannya sudah tertulis di sana.
+</Callout>
+
+## Traceback yang melewati fungsi
+
+Kalau error terjadi di dalam fungsi, traceback jadi lebih panjang. Python menunjukkan
+**jalur panggilan**: dari baris yang memanggil fungsi, sampai baris di dalam fungsi yang
+gagal.
+
+<Playground expectError initialCode={`def harga_per_orang(total, jumlah_orang):
+    return total / jumlah_orang
+
+def bagi_tagihan(total):
+    peserta = 0
+    return harga_per_orang(total, peserta)
+
+print(bagi_tagihan(120000))`} />
+
+Hasilnya kira-kira seperti ini:
+
+```text
+Traceback (most recent call last):
+  File "main.py", line 8, in <module>
+    print(bagi_tagihan(120000))
+  File "main.py", line 6, in bagi_tagihan
+    return harga_per_orang(total, peserta)
+  File "main.py", line 2, in harga_per_orang
+    return total / jumlah_orang
+ZeroDivisionError: division by zero
+```
+
+Bacanya tetap dari bawah. Error terjadi di `harga_per_orang` baris 2 karena membagi dengan
+nol. Naik satu tingkat: fungsi itu dipanggil dari `bagi_tagihan` baris 6. Naik lagi: yang
+memanggil `bagi_tagihan` adalah baris 8. Setiap blok `File ... line ...` adalah satu langkah
+di jalur itu, dan yang paling atas adalah yang paling awal dipanggil.
+
+## Baris yang ditunjuk belum tentu sumber masalah
+
+Traceback menunjuk tempat Python **menyadari** ada masalah. Penyebabnya kadang ada di
+tempat lain. Pada contoh di atas, pembagiannya ada di baris 2, tapi nilai nol berasal dari
+`peserta = 0` di baris 5.
+
+<Playground expectError initialCode={`def ambil_juara(daftar_nilai):
+    return daftar_nilai[0]
+
+nilai_kelas = []
+# Lupa mengisi nilai_kelas di sini
+print("Nilai tertinggi:", ambil_juara(nilai_kelas))`} />
+
+Traceback menunjuk `daftar_nilai[0]` di dalam fungsi, padahal fungsinya benar. Yang salah
+adalah list kosong yang dikirim ke fungsi. Jadi setelah membaca baris yang ditunjuk, tanya
+juga: **dari mana nilai ini datang?**
+
+## Latihan
+
+Kode di bawah berjalan normal. Hapus tanda `#` di baris terakhir, jalankan, lalu baca
+tracebacknya dari bawah ke atas. Perbaiki penyebabnya sampai ongkos per km tampil.
+
+<Playground initialCode={`def ongkos_per_km(ongkos, jarak):
+    return ongkos / jarak
+
+perjalanan = {"Budi": 4, "Ani": 0}
+
+print("Ongkos Budi per km:", ongkos_per_km(20000, perjalanan["Budi"]))
+# TODO: hapus tanda # di baris berikut, baca tracebacknya, lalu perbaiki datanya
+# print("Ongkos Ani per km:", ongkos_per_km(15000, perjalanan["Ani"]))`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Bagian traceback mana yang sebaiknya kamu baca pertama kali?",
+      options: ["Baris paling atas", "Baris paling bawah", "Baris tengah"],
+      answer: 1,
+      explanation: "Baris paling bawah berisi jenis error dan pesannya, petunjuk paling penting.",
+    },
+    {
+      question: "Dalam traceback yang melewati beberapa fungsi, blok File paling atas menunjukkan apa?",
+      options: ["Panggilan paling awal, biasanya dari kode utama", "Tempat error terjadi", "Fungsi terakhir yang kamu tulis"],
+      answer: 0,
+      explanation: "Traceback disusun dari panggilan paling awal di atas sampai tempat error di bawah.",
+    },
+    {
+      question: "Traceback menunjuk daftar[0] di dalam fungsi, tapi fungsinya benar. Apa langkah berikutnya?",
+      options: ["Menghapus fungsi itu", "Mengabaikan errornya", "Mencari dari mana nilai daftar itu berasal"],
+      answer: 2,
+      explanation: "Baris yang ditunjuk adalah tempat masalah ketahuan; penyebabnya bisa data yang dikirim ke fungsi.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Traceback adalah pesan error Python; baca dari **bawah ke atas**.
+- Baris terakhir memberi jenis error dan pesannya, di atasnya ada nomor baris dan isinya.
+- Error di dalam fungsi menampilkan jalur panggilan, satu blok per langkah.
+- Baris yang ditunjuk belum tentu penyebabnya; telusuri dari mana nilainya datang.

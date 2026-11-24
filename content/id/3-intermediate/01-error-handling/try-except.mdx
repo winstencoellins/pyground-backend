@@ -14,7 +14,7 @@ description: Buat programmu tetap berjalan saat terjadi kesalahan, dengan try, e
 Program yang baik tidak langsung "meledak" ketika pengguna mengetik sesuatu yang aneh.
 Coba jalankan kode ini:
 
-<Playground initialCode={`umur = int("dua puluh")
+<Playground expectError initialCode={`umur = int("dua puluh")
 print(umur)`} />
 
 Python menampilkan `ValueError`, lalu program berhenti. Error seperti ini disebut **exception**.

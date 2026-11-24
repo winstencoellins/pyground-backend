@@ -1,0 +1,151 @@
+---
+title: Unpacking Arguments
+slug: unpacking-arguments
+stage: 3
+module: Flexible Arguments
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Use stars when calling functions, merge dicts, and unpack a list into several variables.
+---
+
+# Unpacking Arguments
+
+In the previous lesson, `*` and `**` were used in a function **definition** to collect
+arguments. Now we flip the direction: `*` and `**` in a function **call** to **unpack** a
+list or dict into separate arguments.
+
+## Unpacking a list with `*`
+
+Say the data is already in a list, but the function asks for three separate arguments:
+
+<Playground initialCode={`def kos_info(name, city, price):
+    print(f"Kos {name} in {city}, Rp{price:,} per month")
+
+data = ["Melati", "Yogyakarta", 850000]
+
+kos_info(data[0], data[1], data[2])  # the long way
+kos_info(*data)                      # the short way`} />
+
+`kos_info(*data)` is the same as `kos_info("Melati", "Yogyakarta", 850000)`. The list is
+unpacked and sent as positional arguments. This works for tuples too, and even with
+`print()`:
+
+<Playground initialCode={`menu = ["nasi goreng", "mie ayam", "soto"]
+print(menu)
+print(*menu)
+print(*menu, sep=" | ")`} />
+
+## Unpacking a dict with `**`
+
+`**` unpacks a dict into named arguments. The dict keys must match the parameter names:
+
+<Playground initialCode={`def kos_info(name, city, price):
+    print(f"Kos {name} in {city}, Rp{price:,} per month")
+
+data = {"city": "Malang", "price": 700000, "name": "Mawar"}
+kos_info(**data)`} />
+
+The order of the keys does not matter, because each value is matched by its name.
+
+<Callout type="warning">
+  If the dict has a key the function does not know, such as `"wifi"`, Python raises
+  `TypeError: got an unexpected keyword argument`.
+</Callout>
+
+## Merging dicts with `{**a, **b}`
+
+`**` can also be used inside a dict literal to merge several dicts. If a key appears in
+both, the value from the **later** dict wins:
+
+<Playground initialCode={`defaults = {"size": "medium", "spicy": False, "ice": True}
+ani_order = {"spicy": True, "size": "large"}
+
+final = {**defaults, **ani_order}
+print(final)`} />
+
+This pattern is often used to override default settings with a user's choices.
+
+## Extended unpacking: `first, *rest = ...`
+
+You already know `a, b = [1, 2]`. With `*`, one variable can catch "the rest" as a list:
+
+<Playground initialCode={`queue = ["Budi", "Ani", "Citra", "Dodi"]
+
+first, *rest = queue
+print("Served:", first)
+print("Waiting:", rest)
+
+*front, last = queue
+print("At the back:", last)
+
+champion, *middle, last_place = [95, 88, 76, 60]
+print(champion, middle, last_place)`} />
+
+## Keyword-only parameters after `*`
+
+If you write a bare `*` in the parameter list, every parameter after it **must** be passed
+by name. This makes calls clearer to read:
+
+<Playground initialCode={`def transfer(amount, *, to, note=""):
+    print(f"Transfer Rp{amount:,} to {to}. Note: {note}")
+
+transfer(50000, to="Ani", note="class fund")
+transfer(25000, to="Dodi")`} />
+
+Calling `transfer(50000, "Ani")` fails, because `to` must be written by name:
+
+<Playground expectError initialCode={`def transfer(amount, *, to, note=""):
+    print(f"Transfer Rp{amount:,} to {to}")
+
+transfer(50000, "Ani")`} />
+
+## Exercise
+
+Merge the default settings with Citra's choices, then pass the result to the `order`
+function with `**`. After that, unpack `scores` into the highest score and the rest.
+
+<Playground initialCode={`def order(menu, size, spicy):
+    print(f"{menu} size {size}, spicy: {spicy}")
+
+defaults = {"menu": "mie ayam", "size": "medium", "spicy": False}
+citra_choice = {"spicy": True}
+
+# TODO: merge both dicts, then call order(**...)
+
+scores = [98, 85, 80, 72]
+# TODO: highest, *rest = ...
+pass`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "If numbers = [1, 2, 3], what does print(*numbers) print?",
+      options: ["[1, 2, 3]", "(1, 2, 3)", "1 2 3"],
+      answer: 2,
+      explanation: "*numbers unpacks the list into three separate arguments, so print outputs 1 2 3.",
+    },
+    {
+      question: "What is {**{'a': 1, 'b': 2}, **{'b': 9}}?",
+      options: ["{'a': 1, 'b': 9}", "{'a': 1, 'b': 2}", "An error because of the duplicate key"],
+      answer: 0,
+      explanation: "When a key repeats, the value from the dict written later is used.",
+    },
+    {
+      question: "After a, *b = [10, 20, 30], what is b?",
+      options: ["20", "[20, 30]", "(20, 30)"],
+      answer: 1,
+      explanation: "The starred variable catches the remaining values as a list.",
+    },
+  ]}
+/>
+
+## Summary
+
+- When calling a function, `*items` unpacks a list or tuple into positional arguments.
+- `**mapping` unpacks a dict into named arguments that match the parameter names.
+- `{**a, **b}` merges dicts; repeated keys take the value from the later dict.
+- `first, *rest = ...` catches the remaining values as a list.
+- Parameters after a bare `*` must be passed by name.

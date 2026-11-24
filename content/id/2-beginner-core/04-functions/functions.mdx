@@ -1,0 +1,157 @@
+---
+title: Mengenal Fungsi
+slug: functions
+stage: 2
+module: Fungsi
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Bungkus kode yang sering dipakai ke dalam fungsi dengan def, lalu panggil kapan saja kamu butuh.
+---
+
+# Mengenal Fungsi
+
+Kamu sudah sering memakai fungsi bawaan Python seperti `print()`, `len()`, dan `sum()`. Sekarang
+saatnya membuat fungsimu sendiri. **Fungsi** adalah sekumpulan kode yang diberi nama, supaya bisa
+dipakai berulang kali tanpa ditulis ulang.
+
+## Kenapa butuh fungsi?
+
+Lihat kode di bawah. Bagian yang mencetak struk warung ditulis dua kali, persis sama:
+
+<Playground initialCode={`print("================")
+print("  Warung Bu Ani")
+print("================")
+print("Nasi goreng  Rp15.000")
+
+print("================")
+print("  Warung Bu Ani")
+print("================")
+print("Es teh       Rp5.000")`} />
+
+Kalau nama warungnya berganti, kamu harus mengubahnya di setiap tempat. Semakin banyak salinan,
+semakin besar peluang ada yang terlewat. Fungsi menyelesaikan masalah ini: tulis sekali, pakai
+berkali-kali.
+
+## Membuat fungsi dengan `def`
+
+Fungsi dibuat dengan kata kunci `def`, lalu nama fungsi, tanda kurung, dan titik dua. Isi fungsi
+ditulis menjorok ke dalam, sama seperti isi `if` atau `for`:
+
+<Playground initialCode={`def cetak_kepala_struk():
+    print("================")
+    print("  Warung Bu Ani")
+    print("================")
+
+cetak_kepala_struk()
+print("Nasi goreng  Rp15.000")
+print()
+cetak_kepala_struk()
+print("Es teh       Rp5.000")`} />
+
+Membuat fungsi dengan `def` belum menjalankan isinya. Isinya baru jalan saat fungsi **dipanggil**,
+yaitu saat kamu menulis namanya diikuti tanda kurung: `cetak_kepala_struk()`.
+
+<Callout type="warning">
+  Jangan lupa tanda kurungnya. Menulis `cetak_kepala_struk` tanpa `()` tidak menjalankan apa-apa.
+  Selain itu, fungsi harus dibuat dulu sebelum dipanggil, karena Python membaca kode dari atas ke
+  bawah.
+</Callout>
+
+## Memberi nama fungsi
+
+Aturan nama fungsi sama dengan nama variabel: huruf kecil, kata dipisah garis bawah, dan tidak boleh
+diawali angka. Biasakan memakai **kata kerja** yang menjelaskan apa yang dikerjakan fungsi, misalnya
+`cetak_menu`, `hitung_total`, atau `sapa_pelanggan`.
+
+<Playground initialCode={`def sapa_pelanggan():
+    print("Selamat datang di Warung Bu Ani!")
+    print("Silakan pilih menu.")
+
+for i in range(3):
+    sapa_pelanggan()`} />
+
+Fungsi bisa dipanggil di mana saja, termasuk di dalam loop.
+
+## Docstring: catatan singkat untuk fungsi
+
+Baris teks di awal isi fungsi, diapit tiga tanda kutip, disebut **docstring**. Docstring
+menjelaskan kegunaan fungsi kepada siapa pun yang membaca kodemu, termasuk kamu sendiri di masa
+depan:
+
+<Playground initialCode={`def cetak_jam_buka():
+    """Menampilkan jam buka warung."""
+    print("Buka setiap hari, 07.00 - 21.00")
+
+cetak_jam_buka()
+help(cetak_jam_buka)`} />
+
+`help()` menampilkan docstring sebuah fungsi. Satu kalimat pendek biasanya sudah cukup.
+
+## Fungsi memanggil fungsi
+
+Isi sebuah fungsi boleh memanggil fungsi lain. Dengan begitu, tugas besar bisa dipecah menjadi
+tugas-tugas kecil yang masing-masing punya nama jelas:
+
+<Playground initialCode={`def cetak_garis():
+    print("================")
+
+def cetak_kepala_struk():
+    cetak_garis()
+    print("  Warung Bu Ani")
+    cetak_garis()
+
+def cetak_penutup():
+    cetak_garis()
+    print("   Terima kasih!")
+    cetak_garis()
+
+cetak_kepala_struk()
+print("Soto ayam    Rp12.000")
+cetak_penutup()`} />
+
+Sekarang, kalau kamu ingin mengganti bentuk garisnya, cukup ubah satu baris di `cetak_garis()`.
+
+## Latihan
+
+Buat fungsi `cetak_jadwal_ojek()` yang menampilkan tiga baris jadwal antar-jemput (misalnya
+"Senin: jemput Citra jam 07.00"). Lalu panggil fungsinya dua kali.
+
+<Playground initialCode={`def cetak_jadwal_ojek():
+    # TODO: ganti pass dengan tiga print() jadwal
+    pass
+
+# TODO: panggil cetak_jadwal_ojek() dua kali di sini`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kata kunci apa yang dipakai untuk membuat fungsi?",
+      options: ["func", "def", "function"],
+      answer: 1,
+      explanation: "Di Python, fungsi dibuat dengan def, diikuti nama fungsi, tanda kurung, dan titik dua.",
+    },
+    {
+      question: "Kode def halo(): print('Halo') dijalankan tanpa baris lain. Apa yang tampil?",
+      options: ["Tidak ada apa-apa", "Halo", "Error"],
+      answer: 0,
+      explanation: "def hanya membuat fungsi. Isinya baru jalan kalau fungsi dipanggil dengan halo().",
+    },
+    {
+      question: "Nama fungsi mana yang paling sesuai dengan kebiasaan Python?",
+      options: ["HitungTotal", "2hitung", "hitung_total"],
+      answer: 2,
+      explanation: "Nama fungsi memakai huruf kecil dengan garis bawah, dan tidak boleh diawali angka.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Fungsi membungkus kode supaya bisa dipakai berulang tanpa ditulis ulang.
+- Buat fungsi dengan `def nama():`, lalu tulis isinya menjorok ke dalam.
+- Isi fungsi baru jalan saat dipanggil: `nama()`.
+- Docstring dengan tiga tanda kutip menjelaskan kegunaan fungsi.
+- Fungsi boleh memanggil fungsi lain untuk memecah tugas besar.

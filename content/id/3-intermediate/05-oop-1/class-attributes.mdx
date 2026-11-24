@@ -1,0 +1,223 @@
+---
+title: Atribut Class dan Property
+slug: class-attributes
+stage: 3
+module: OOP Bagian 1
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Bedakan atribut class dan atribut instance, hindari jebakan list bersama, dan buat nilai hitungan dengan property.
+---
+
+# Atribut Class dan Property
+
+Sejauh ini setiap atribut yang kamu buat lewat `self` adalah milik satu object saja. Kadang
+ada data yang sebaiknya dimiliki **bersama** oleh semua object dari class yang sama. Di
+pelajaran ini kamu juga akan belajar membuat atribut yang dihitung otomatis.
+
+## Atribut class vs atribut instance
+
+- **Atribut instance** ditulis di `__init__` lewat `self`. Setiap object punya nilainya sendiri.
+- **Atribut class** ditulis langsung di badan class. Nilainya dipakai bersama oleh semua object.
+
+<Playground initialCode={`class KamarKos:
+    kota = "Yogyakarta"
+
+    def __init__(self, nomor, harga):
+        self.nomor = nomor
+        self.harga = harga
+
+k1 = KamarKos("A1", 800000)
+k2 = KamarKos("B3", 950000)
+
+print(k1.nomor, k1.harga, k1.kota)
+print(k2.nomor, k2.harga, k2.kota)
+print(KamarKos.kota)`} />
+
+Saat kamu membaca `k1.kota`, Python mencari dulu di object `k1`. Karena tidak ada, Python
+mencarinya di class `KamarKos`.
+
+## Menghitung object yang sudah dibuat
+
+Atribut class cocok untuk data yang menggambarkan class secara keseluruhan, misalnya jumlah
+object yang sudah dibuat. Ubah lewat nama class, bukan lewat `self`.
+
+<Playground initialCode={`class Pesanan:
+    jumlah_dibuat = 0
+
+    def __init__(self, menu):
+        self.menu = menu
+        Pesanan.jumlah_dibuat += 1
+        self.nomor = Pesanan.jumlah_dibuat
+
+p1 = Pesanan("Nasi goreng")
+p2 = Pesanan("Es teh")
+p3 = Pesanan("Mie ayam")
+
+print(p3.nomor, p3.menu)
+print("Total pesanan hari ini:", Pesanan.jumlah_dibuat)`} />
+
+<Callout type="warning">
+  Menulis `self.jumlah_dibuat += 1` **tidak** mengubah atribut class. Python membaca nilai dari
+  class, lalu menyimpan hasilnya sebagai atribut baru milik object itu saja. Untuk mengubah
+  atribut class, tulis nama class-nya: `Pesanan.jumlah_dibuat += 1`.
+</Callout>
+
+## Jebakan: list sebagai atribut class
+
+Atribut class yang berisi list (atau dict) dipakai bersama. Kalau satu object menambah isi
+list itu, semua object ikut berubah.
+
+<Playground initialCode={`class Keranjang:
+    isi = []
+
+    def __init__(self, pemilik):
+        self.pemilik = pemilik
+
+    def tambah(self, barang):
+        self.isi.append(barang)
+
+kb = Keranjang("Budi")
+ka = Keranjang("Ani")
+kb.tambah("Kopi")
+ka.tambah("Gula")
+
+print("Keranjang Budi:", kb.isi)
+print("Keranjang Ani:", ka.isi)`} />
+
+Budi tidak pernah membeli gula, tapi gula muncul di keranjangnya. Perbaikannya: buat list
+baru di `__init__`, supaya setiap object punya list sendiri.
+
+<Playground initialCode={`class Keranjang:
+    def __init__(self, pemilik):
+        self.pemilik = pemilik
+        self.isi = []
+
+    def tambah(self, barang):
+        self.isi.append(barang)
+
+kb = Keranjang("Budi")
+ka = Keranjang("Ani")
+kb.tambah("Kopi")
+ka.tambah("Gula")
+
+print("Keranjang Budi:", kb.isi)
+print("Keranjang Ani:", ka.isi)`} />
+
+## `@property`: nilai yang dihitung
+
+Kadang sebuah nilai bisa dihitung dari atribut lain, misalnya total harga dari harga satuan dan
+jumlah. Dengan `@property`, method bisa dibaca seperti atribut biasa, tanpa tanda kurung.
+
+<Playground initialCode={`class ItemBelanja:
+    def __init__(self, nama, harga, jumlah):
+        self.nama = nama
+        self.harga = harga
+        self.jumlah = jumlah
+
+    @property
+    def total(self):
+        return self.harga * self.jumlah
+
+telur = ItemBelanja("Telur", 2500, 10)
+print(telur.total)
+
+telur.jumlah = 12
+print(telur.total)`} />
+
+Karena dihitung ulang setiap kali dibaca, `total` selalu sesuai dengan `harga` dan `jumlah`.
+Property tanpa setter juga bersifat **read-only**: mengisinya langsung akan gagal.
+
+<Playground expectError initialCode={`class ItemBelanja:
+    def __init__(self, nama, harga, jumlah):
+        self.nama = nama
+        self.harga = harga
+        self.jumlah = jumlah
+
+    @property
+    def total(self):
+        return self.harga * self.jumlah
+
+telur = ItemBelanja("Telur", 2500, 10)
+telur.total = 1000`} />
+
+## Konvensi garis bawah di depan nama
+
+Atribut yang namanya diawali satu garis bawah, misalnya `self._saldo`, artinya "ini urusan
+dalam class, jangan diubah langsung dari luar". Python tidak melarangnya, tapi programmer lain
+akan menghormati tanda itu. Gabungkan dengan `@property` untuk memberi akses baca saja.
+
+<Playground initialCode={`class RekeningBank:
+    def __init__(self, pemilik):
+        self.pemilik = pemilik
+        self._saldo = 0
+
+    @property
+    def saldo(self):
+        return self._saldo
+
+    def setor(self, jumlah):
+        if jumlah <= 0:
+            raise ValueError("Jumlah harus lebih dari 0")
+        self._saldo += jumlah
+
+rek = RekeningBank("Citra")
+rek.setor(50000)
+print(rek.saldo)`} />
+
+Sekarang satu-satunya cara resmi mengubah saldo adalah lewat `setor()`, yang selalu memeriksa
+jumlahnya.
+
+## Latihan
+
+Lengkapi class `Siswa`. Tambahkan atribut class `jumlah_siswa` yang bertambah setiap ada siswa
+baru, dan property `rata_rata` yang menghitung rata-rata dari list `nilai`.
+
+<Playground initialCode={`class Siswa:
+    # TODO: tambahkan atribut class jumlah_siswa = 0
+
+    def __init__(self, nama):
+        self.nama = nama
+        self.nilai = []
+        # TODO: tambah jumlah_siswa lewat nama class
+
+    # TODO: buat @property rata_rata
+
+budi = Siswa("Budi")
+budi.nilai.append(80)
+budi.nilai.append(90)
+ani = Siswa("Ani")
+print(budi.nama, budi.nilai)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Di mana atribut class ditulis?",
+      options: ["Di dalam __init__ dengan self", "Langsung di badan class, di luar method", "Di luar class setelah object dibuat"],
+      answer: 1,
+      explanation: "Atribut class ditulis di badan class dan dipakai bersama oleh semua object.",
+    },
+    {
+      question: "class A: data = []. Kalau a1 dan a2 object A, lalu a1.data.append(5), apa isi a2.data?",
+      options: ["[]", "Error karena a2 belum punya data", "[5]"],
+      answer: 2,
+      explanation: "data adalah satu list milik class, jadi a1 dan a2 melihat list yang sama.",
+    },
+    {
+      question: "Apa keuntungan @property total dibanding atribut biasa total?",
+      options: ["Nilainya selalu dihitung ulang dari data terbaru dan tidak bisa diisi langsung", "Program jadi lebih cepat karena nilainya disimpan", "Bisa dipanggil dengan obj.total() saja"],
+      answer: 0,
+      explanation: "Property dihitung setiap kali dibaca, dibaca tanpa kurung, dan tanpa setter bersifat read-only.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Atribut instance (lewat `self`) milik satu object; atribut class milik semua object.
+- Ubah atribut class lewat nama class, misalnya `Pesanan.jumlah_dibuat += 1`.
+- Jangan pakai list atau dict sebagai atribut class kalau setiap object butuh isinya sendiri; buat di `__init__`.
+- `@property` membuat method dibaca seperti atribut dan cocok untuk nilai hitungan yang read-only.
+- Nama yang diawali `_` menandakan atribut internal yang sebaiknya tidak diubah dari luar.

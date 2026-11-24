@@ -1,0 +1,158 @@
+---
+title: A Tour of the Standard Library
+slug: standard-library
+stage: 3
+module: Modules, pip, and venv
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Meet the built-in Python modules you will use most, math, random, statistics, collections, and string, and learn how to read their docs.
+---
+
+# A Tour of the Standard Library
+
+Python comes with "batteries included": hundreds of built-in modules called the
+**standard library**. You don't need to install anything to use them. In this lesson we
+visit a few of the most used ones.
+
+## `math`: calculations
+
+<Playground initialCode={`import math
+
+print(math.sqrt(225))       # square root
+print(math.pow(2, 10))      # power, the result is a float
+print(math.floor(9.99))     # round down
+print(math.ceil(9.01))      # round up
+print(round(math.pi, 4))
+
+# How many egg boxes (10 per box) for 47 eggs?
+print(math.ceil(47 / 10), "boxes")`} />
+
+## `random`: random numbers you can repeat
+
+`random` picks numbers or list items at random. If you call `random.seed()` with the same
+number, the "random" sequence is always the same. That's useful when testing a program:
+
+<Playground initialCode={`import random
+
+random.seed(42)
+
+print(random.randint(1, 6))  # roll a die
+print(random.choice(["Budi", "Ani", "Citra", "Dodi"]))  # who's on cleaning duty today
+
+queue = ["Budi", "Ani", "Citra", "Dodi"]
+random.shuffle(queue)
+print(queue)`} />
+
+Run it a few times: the result is always the same. Delete the `random.seed(42)` line, and the
+result changes every run.
+
+<Callout type="warning">
+  Don't use `random` for anything security related, like generating passwords or tokens.
+  Python has the `secrets` module for that.
+</Callout>
+
+## `statistics`: averages and friends
+
+<Playground initialCode={`import statistics
+
+scores = [78, 85, 92, 66, 85, 70]
+
+print("Mean:", statistics.mean(scores))
+print("Median:", statistics.median(scores))
+print("Mode:", statistics.mode(scores))
+print("Standard deviation:", round(statistics.stdev(scores), 2))`} />
+
+## `collections.Counter`: counting occurrences
+
+`Counter` counts how many times each item appears, so you don't have to build a counting
+dict yourself:
+
+<Playground initialCode={`from collections import Counter
+
+orders = ["es teh", "kopi", "es teh", "nasi goreng", "es teh", "kopi"]
+counts = Counter(orders)
+
+print(counts)
+print("Es teh was ordered", counts["es teh"], "times")
+print("Top two items:", counts.most_common(2))
+
+print(Counter("banana"))`} />
+
+## `string`: ready-made character sets
+
+<Playground initialCode={`import string
+
+print(string.ascii_lowercase)
+print(string.digits)
+print(string.punctuation)
+
+sentence = "good morning, residents of kos melati"
+print(string.capwords(sentence))`} />
+
+## Finding out yourself: `dir()` and `help()`
+
+You don't need to memorise every module. `dir()` lists the names inside a module, and
+`help()` shows their explanation:
+
+<Playground initialCode={`import math
+
+print(dir(math))
+print()
+help(math.ceil)`} />
+
+For full explanations with examples, open the official docs at docs.python.org, under
+"The Python Standard Library".
+
+## Exercise
+
+Simulate 20 die rolls with seed `7`, then use `Counter` to find which number came up most
+often, and `statistics` for the average.
+
+<Playground initialCode={`import random
+from collections import Counter
+import statistics
+
+random.seed(7)
+
+rolls = []
+for _ in range(20):
+    rolls.append(random.randint(1, 6))
+
+print(rolls)
+# TODO: count each number with Counter
+# TODO: print the most frequent number (most_common)
+# TODO: print the average roll with statistics.mean`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What does random.seed(42) do?",
+      options: ["Makes random numbers more random", "Makes the random sequence the same on every run", "Limits random numbers to 42"],
+      answer: 1,
+      explanation: "The same seed produces the same random sequence, so the result can be repeated.",
+    },
+    {
+      question: "What does Counter(['a', 'b', 'a']).most_common(1) return?",
+      options: ["[('a', 2)]", "['a']", "{'a': 2}"],
+      answer: 0,
+      explanation: "most_common(n) returns a list of the n most frequent (item, count) pairs.",
+    },
+    {
+      question: "Which function lists the names inside a module?",
+      options: ["help()", "list()", "dir()"],
+      answer: 2,
+      explanation: "dir(module) lists the names inside the module, while help() shows their explanation.",
+    },
+  ]}
+/>
+
+## Summary
+
+- The standard library is Python's built-in modules, with nothing to install.
+- `math` for calculations, `random` for randomness (use `seed()` to make it repeatable),
+  `statistics` for mean, median, and mode.
+- `collections.Counter` counts occurrences, and `string` holds ready-made character sets.
+- `dir()` and `help()` let you explore a module without memorising it.

@@ -1,0 +1,229 @@
+---
+title: Inheritance
+slug: inheritance
+stage: 3
+module: OOP Part 2
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Build subclasses that inherit their parent's attributes and methods, then change their behaviour with overriding and super().
+---
+
+# Inheritance
+
+Motorbikes and cars are both vehicles: they have a plate number, an owner, and they can move.
+But a motorbike has two wheels and a car has four. Instead of writing the same code twice, you
+can make a **parent** class `Vehicle`, then **child** classes `Motorbike` and `Car` that
+inherit from it.
+
+## Creating a subclass
+
+Put the parent class name in parentheses. The subclass automatically gets all of its parent's
+attributes and methods.
+
+<Playground initialCode={`class Vehicle:
+    def __init__(self, plate, owner):
+        self.plate = plate
+        self.owner = owner
+
+    def info(self):
+        print(self.plate, "owned by", self.owner)
+
+class Motorbike(Vehicle):
+    pass
+
+budi_bike = Motorbike("AB 1234 XY", "Budi")
+budi_bike.info()`} />
+
+`Motorbike` doesn't define its own `__init__` or `info`, but both work because they're
+inherited from `Vehicle`.
+
+## Adding attributes with `super().__init__`
+
+A subclass often needs extra data. Write a new `__init__`, then call `super().__init__(...)` so
+the parent's part still gets set up.
+
+<Playground initialCode={`class Vehicle:
+    def __init__(self, plate, owner):
+        self.plate = plate
+        self.owner = owner
+
+class Car(Vehicle):
+    def __init__(self, plate, owner, seats):
+        super().__init__(plate, owner)
+        self.seats = seats
+
+ani_car = Car("B 5678 CD", "Ani", 7)
+print(ani_car.plate, ani_car.owner, ani_car.seats)`} />
+
+<Callout type="warning">
+  If you forget to call `super().__init__(...)`, the parent's `__init__` never runs. Attributes
+  like `plate` are never created, and you'll get an `AttributeError` when you read them.
+</Callout>
+
+## Overriding: replacing a method's behaviour
+
+A subclass can rewrite a method with the same name. This is called **overriding**. Python
+always uses the version closest to the object.
+
+<Playground initialCode={`class Vehicle:
+    def __init__(self, plate):
+        self.plate = plate
+
+    def wheel_count(self):
+        return 0
+
+    def sound(self):
+        return "..."
+
+class Motorbike(Vehicle):
+    def wheel_count(self):
+        return 2
+
+    def sound(self):
+        return "Vroom vroom"
+
+class Car(Vehicle):
+    def wheel_count(self):
+        return 4
+
+garage = [Motorbike("AB 1111 AA"), Car("B 2222 BB")]
+for v in garage:
+    print(v.plate, v.wheel_count(), "wheels,", v.sound())`} />
+
+`Car` doesn't override `sound`, so it uses the version from `Vehicle`. You can also use
+`super()` inside an overriding method to extend, rather than replace, the parent's behaviour.
+
+<Playground initialCode={`class Vehicle:
+    def __init__(self, plate):
+        self.plate = plate
+
+    def info(self):
+        return "Plate: " + self.plate
+
+class Ojek(Vehicle):
+    def __init__(self, plate, driver):
+        super().__init__(plate)
+        self.driver = driver
+
+    def info(self):
+        return super().info() + ", driver: " + self.driver
+
+print(Ojek("D 3333 CC", "Dodi").info())`} />
+
+## Checking an object's type with `isinstance`
+
+`isinstance(obj, Class)` is `True` if the object was made from that class **or** one of its
+subclasses.
+
+<Playground initialCode={`class Vehicle:
+    pass
+
+class Motorbike(Vehicle):
+    pass
+
+class Car(Vehicle):
+    pass
+
+m = Motorbike()
+print(isinstance(m, Motorbike))
+print(isinstance(m, Vehicle))
+print(isinstance(m, Car))
+print(issubclass(Car, Vehicle))`} />
+
+## A small complete hierarchy
+
+Here's a full example: parking fees are computed differently for each vehicle type, but the
+code that uses them is a single loop.
+
+<Playground initialCode={`class Vehicle:
+    rate_per_hour = 0
+
+    def __init__(self, plate, hours):
+        self.plate = plate
+        self.hours = hours
+
+    def parking_fee(self):
+        return self.rate_per_hour * self.hours
+
+class Motorbike(Vehicle):
+    rate_per_hour = 2000
+
+class Car(Vehicle):
+    rate_per_hour = 5000
+
+    def parking_fee(self):
+        fee = super().parking_fee()
+        if self.hours > 5:
+            fee = fee - 5000
+        return fee
+
+lot = [Motorbike("AB 1234 XY", 3), Car("B 5678 CD", 2), Car("D 9999 EE", 6)]
+total = 0
+for v in lot:
+    fee = v.parking_fee()
+    total += fee
+    print(type(v).__name__, v.plate, "Rp", fee)
+print("Total income: Rp", total)`} />
+
+<Callout type="info">
+  **Composition vs inheritance.** Use inheritance for an "is a" relationship: a motorbike *is
+  a* vehicle. For a "has a" relationship, like a car *has an* engine, store an `Engine` object
+  as an attribute instead (`self.engine = Engine()`). That's called **composition**, and it's
+  often easier to change than a deep class hierarchy.
+</Callout>
+
+## Exercise
+
+Create a parent class `Employee` with `name` and `base_salary` attributes and a `salary()`
+method that returns the base salary. Then create `Manager`, which adds an `allowance`
+attribute and overrides `salary()` to return base salary plus allowance.
+
+<Playground initialCode={`class Employee:
+    def __init__(self, name, base_salary):
+        self.name = name
+        self.base_salary = base_salary
+
+    def salary(self):
+        return self.base_salary
+
+class Manager(Employee):
+    # TODO: an __init__ that calls super().__init__ and stores allowance
+    # TODO: override salary()
+    pass
+
+budi = Employee("Budi", 5000000)
+print(budi.name, budi.salary())`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "How do you create a Motorbike class that inherits from Vehicle?",
+      options: ["class Motorbike extends Vehicle:", "class Vehicle(Motorbike):", "class Motorbike(Vehicle):"],
+      answer: 2,
+      explanation: "The parent class goes in parentheses after the subclass name.",
+    },
+    {
+      question: "What does super().__init__(plate, owner) do in a subclass's __init__?",
+      options: ["Runs the parent's __init__ so the parent's attributes are set too", "Creates a separate parent object", "Deletes the parent's __init__"],
+      answer: 0,
+      explanation: "super() gives access to the parent's methods, so attributes like plate and owner still get created.",
+    },
+    {
+      question: "If Motorbike is a subclass of Vehicle and m = Motorbike(), what is isinstance(m, Vehicle)?",
+      options: ["False", "True", "An error"],
+      answer: 1,
+      explanation: "isinstance is also True for parent classes, because a motorbike is a vehicle.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `class Child(Parent):` creates a subclass that inherits the parent's attributes and methods.
+- Call `super().__init__(...)` in the subclass's `__init__` so the parent's part is still set up.
+- Overriding means rewriting a parent method; `super().method_name()` calls the parent's version.
+- `isinstance(obj, Class)` is also `True` for parent classes.
+- Inheritance for "is a" relationships, composition for "has a" relationships.

@@ -1,0 +1,215 @@
+---
+title: Working with Dates and Times
+slug: datetime-basics
+stage: 3
+module: datetime and requests
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Create, format, parse, and calculate dates with the datetime module, including Indonesian day and month names.
+---
+
+# Working with Dates and Times
+
+Dates are everywhere: the kos rent due date, a school assignment deadline, the order date at an
+online warung. Storing a date as a string like `"17-08-2026"` is easy, but you can't add or
+subtract strings. The built-in **`datetime`** module gives you dedicated types for dates and
+times that you can calculate with.
+
+## Creating a date with `date`
+
+`date(year, month, day)` creates a date. From it you can read the year, month, and day:
+
+<Playground initialCode={`from datetime import date
+
+independence_day = date(2026, 8, 17)
+
+print(independence_day)
+print("Year:", independence_day.year)
+print("Month:", independence_day.month)
+print("Day:", independence_day.day)
+print("weekday():", independence_day.weekday())  # 0 = Monday, 6 = Sunday`} />
+
+`weekday()` gives the day of the week as a number: `0` for Monday up to `6` for Sunday. That
+number comes in handy later for looking up Indonesian day names.
+
+## Date plus time with `datetime`
+
+If you need hours and minutes too, use `datetime`:
+
+<Playground initialCode={`from datetime import datetime
+
+ojek_pickup = datetime(2026, 8, 17, 7, 30)
+
+print(ojek_pickup)
+print("Hour:", ojek_pickup.hour)
+print("Minute:", ojek_pickup.minute)
+print("Just the date:", ojek_pickup.date())`} />
+
+For the **current** date and time, Python has `date.today()` and `datetime.now()`:
+
+```python
+from datetime import date, datetime
+
+print(date.today())    # e.g. 2026-11-24
+print(datetime.now())  # e.g. 2026-11-24 14:05:31.123456
+```
+
+<Callout type="info">
+  The result of `now()` and `today()` always changes depending on when the program runs. In
+  this lesson we use fixed dates so you get the same output every time you try.
+</Callout>
+
+## Formatting dates with `strftime`
+
+`strftime()` turns a date into a string in the format you choose. Codes like `%d` (day),
+`%m` (month), `%Y` (4-digit year), `%H` (hour) and `%M` (minute) decide its shape:
+
+<Playground initialCode={`from datetime import datetime
+
+order = datetime(2026, 8, 17, 19, 45)
+
+print(order.strftime("%d/%m/%Y"))
+print(order.strftime("%d-%m-%Y %H:%M"))
+print(order.strftime("%A, %d %B %Y"))`} />
+
+The last line prints `Monday` and `August` in English. The easiest way to get Indonesian day
+and month names is to build them yourself with a **list**, then look them up with `weekday()`
+and `month`:
+
+<Playground initialCode={`from datetime import date
+
+DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+          "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+
+def format_indonesian(day):
+    day_name = DAYS[day.weekday()]
+    month_name = MONTHS[day.month - 1]  # months start at 1, list indexes start at 0
+    return f"{day_name}, {day.day} {month_name} {day.year}"
+
+print(format_indonesian(date(2026, 8, 17)))
+print(format_indonesian(date(2026, 12, 25)))`} />
+
+## Parsing a string into a date with `strptime`
+
+The opposite of `strftime` is `strptime`: it reads a string in a given format and turns it
+into a `datetime`. Useful when dates come from user input or a CSV file:
+
+<Playground initialCode={`from datetime import datetime
+
+text = "05/09/2026"
+parsed = datetime.strptime(text, "%d/%m/%Y")
+
+print(parsed)
+print("Month:", parsed.month)
+print("Date only:", parsed.date())`} />
+
+If the string doesn't match the format, Python raises a `ValueError`:
+
+<Playground expectError initialCode={`from datetime import datetime
+
+# The format is day/month/year, but the string uses dashes
+parsed = datetime.strptime("05-09-2026", "%d/%m/%Y")`} />
+
+## Calculating with `timedelta`
+
+This is where date types beat strings. A `timedelta` represents a **span of time**. Add it to
+a date to find a due date, or subtract two dates to find how many days are left:
+
+<Playground initialCode={`from datetime import date, timedelta
+
+borrowed_on = date(2026, 9, 1)
+due_date = borrowed_on + timedelta(days=14)
+print("Library book is due:", due_date)
+
+today = date(2026, 9, 10)
+assignment_deadline = date(2026, 9, 25)
+remaining = assignment_deadline - today
+print("Time left:", remaining)
+print("Days left:", remaining.days)
+
+a_week_ago = today - timedelta(weeks=1)
+print("A week ago:", a_week_ago)`} />
+
+Subtracting two dates gives a `timedelta`, and its `.days` attribute gives the number of days
+as a plain number. Python also handles month changes and leap years for you.
+
+## Time zones with `zoneinfo`
+
+A plain `datetime` doesn't know about time zones. For times tied to a place, such as WIB
+(Western Indonesia Time), use the `zoneinfo` module (Python 3.9 and later):
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+wib = ZoneInfo("Asia/Jakarta")
+meeting = datetime(2026, 8, 17, 9, 0, tzinfo=wib)
+
+print(meeting)                                      # 2026-08-17 09:00:00+07:00
+print(meeting.astimezone(ZoneInfo("Asia/Makassar")))  # 2026-08-17 10:00:00+08:00 (WITA)
+```
+
+<Callout type="warning">
+  This time zone example is in a regular code block because the browser may not have time zone
+  data. Run it on your own computer. On Windows, you may need to `pip install tzdata` first.
+</Callout>
+
+## Exercise
+
+Budi pays his kos rent every 30 days. His last payment was on 20 October 2026. Work out the
+next payment date, show it with Indonesian day and month names, then count how many days are
+left from 1 November 2026.
+
+<Playground initialCode={`from datetime import date, timedelta
+
+DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+          "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+
+last_payment = date(2026, 10, 20)
+today = date(2026, 11, 1)
+
+# TODO: work out next_payment with timedelta
+next_payment = last_payment
+
+# TODO: show it like "Kamis, 19 November 2026"
+print("Next payment:", next_payment)
+
+# TODO: work out the days left with .days
+days_left = 0
+print("Days left:", days_left)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is date(2026, 9, 1) + timedelta(days=30)?",
+      options: ["date(2026, 10, 1)", "date(2026, 9, 31)", "date(2026, 10, 31)"],
+      answer: 0,
+      explanation: "September has 30 days, so 30 days after 1 September is 1 October. Python handles the month change for you.",
+    },
+    {
+      question: "Which function turns the string '17/08/2026' into a datetime object?",
+      options: ["strftime", "timedelta", "strptime"],
+      answer: 2,
+      explanation: "strptime parses a string into a datetime, while strftime does the opposite.",
+    },
+    {
+      question: "If day.weekday() is 4, which day is it?",
+      options: ["Thursday", "Friday", "Saturday"],
+      answer: 1,
+      explanation: "weekday() starts at 0 for Monday, so 4 is Friday.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `date(year, month, day)` and `datetime(..., hour, minute)` create dates you can calculate with.
+- `strftime()` turns a date into a string, and `strptime()` parses a string into a date.
+- Indonesian day and month names can be looked up in a list with `weekday()` and `month - 1`.
+- `timedelta` adds or subtracts time, and the difference between two dates gives `.days`.
+- `zoneinfo` handles time zones such as `Asia/Jakarta` (WIB).

@@ -1,0 +1,174 @@
+---
+title: Membaca dan Menulis File
+slug: files-basics
+stage: 3
+module: File
+order: 1
+isFree: false
+estimatedMinutes: 20
+description: Simpan data ke file teks dan baca kembali dengan open(), mode r/w/a, dan pernyataan with.
+---
+
+# Membaca dan Menulis File
+
+Sampai sekarang, semua data di programmu hilang begitu program selesai. Supaya data bisa
+dipakai lagi besok, kamu perlu menyimpannya ke **file**. Python membuka file dengan fungsi
+`open()`.
+
+## Membuka file dengan `open()`
+
+`open()` menerima nama file dan **mode**:
+
+| Mode | Arti |
+| --- | --- |
+| `"r"` | read: membaca file (mode bawaan). File harus sudah ada. |
+| `"w"` | write: menulis file baru. Kalau file sudah ada, isinya **dihapus** dulu. |
+| `"a"` | append: menambah di akhir file tanpa menghapus isi lama. |
+
+Kita tulis dulu sebuah file, lalu baca lagi:
+
+<Playground initialCode={`f = open("catatan.txt", "w")
+f.write("Beli beras 5 kg di warung Bu Ani")
+f.close()
+
+f = open("catatan.txt", "r")
+isi = f.read()
+f.close()
+
+print(isi)`} />
+
+Setiap file yang dibuka harus **ditutup** dengan `close()`. File yang lupa ditutup bisa
+membuat data belum benar-benar tersimpan.
+
+## Pernyataan `with`
+
+Mengingat `close()` itu merepotkan, apalagi kalau terjadi error di tengah jalan. Pernyataan
+`with` menutup file **otomatis** begitu bloknya selesai, bahkan saat ada error:
+
+<Playground initialCode={`with open("catatan.txt", "w", encoding="utf-8") as f:
+    f.write("Bayar kos bulan Juli")
+
+print("Sudah ditutup?", f.closed)
+
+with open("catatan.txt", "r", encoding="utf-8") as f:
+    print(f.read())`} />
+
+Mulai sekarang, selalu pakai `with` untuk membuka file.
+
+<Callout type="info">
+  `encoding="utf-8"` memastikan huruf seperti é, emoji, atau simbol lain tersimpan dan terbaca
+  dengan benar di semua komputer. Tanpanya, Windows bisa memakai encoding lain dan teksmu
+  jadi rusak. Biasakan selalu menulisnya.
+</Callout>
+
+## Menulis beberapa baris dan mode `"a"`
+
+`f.write()` **tidak** menambahkan baris baru sendiri. Cara paling mudah untuk menulis per
+baris adalah `print(..., file=f)`, yang otomatis menambah baris baru seperti `print()` biasa.
+Mode `"a"` lalu menambah baris di akhir file:
+
+<Playground initialCode={`with open("pengeluaran.txt", "w", encoding="utf-8") as f:
+    print("Senin: makan siang Rp15000", file=f)
+    print("Selasa: ojek Rp12000", file=f)
+
+with open("pengeluaran.txt", "a", encoding="utf-8") as f:
+    print("Rabu: pulsa Rp25000", file=f)
+
+with open("pengeluaran.txt", encoding="utf-8") as f:
+    print(f.read())`} />
+
+<Callout type="warning">
+  Hati-hati dengan mode `"w"`: membuka file yang sudah ada dengan `"w"` langsung mengosongkan
+  isinya. Pakai `"a"` kalau kamu hanya ingin menambah.
+</Callout>
+
+## Membaca baris demi baris
+
+File bisa di-loop dengan `for`, satu baris setiap putaran. Setiap baris masih membawa karakter
+baris baru di ujungnya, jadi bersihkan dengan `strip()`:
+
+<Playground initialCode={`with open("siswa.txt", "w", encoding="utf-8") as f:
+    print("Budi", file=f)
+    print("Ani", file=f)
+    print("Citra", file=f)
+
+with open("siswa.txt", encoding="utf-8") as f:
+    for nomor, baris in enumerate(f, start=1):
+        nama = baris.strip()
+        print(f"{nomor}. {nama} (panjang {len(nama)} huruf)")`} />
+
+Coba hapus `.strip()` dan jalankan lagi: ada baris kosong tambahan dan panjang namanya
+bertambah satu, karena karakter baris baru ikut terhitung.
+
+## Kalau file tidak ada
+
+Membaca file yang tidak ada memunculkan `FileNotFoundError`:
+
+<Playground expectError initialCode={`with open("tidak_ada.txt", encoding="utf-8") as f:
+    print(f.read())`} />
+
+Tangani dengan `try`/`except` yang sudah kamu pelajari:
+
+<Playground initialCode={`def baca_catatan(nama_file):
+    try:
+        with open(nama_file, encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "(belum ada catatan)"
+
+with open("hari_ini.txt", "w", encoding="utf-8") as f:
+    f.write("Belajar Python 30 menit")
+
+print(baca_catatan("hari_ini.txt"))
+print(baca_catatan("kemarin.txt"))`} />
+
+## Latihan
+
+Program di bawah menulis daftar penghuni kos. Lengkapi bagian bacanya: hitung jumlah penghuni
+dan cetak setiap nama dalam huruf kapital.
+
+<Playground initialCode={`with open("penghuni_kos.txt", "w", encoding="utf-8") as f:
+    print("Dodi", file=f)
+    print("Citra", file=f)
+    print("Budi", file=f)
+
+jumlah = 0
+with open("penghuni_kos.txt", encoding="utf-8") as f:
+    for baris in f:
+        # TODO: bersihkan baris dengan strip(), cetak dalam huruf kapital, tambah jumlah
+        pass
+
+print("Jumlah penghuni:", jumlah)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Mode apa yang menambah isi di akhir file tanpa menghapus isi lama?",
+      options: ["'w'", "'a'", "'r'"],
+      answer: 1,
+      explanation: "'a' (append) menambah di akhir. 'w' justru mengosongkan file dulu.",
+    },
+    {
+      question: "Apa keuntungan utama memakai with open(...) as f?",
+      options: ["File ditutup otomatis, bahkan saat terjadi error", "File dibaca lebih cepat", "File tidak bisa dihapus"],
+      answer: 0,
+      explanation: "with menutup file begitu bloknya selesai, jadi kamu tidak perlu ingat memanggil close().",
+    },
+    {
+      question: "Kenapa kita memanggil strip() saat membaca file baris demi baris?",
+      options: ["Supaya huruf jadi kecil", "Supaya file tertutup", "Supaya karakter baris baru di ujung baris hilang"],
+      answer: 2,
+      explanation: "Setiap baris yang dibaca membawa karakter baris baru; strip() membuang spasi dan baris baru di kedua ujung.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `open(nama, mode)` membuka file: `"r"` baca, `"w"` tulis ulang, `"a"` tambah di akhir.
+- Selalu pakai `with open(...) as f:` supaya file tertutup otomatis.
+- Tulis `encoding="utf-8"` supaya teks aman di semua komputer.
+- Loop `for baris in f:` membaca per baris; bersihkan dengan `strip()`.
+- Tangani file yang belum ada dengan `except FileNotFoundError`.

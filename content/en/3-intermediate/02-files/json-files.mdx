@@ -1,0 +1,177 @@
+---
+title: Saving Data with JSON
+slug: json-files
+stage: 3
+module: Files
+order: 3
+isFree: false
+estimatedMinutes: 20
+description: Turn dicts and lists into JSON, save them to a file, and load them back to store app data such as a to-do list.
+---
+
+# Saving Data with JSON
+
+CSV is great for tables, but what about nested data, such as a dict that holds a list? That is
+what **JSON** (JavaScript Object Notation) is for. It looks very much like Python dicts and
+lists, and almost every programming language and web app can read it.
+
+```json
+{"name": "Budi", "age": 17, "hobbies": ["futsal", "guitar"], "active": true}
+```
+
+The built-in `json` module turns Python data into JSON text and back.
+
+## `json.dumps()` and `json.loads()`
+
+`dumps()` (dump **s**tring) turns a dict or list into JSON **text**. `loads()` turns JSON text
+back into Python data:
+
+<Playground initialCode={`import json
+
+student = {"name": "Budi", "age": 17, "hobbies": ["futsal", "guitar"], "active": True}
+
+text = json.dumps(student)
+print(text)
+print(type(text))
+
+back = json.loads(text)
+print(back["hobbies"][0])
+print(type(back))`} />
+
+Notice: Python's `True` becomes `true` in JSON, and `None` becomes `null`. The result of
+`dumps()` is just an ordinary string, so you can save it to a file or send it over the
+internet.
+
+## `indent` and `ensure_ascii=False`
+
+By default, JSON is written on one line, and non-ASCII letters (like é or emoji) are turned
+into strange codes. These two parameters make it pleasant to read:
+
+<Playground initialCode={`import json
+
+menu = {"warung": "Café Bu Ani", "favourites": ["kopi susu ☕", "pisang goreng"]}
+
+print(json.dumps(menu))
+print()
+print(json.dumps(menu, indent=2, ensure_ascii=False))`} />
+
+- `indent=2` puts each item on its own line, indented by 2 spaces.
+- `ensure_ascii=False` keeps letters like é and emoji as they are.
+
+## `json.dump()` and `json.load()` for files
+
+Without the **s**, `dump()` writes straight to a file and `load()` reads straight from a file:
+
+<Playground initialCode={`import json
+
+profile = {"name": "Citra", "city": "Bandung", "scores": [88, 92, 79]}
+
+with open("profile.json", "w", encoding="utf-8") as f:
+    json.dump(profile, f, indent=2, ensure_ascii=False)
+
+with open("profile.json", encoding="utf-8") as f:
+    data = json.load(f)
+
+print(data)
+print("Average score of", data["name"], "=", sum(data["scores"]) / len(data["scores"]))`} />
+
+<Callout type="tip">
+  An easy way to remember: the ones ending in **s** (`dumps`, `loads`) work with **s**trings.
+  The ones without s (`dump`, `load`) work with files.
+</Callout>
+
+## Saving app data: a to-do list
+
+This is the main use of JSON in small programs: saving **app state** so it is not lost when
+the program closes. We write two functions, one to load and one to save:
+
+<Playground initialCode={`import json
+
+def load_tasks(file_name):
+    try:
+        with open(file_name, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def save_tasks(file_name, tasks):
+    with open(file_name, "w", encoding="utf-8") as f:
+        json.dump(tasks, f, indent=2, ensure_ascii=False)
+
+print("File does not exist yet:", load_tasks("not_yet.json"))
+
+# First session: start from an empty list, add tasks, save
+tasks = []
+tasks.append({"title": "Do maths homework", "done": False})
+tasks.append({"title": "Pay the kos rent", "done": False})
+save_tasks("todo.json", tasks)
+
+# Next session: load from the file again, mark one task as done
+tasks = load_tasks("todo.json")
+tasks[1]["done"] = True
+save_tasks("todo.json", tasks)
+
+for number, t in enumerate(load_tasks("todo.json"), start=1):
+    mark = "x" if t["done"] else " "
+    print(f"{number}. [{mark}] {t['title']}")`} />
+
+`load_tasks()` returns an empty list when the file does not exist yet, so the app still works
+the very first time it is used.
+
+<Callout type="warning">
+  JSON only knows strings, numbers, `true`/`false`, `null`, lists, and dicts with string keys.
+  A tuple comes back as a list, and number keys in a dict come back as strings.
+</Callout>
+
+## Exercise
+
+Complete the `add_contact()` function so it adds a new contact to the `contacts.json` file:
+load its contents first, add the contact, then save it again.
+
+<Playground initialCode={`import json
+
+with open("contacts.json", "w", encoding="utf-8") as f:
+    json.dump({"Budi": "0812-1111"}, f)
+
+def add_contact(name, number):
+    # TODO: load the dict from contacts.json with json.load()
+    # TODO: add contacts[name] = number
+    # TODO: save it again with json.dump(..., indent=2)
+    pass
+
+add_contact("Ani", "0813-2222")
+
+with open("contacts.json", encoding="utf-8") as f:
+    print(f.read())`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which function turns a dict into JSON text (a string)?",
+      options: ["json.loads()", "json.load()", "json.dumps()"],
+      answer: 2,
+      explanation: "dumps() = dump string. loads() does the opposite, and dump()/load() work with files.",
+    },
+    {
+      question: "What does ensure_ascii=False do?",
+      options: ["Makes the JSON shorter", "Keeps letters like é and emoji readable as they are", "Sorts the dict keys"],
+      answer: 1,
+      explanation: "Without ensure_ascii=False, non-ASCII letters are turned into codes like \\u00e9 that are hard to read.",
+    },
+    {
+      question: "How is the Python value True stored in JSON?",
+      options: ["true", "True", "'True'"],
+      answer: 0,
+      explanation: "JSON uses lowercase: true, false, and null for None.",
+    },
+  ]}
+/>
+
+## Summary
+
+- JSON stores nested data (dicts and lists) as text that many languages can read.
+- `json.dumps()` / `json.loads()` work with strings; `json.dump()` / `json.load()` with files.
+- `indent=2` makes JSON tidy, and `ensure_ascii=False` keeps non-ASCII letters intact.
+- The load-change-save pattern, with `FileNotFoundError` as an empty start, is a good way to store app data.

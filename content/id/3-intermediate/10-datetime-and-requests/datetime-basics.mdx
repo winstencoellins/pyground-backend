@@ -1,0 +1,217 @@
+---
+title: Bekerja dengan Tanggal dan Waktu
+slug: datetime-basics
+stage: 3
+module: datetime dan requests
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Buat, format, baca, dan hitung tanggal dengan modul datetime, lengkap dengan nama hari dan bulan berbahasa Indonesia.
+---
+
+# Bekerja dengan Tanggal dan Waktu
+
+Tanggal ada di mana-mana: jatuh tempo bayar kos, deadline tugas sekolah, tanggal pesanan di
+warung online. Menyimpan tanggal sebagai string seperti `"17-08-2026"` memang mudah, tapi
+string tidak bisa dijumlah atau dikurangi. Modul bawaan **`datetime`** memberi tipe data khusus
+untuk tanggal dan waktu yang bisa dihitung.
+
+## Membuat tanggal dengan `date`
+
+`date(tahun, bulan, hari)` membuat sebuah tanggal. Dari situ kamu bisa mengambil tahun, bulan,
+dan harinya:
+
+<Playground initialCode={`from datetime import date
+
+kemerdekaan = date(2026, 8, 17)
+
+print(kemerdekaan)
+print("Tahun:", kemerdekaan.year)
+print("Bulan:", kemerdekaan.month)
+print("Hari ke:", kemerdekaan.day)
+print("weekday():", kemerdekaan.weekday())  # 0 = Senin, 6 = Minggu`} />
+
+`weekday()` memberi nomor hari dalam seminggu: `0` untuk Senin sampai `6` untuk Minggu. Nomor
+ini nanti berguna untuk mencari nama hari dalam bahasa Indonesia.
+
+## Tanggal plus jam dengan `datetime`
+
+Kalau butuh jam dan menit juga, pakai `datetime`:
+
+<Playground initialCode={`from datetime import datetime
+
+jadwal_ojek = datetime(2026, 8, 17, 7, 30)
+
+print(jadwal_ojek)
+print("Jam:", jadwal_ojek.hour)
+print("Menit:", jadwal_ojek.minute)
+print("Tanggalnya saja:", jadwal_ojek.date())`} />
+
+Untuk tanggal dan waktu **sekarang**, Python punya `date.today()` dan `datetime.now()`:
+
+```python
+from datetime import date, datetime
+
+print(date.today())    # contoh: 2026-11-24
+print(datetime.now())  # contoh: 2026-11-24 14:05:31.123456
+```
+
+<Callout type="info">
+  Hasil `now()` dan `today()` selalu berubah tergantung kapan programnya dijalankan. Di
+  pelajaran ini kita memakai tanggal tetap supaya hasilnya sama setiap kali kamu mencoba.
+</Callout>
+
+## Memformat tanggal dengan `strftime`
+
+`strftime()` mengubah tanggal menjadi string dengan format pilihanmu. Kode seperti `%d`
+(hari), `%m` (bulan), `%Y` (tahun 4 digit), `%H` (jam) dan `%M` (menit) menentukan bentuknya:
+
+<Playground initialCode={`from datetime import datetime
+
+pesanan = datetime(2026, 8, 17, 19, 45)
+
+print(pesanan.strftime("%d/%m/%Y"))
+print(pesanan.strftime("%d-%m-%Y %H:%M"))
+print(pesanan.strftime("%A, %d %B %Y"))`} />
+
+Baris terakhir menulis `Monday` dan `August` dalam bahasa Inggris. Nama hari dan bulan
+Indonesia paling mudah dibuat sendiri dengan **list**, lalu diambil pakai `weekday()` dan
+`month`:
+
+<Playground initialCode={`from datetime import date
+
+HARI = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+         "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+
+def format_indonesia(tanggal):
+    hari = HARI[tanggal.weekday()]
+    bulan = BULAN[tanggal.month - 1]  # bulan mulai dari 1, indeks list mulai dari 0
+    return f"{hari}, {tanggal.day} {bulan} {tanggal.year}"
+
+print(format_indonesia(date(2026, 8, 17)))
+print(format_indonesia(date(2026, 12, 25)))`} />
+
+## Membaca string jadi tanggal dengan `strptime`
+
+Kebalikan dari `strftime` adalah `strptime`: ia membaca string dengan format tertentu dan
+mengubahnya menjadi `datetime`. Berguna saat tanggal datang dari input pengguna atau file CSV:
+
+<Playground initialCode={`from datetime import datetime
+
+teks = "05/09/2026"
+tanggal = datetime.strptime(teks, "%d/%m/%Y")
+
+print(tanggal)
+print("Bulan:", tanggal.month)
+print("Hanya tanggal:", tanggal.date())`} />
+
+Kalau string tidak cocok dengan formatnya, Python memberi `ValueError`:
+
+<Playground expectError initialCode={`from datetime import datetime
+
+# Formatnya hari/bulan/tahun, tapi string-nya memakai tanda strip
+tanggal = datetime.strptime("05-09-2026", "%d/%m/%Y")`} />
+
+## Menghitung dengan `timedelta`
+
+Di sinilah tipe tanggal unggul dibanding string. `timedelta` mewakili **selisih waktu**.
+Tambahkan ke tanggal untuk mencari jatuh tempo, atau kurangi dua tanggal untuk tahu sisa hari:
+
+<Playground initialCode={`from datetime import date, timedelta
+
+tanggal_pinjam = date(2026, 9, 1)
+jatuh_tempo = tanggal_pinjam + timedelta(days=14)
+print("Buku perpustakaan harus kembali:", jatuh_tempo)
+
+hari_ini = date(2026, 9, 10)
+deadline_tugas = date(2026, 9, 25)
+sisa = deadline_tugas - hari_ini
+print("Sisa waktu:", sisa)
+print("Sisa hari:", sisa.days)
+
+seminggu_lalu = hari_ini - timedelta(weeks=1)
+print("Seminggu lalu:", seminggu_lalu)`} />
+
+Hasil pengurangan dua tanggal adalah `timedelta`, dan atribut `.days` memberi jumlah harinya
+sebagai angka biasa. Python juga mengurus pergantian bulan dan tahun kabisat untukmu.
+
+## Zona waktu dengan `zoneinfo`
+
+`datetime` biasa tidak tahu zona waktu. Untuk waktu yang terikat lokasi, seperti WIB, pakai
+modul `zoneinfo` (Python 3.9 ke atas):
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+wib = ZoneInfo("Asia/Jakarta")
+rapat = datetime(2026, 8, 17, 9, 0, tzinfo=wib)
+
+print(rapat)                                    # 2026-08-17 09:00:00+07:00
+print(rapat.astimezone(ZoneInfo("Asia/Makassar")))  # 2026-08-17 10:00:00+08:00 (WITA)
+```
+
+<Callout type="warning">
+  Contoh zona waktu ini kita tulis di blok kode biasa karena browser belum tentu punya data
+  zona waktu. Jalankan di komputermu sendiri. Di Windows, kamu mungkin perlu
+  `pip install tzdata` dulu.
+</Callout>
+
+## Latihan
+
+Budi membayar kos setiap 30 hari. Pembayaran terakhirnya tanggal 20 Oktober 2026. Hitung
+tanggal bayar berikutnya, tampilkan dengan nama hari dan bulan Indonesia, lalu hitung berapa
+hari lagi dari tanggal 1 November 2026.
+
+<Playground initialCode={`from datetime import date, timedelta
+
+HARI = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+         "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+
+bayar_terakhir = date(2026, 10, 20)
+hari_ini = date(2026, 11, 1)
+
+# TODO: hitung bayar_berikutnya dengan timedelta
+bayar_berikutnya = bayar_terakhir
+
+# TODO: tampilkan seperti "Kamis, 19 November 2026"
+print("Bayar berikutnya:", bayar_berikutnya)
+
+# TODO: hitung sisa hari dengan .days
+sisa_hari = 0
+print("Sisa hari:", sisa_hari)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil date(2026, 9, 1) + timedelta(days=30)?",
+      options: ["date(2026, 10, 1)", "date(2026, 9, 31)", "date(2026, 10, 31)"],
+      answer: 0,
+      explanation: "September punya 30 hari, jadi 30 hari setelah 1 September adalah 1 Oktober. Python mengurus pergantian bulan untukmu.",
+    },
+    {
+      question: "Fungsi mana yang mengubah string '17/08/2026' menjadi objek datetime?",
+      options: ["strftime", "timedelta", "strptime"],
+      answer: 2,
+      explanation: "strptime membaca (parse) string menjadi datetime, sedangkan strftime melakukan kebalikannya.",
+    },
+    {
+      question: "Kalau tanggal.weekday() bernilai 4, hari apakah itu?",
+      options: ["Kamis", "Jumat", "Sabtu"],
+      answer: 1,
+      explanation: "weekday() dimulai dari 0 untuk Senin, jadi 4 adalah Jumat.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `date(tahun, bulan, hari)` dan `datetime(..., jam, menit)` membuat tanggal yang bisa dihitung.
+- `strftime()` mengubah tanggal menjadi string, `strptime()` membaca string menjadi tanggal.
+- Nama hari dan bulan Indonesia bisa diambil dari list memakai `weekday()` dan `month - 1`.
+- `timedelta` menambah atau mengurangi waktu, dan selisih dua tanggal memberi `.days`.
+- `zoneinfo` mengatur zona waktu seperti `Asia/Jakarta` (WIB).

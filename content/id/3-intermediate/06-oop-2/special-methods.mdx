@@ -1,0 +1,210 @@
+---
+title: Method Spesial
+slug: special-methods
+stage: 3
+module: OOP Bagian 2
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Buat object-mu bisa dicetak dengan rapi, dibandingkan, dihitung panjangnya, dan dijumlahkan dengan method spesial.
+---
+
+# Method Spesial
+
+Kamu sudah kenal `__init__`. Python punya banyak method lain dengan dua garis bawah di depan
+dan belakang namanya, sering disebut **dunder method** (*double underscore*). Python
+memanggilnya otomatis saat kamu memakai `print()`, `==`, `len()`, atau `+` pada object-mu.
+
+## `__str__`: tampilan untuk manusia
+
+Coba cetak sebuah object biasa. Hasilnya kurang berguna.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, jumlah):
+        self.jumlah = jumlah
+
+harga = Rupiah(15000)
+print(harga)`} />
+
+`print()` memanggil `str()` pada object, dan `str()` mencari method `__str__`. Kalau kamu
+menulisnya, kamu yang menentukan tampilannya.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, jumlah):
+        self.jumlah = jumlah
+
+    def __str__(self):
+        return f"Rp{self.jumlah:,}".replace(",", ".")
+
+harga = Rupiah(15000)
+print(harga)
+print("Harga nasi padang:", harga)
+teks = str(Rupiah(2500000))
+print(teks)`} />
+
+`__str__` harus **mengembalikan** string dengan `return`, bukan mencetaknya.
+
+## `__repr__`: tampilan untuk programmer
+
+`__repr__` dipakai saat object ditampilkan untuk keperluan debugging, misalnya saat object
+berada di dalam list. Biasanya bentuknya mirip kode untuk membuat object itu.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, jumlah):
+        self.jumlah = jumlah
+
+    def __str__(self):
+        return f"Rp{self.jumlah:,}".replace(",", ".")
+
+    def __repr__(self):
+        return f"Rupiah({self.jumlah})"
+
+daftar_harga = [Rupiah(5000), Rupiah(12000)]
+print(daftar_harga)
+print(daftar_harga[0])
+print(repr(daftar_harga[0]))`} />
+
+<Callout type="tip">
+  Kalau kamu hanya sempat menulis satu, tulis `__repr__`. Saat `__str__` tidak ada, `print()`
+  akan memakai `__repr__` sebagai gantinya.
+</Callout>
+
+## `__eq__`: membandingkan dengan `==`
+
+Secara bawaan, `==` pada object hanya bernilai `True` kalau keduanya object yang *sama persis*.
+Dua uang Rp5.000 terpisah dianggap berbeda. `__eq__` mengubah aturan itu.
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, jumlah):
+        self.jumlah = jumlah
+
+print("Tanpa __eq__:", Rupiah(5000) == Rupiah(5000))
+
+class Rupiah:
+    def __init__(self, jumlah):
+        self.jumlah = jumlah
+
+    def __eq__(self, lain):
+        return self.jumlah == lain.jumlah
+
+print("Dengan __eq__:", Rupiah(5000) == Rupiah(5000))
+print(Rupiah(5000) == Rupiah(2000))`} />
+
+## `__len__` dan `__add__`
+
+`__len__` dipanggil oleh `len()`, dan `__add__` dipanggil oleh operator `+`. Contohnya keranjang
+belanja di warung.
+
+<Playground initialCode={`class Keranjang:
+    def __init__(self, barang=None):
+        if barang is None:
+            barang = []
+        self.barang = barang
+
+    def tambah(self, nama):
+        self.barang.append(nama)
+
+    def __len__(self):
+        return len(self.barang)
+
+    def __add__(self, lain):
+        return Keranjang(self.barang + lain.barang)
+
+    def __str__(self):
+        return "Keranjang: " + ", ".join(self.barang)
+
+punya_budi = Keranjang()
+punya_budi.tambah("Kopi")
+punya_budi.tambah("Gula")
+
+punya_ani = Keranjang(["Teh", "Roti"])
+
+gabungan = punya_budi + punya_ani
+print(gabungan)
+print("Jumlah barang:", len(gabungan))
+print(len(punya_budi))`} />
+
+`__add__` mengembalikan object **baru**, jadi keranjang Budi dan Ani tidak berubah. Ini sama
+seperti `1 + 2` yang tidak mengubah angka 1.
+
+Perhatikan `barang=None` di `__init__`: kalau kita menulis `barang=[]`, semua keranjang yang
+dibuat tanpa argumen akan memakai list yang sama, mirip jebakan atribut class yang sudah kamu
+pelajari.
+
+## Menggabungkan semuanya
+
+<Playground initialCode={`class Rupiah:
+    def __init__(self, jumlah):
+        self.jumlah = jumlah
+
+    def __str__(self):
+        return f"Rp{self.jumlah:,}".replace(",", ".")
+
+    def __repr__(self):
+        return f"Rupiah({self.jumlah})"
+
+    def __eq__(self, lain):
+        return self.jumlah == lain.jumlah
+
+    def __add__(self, lain):
+        return Rupiah(self.jumlah + lain.jumlah)
+
+nasi = Rupiah(12000)
+es_teh = Rupiah(4000)
+kerupuk = Rupiah(2000)
+
+total = nasi + es_teh + kerupuk
+print("Total bayar:", total)
+print(total == Rupiah(18000))`} />
+
+## Latihan
+
+Lengkapi class `Playlist`. Tambahkan `__len__` (jumlah lagu), `__str__` (misalnya
+`Playlist Ani (3 lagu)`), dan `__add__` yang menggabungkan dua playlist menjadi playlist baru.
+
+<Playground initialCode={`class Playlist:
+    def __init__(self, nama, lagu):
+        self.nama = nama
+        self.lagu = lagu
+
+    # TODO: __len__
+
+    # TODO: __str__
+
+    # TODO: __add__ yang mengembalikan Playlist baru
+
+pagi = Playlist("Pagi", ["Lagu A", "Lagu B"])
+malam = Playlist("Malam", ["Lagu C"])
+print(pagi.nama, pagi.lagu)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Method apa yang dipanggil saat kamu menulis print(obj)?",
+      options: ["__print__", "__str__", "__init__"],
+      answer: 1,
+      explanation: "print() memanggil str(obj), yang memakai __str__ (atau __repr__ kalau __str__ tidak ada).",
+    },
+    {
+      question: "Apa yang dipanggil Python untuk a + b kalau a adalah object buatanmu?",
+      options: ["a.__add__(b)", "b.__add__(a)", "a.__plus__(b)"],
+      answer: 0,
+      explanation: "Operator + memanggil __add__ pada object di sebelah kiri, dengan object kanan sebagai argumen.",
+    },
+    {
+      question: "Tanpa __eq__, apa hasil Rupiah(5000) == Rupiah(5000)?",
+      options: ["True", "Error", "False"],
+      answer: 2,
+      explanation: "Secara bawaan == membandingkan identitas object, dan keduanya dua object berbeda.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Method spesial (dunder) dipanggil otomatis oleh Python, bukan oleh kamu langsung.
+- `__str__` untuk `print()` dan `str()`; `__repr__` untuk tampilan debugging dan isi list.
+- `__eq__` mengatur `==`, `__len__` mengatur `len()`, dan `__add__` mengatur `+`.
+- Method spesial harus mengembalikan nilai dengan `return`; `__add__` sebaiknya mengembalikan object baru.

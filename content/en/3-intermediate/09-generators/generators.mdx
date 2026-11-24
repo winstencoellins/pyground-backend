@@ -1,0 +1,190 @@
+---
+title: Writing Generators
+slug: generators
+stage: 3
+module: Generators
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Build your own iterators with yield, save memory with lazy evaluation, and chain generators into pipelines.
+---
+
+# Writing Generators
+
+In the previous lesson you used iterators that Python already provides. Now you will build
+your own iterators the easiest way: with **generators**. A generator is a function that uses
+`yield` instead of `return`.
+
+## The `yield` keyword
+
+`return` hands back a value and the function ends. `yield` hands back one value and the
+function **pauses**, then resumes from the same line when `next()` is called again:
+
+<Playground initialCode={`def queue_numbers():
+    print("Start")
+    yield 1
+    print("Continue")
+    yield 2
+    print("Continue again")
+    yield 3
+
+gen = queue_numbers()
+print(type(gen))
+print(next(gen))
+print(next(gen))
+print(next(gen))`} />
+
+Notice that calling `queue_numbers()` does not run its body at all yet. The code only runs
+when `next()` is called. A generator is an iterator, so it works directly in a `for` loop:
+
+<Playground initialCode={`def countdown(n):
+    while n > 0:
+        yield n
+        n -= 1
+
+for number in countdown(5):
+    print(number)
+print("Ojek is leaving!")`} />
+
+## Lazy evaluation and saving memory
+
+Generators are **lazy**: values are made one at a time only when asked for, not all at once
+up front. Compare the size of a list and a generator for the same data:
+
+<Playground initialCode={`import sys
+
+def numbers(n):
+    for i in range(n):
+        yield i
+
+as_list = [i for i in range(100000)]
+gen = numbers(100000)
+
+print("List size:", sys.getsizeof(as_list), "bytes")
+print("Generator size:", sys.getsizeof(gen), "bytes")
+
+print(sum(numbers(1000000)))`} />
+
+The list has to keep 100,000 numbers in memory, while the generator only keeps its current
+position. That is why we can add up a million numbers without building a list that big.
+
+## Generator expressions
+
+You already know list comprehensions. Swap the square brackets for parentheses and you get a
+**generator expression**:
+
+<Playground initialCode={`prices = [12000, 8000, 25000, 5000]
+
+tax_list = [p * 11 // 100 for p in prices]
+tax_gen = (p * 11 // 100 for p in prices)
+
+print(tax_list)
+print(tax_gen)
+print(list(tax_gen))
+
+# Directly inside a function call, you do not need a second pair of parentheses
+print(sum(p * 11 // 100 for p in prices))`} />
+
+<Callout type="warning">
+  Like any other iterator, a generator can only be used **once**. After `list(tax_gen)`, the
+  generator is used up. If you need the data several times, use a list.
+</Callout>
+
+## Infinite generators and `itertools.islice`
+
+Because they are lazy, generators may never stop. That is safe as long as you only take part
+of them. `itertools.islice` takes the first few values from any iterator:
+
+<Playground initialCode={`import itertools
+
+def receipt_numbers():
+    number = 1
+    while True:
+        yield f"RECEIPT-{number:04d}"
+        number += 1
+
+gen = receipt_numbers()
+for receipt in itertools.islice(gen, 5):
+    print(receipt)
+
+print(list(itertools.islice(gen, 3)))`} />
+
+Never write `list(receipt_numbers())` or a `for` loop without `break` over an infinite
+generator, because the program would never finish.
+
+## Generator pipelines
+
+Generators can be chained: the output of one generator becomes the input of the next. Each
+item flows through every stage one at a time, with no intermediate lists:
+
+<Playground initialCode={`with open("sales.txt", "w") as f:
+    for line in ["nasi goreng,15000", "", "es teh,3000", "soto,12000"]:
+        f.write(line + chr(10))
+
+def read_lines(filename):
+    with open(filename) as f:
+        for line in f:
+            yield line.strip()
+
+def skip_empty(lines):
+    for line in lines:
+        if line:
+            yield line
+
+def get_prices(lines):
+    for line in lines:
+        menu, price = line.split(",")
+        yield int(price)
+
+total = sum(get_prices(skip_empty(read_lines("sales.txt"))))
+print("Total sales:", total)`} />
+
+This pattern suits processing log files or very large data, because only one line is in
+memory at a time.
+
+## Exercise
+
+Write a generator `multiples(n)` that produces the multiples of `n` forever (n, 2n, 3n, ...).
+Then take the first 5 values with `itertools.islice` and print them.
+
+<Playground initialCode={`import itertools
+
+def multiples(n):
+    # TODO: use while True and yield
+    pass
+
+# TODO: take the first 5 values of multiples(7) with itertools.islice
+print("Done")`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What makes yield different from return?",
+      options: ["yield gives a value, then the function pauses and can resume", "yield ends the function immediately", "yield can only be used inside a class"],
+      answer: 0,
+      explanation: "yield sends one value and pauses the function; the next next() call resumes from the same line.",
+    },
+    {
+      question: "Which one is a generator expression?",
+      options: ["[x * 2 for x in data]", "{x * 2 for x in data}", "(x * 2 for x in data)"],
+      answer: 2,
+      explanation: "Parentheses make a generator expression; square brackets make a list and curly braces make a set.",
+    },
+    {
+      question: "How do you safely take 10 values from an infinite generator gen?",
+      options: ["list(gen)", "itertools.islice(gen, 10)", "len(gen)"],
+      answer: 1,
+      explanation: "islice only takes the first 10 values. list(gen) would never finish.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A function with `yield` is a generator: it gives values one at a time and can resume.
+- Generators are lazy, so they save memory on large data.
+- `(x for x in data)` is a generator expression, the lazy version of a list comprehension.
+- Take part of an infinite generator with `itertools.islice`.
+- Generators can be chained into pipelines to process data stage by stage.

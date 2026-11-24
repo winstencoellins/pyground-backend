@@ -1,0 +1,185 @@
+---
+title: Mengolah File CSV
+slug: csv-files
+stage: 3
+module: File
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Tulis dan baca data tabel dalam format CSV dengan modul csv, lalu buat laporan penjualan sederhana.
+---
+
+# Mengolah File CSV
+
+**CSV** (comma-separated values) adalah file teks berisi tabel: setiap baris adalah satu
+baris tabel, dan kolomnya dipisah koma. File seperti ini bisa dibuka di Excel atau Google
+Sheets, jadi sering dipakai untuk bertukar data.
+
+```
+nama,kelas,nilai
+Budi,10A,85
+Ani,10B,92
+```
+
+Python punya modul bawaan `csv` yang mengurus detail format ini untukmu.
+
+## Menulis CSV dengan `csv.writer`
+
+`csv.writer` membungkus file yang sudah dibuka. `writerow()` menulis satu baris dari sebuah
+list, dan `writerows()` menulis banyak baris sekaligus:
+
+<Playground initialCode={`import csv
+
+with open("nilai.csv", "w", newline="", encoding="utf-8") as f:
+    penulis = csv.writer(f)
+    penulis.writerow(["nama", "kelas", "nilai"])
+    penulis.writerows([
+        ["Budi", "10A", 85],
+        ["Ani", "10B", 92],
+        ["Citra", "10A", 78],
+    ])
+
+with open("nilai.csv", encoding="utf-8") as f:
+    print(f.read())`} />
+
+<Callout type="info">
+  Saat membuka file untuk `csv.writer`, tambahkan `newline=""`. Modul `csv` mengatur baris
+  barunya sendiri, dan tanpa `newline=""` file di Windows bisa berisi baris kosong di sela-sela.
+</Callout>
+
+## Membaca dengan `csv.reader`
+
+`csv.reader` memberi setiap baris sebagai **list of string**. Baris pertama biasanya judul
+kolom, jadi ambil dulu dengan `next()`:
+
+<Playground initialCode={`import csv
+
+with open("nilai.csv", "w", newline="", encoding="utf-8") as f:
+    penulis = csv.writer(f)
+    penulis.writerow(["nama", "kelas", "nilai"])
+    penulis.writerows([["Budi", "10A", 85], ["Ani", "10B", 92], ["Citra", "10A", 78]])
+
+with open("nilai.csv", encoding="utf-8") as f:
+    pembaca = csv.reader(f)
+    judul = next(pembaca)
+    print("Kolom:", judul)
+    for baris in pembaca:
+        print(baris)`} />
+
+<Callout type="warning">
+  Semua isi CSV terbaca sebagai **string**, termasuk angka. `"85"` belum bisa dijumlahkan;
+  ubah dulu dengan `int()` atau `float()`.
+</Callout>
+
+## Membaca dengan `csv.DictReader`
+
+Mengingat `baris[2]` itu kolom apa cukup merepotkan. `csv.DictReader` memakai baris judul
+sebagai kunci, jadi setiap baris menjadi **dict**:
+
+<Playground initialCode={`import csv
+
+with open("nilai.csv", "w", newline="", encoding="utf-8") as f:
+    penulis = csv.writer(f)
+    penulis.writerow(["nama", "kelas", "nilai"])
+    penulis.writerows([["Budi", "10A", 85], ["Ani", "10B", 92], ["Citra", "10A", 78]])
+
+with open("nilai.csv", encoding="utf-8") as f:
+    for siswa in csv.DictReader(f):
+        nilai = int(siswa["nilai"])
+        status = "lulus" if nilai >= 80 else "remedial"
+        print(f"{siswa['nama']} ({siswa['kelas']}): {nilai}, {status}")`} />
+
+Kode jadi lebih mudah dibaca: `siswa["nilai"]` jelas maksudnya, dan tetap benar walaupun
+urutan kolom di file berubah.
+
+## Laporan penjualan warung
+
+Sekarang gabungkan semuanya. Warung Pak Dodi mencatat penjualan harian dalam CSV. Kita
+hitung total pendapatan dan pendapatan per produk dengan dict:
+
+<Playground initialCode={`import csv
+
+penjualan = [
+    ["tanggal", "produk", "jumlah", "harga"],
+    ["2024-07-01", "kopi", 12, 5000],
+    ["2024-07-01", "mi instan", 8, 3500],
+    ["2024-07-02", "kopi", 15, 5000],
+    ["2024-07-02", "es teh", 20, 4000],
+    ["2024-07-03", "mi instan", 10, 3500],
+]
+with open("penjualan.csv", "w", newline="", encoding="utf-8") as f:
+    csv.writer(f).writerows(penjualan)
+
+per_produk = {}
+total = 0
+with open("penjualan.csv", encoding="utf-8") as f:
+    for baris in csv.DictReader(f):
+        pendapatan = int(baris["jumlah"]) * int(baris["harga"])
+        produk = baris["produk"]
+        per_produk[produk] = per_produk.get(produk, 0) + pendapatan
+        total += pendapatan
+
+print("LAPORAN PENJUALAN")
+for produk, pendapatan in per_produk.items():
+    print(f"{produk:<10} Rp{pendapatan:>8,}")
+print(f"{'TOTAL':<10} Rp{total:>8,}")`} />
+
+`per_produk.get(produk, 0)` memberi 0 kalau produk belum ada di dict, trik yang sama seperti
+saat menghitung di modul Dictionary dan Set.
+
+## Latihan
+
+Data pengeluaran kos sudah ditulis ke `pengeluaran.csv`. Baca dengan `csv.DictReader`, lalu
+hitung total pengeluaran untuk kategori `"makan"` saja.
+
+<Playground initialCode={`import csv
+
+data = [
+    ["keterangan", "kategori", "biaya"],
+    ["nasi goreng", "makan", 15000],
+    ["ojek ke kampus", "transport", 12000],
+    ["bakso", "makan", 18000],
+    ["galon", "kebutuhan", 20000],
+]
+with open("pengeluaran.csv", "w", newline="", encoding="utf-8") as f:
+    csv.writer(f).writerows(data)
+
+total_makan = 0
+with open("pengeluaran.csv", encoding="utf-8") as f:
+    for baris in csv.DictReader(f):
+        # TODO: kalau kategorinya "makan", tambahkan biayanya (ingat int())
+        pass
+
+print("Total makan: Rp", total_makan)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kalau file berisi baris Budi,10A,85, apa yang diberikan csv.reader untuk baris itu?",
+      options: ["['Budi', '10A', 85]", "{'nama': 'Budi'}", "['Budi', '10A', '85']"],
+      answer: 2,
+      explanation: "csv.reader memberi list of string. Angka 85 pun terbaca sebagai '85'.",
+    },
+    {
+      question: "Apa kelebihan csv.DictReader dibanding csv.reader?",
+      options: ["Setiap baris jadi dict dengan judul kolom sebagai kunci", "Angka otomatis jadi int", "Bisa membaca file yang belum ada"],
+      answer: 0,
+      explanation: "DictReader memakai baris judul sebagai kunci, jadi kamu menulis baris['nilai'] bukan baris[2].",
+    },
+    {
+      question: "Kenapa kita menambahkan newline=\"\" saat membuka file untuk csv.writer?",
+      options: ["Supaya file jadi lebih kecil", "Supaya tidak muncul baris kosong ekstra di sela-sela baris", "Supaya kolom dipisah titik koma"],
+      answer: 1,
+      explanation: "Modul csv mengatur baris barunya sendiri; newline=\"\" mencegah baris baru dobel, terutama di Windows.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- CSV adalah tabel dalam file teks: satu baris per data, kolom dipisah koma.
+- Tulis dengan `csv.writer(f)` dan `writerow()` / `writerows()`; buka file dengan `newline=""`.
+- `csv.reader` memberi list of string; `csv.DictReader` memberi dict per baris.
+- Isi CSV selalu string, jadi ubah angka dengan `int()` atau `float()` sebelum dihitung.

@@ -1,0 +1,160 @@
+---
+title: Dict dan Set Comprehension
+slug: dict-and-set-comprehensions
+stage: 3
+module: Comprehension
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Buat dict dan set dalam satu baris, gabungkan dengan zip() dan enumerate(), lalu kenali comprehension bersarang dan generator expression.
+---
+
+# Dict dan Set Comprehension
+
+Comprehension tidak hanya untuk list. Dengan kurung kurawal, kamu bisa membuat **dict** dan
+**set** dengan cara yang sama ringkasnya.
+
+## Dict comprehension
+
+Bentuknya `{kunci: nilai for item in kumpulan}`, ditulis dengan kurung kurawal dan titik dua
+di antara kunci dan nilai:
+
+<Playground initialCode={`menu = ["es teh", "kopi", "nasi goreng"]
+
+panjang_nama = {m: len(m) for m in menu}
+print(panjang_nama)
+
+harga = {"es teh": 5000, "kopi": 8000, "nasi goreng": 18000}
+harga_naik = {nama: h + 1000 for nama, h in harga.items()}
+print(harga_naik)
+
+# Filter if juga bisa dipakai
+murah = {nama: h for nama, h in harga.items() if h < 10000}
+print(murah)`} />
+
+Ingat, `.items()` memberi pasangan kunci dan nilai, jadi kamu bisa membongkarnya menjadi
+`nama, h` seperti di loop `for`.
+
+## Set comprehension
+
+Kurung kurawal **tanpa** titik dua menghasilkan set. Karena set tidak menyimpan isi kembar,
+ini cocok untuk mencari nilai yang unik:
+
+<Playground initialCode={`pemesan = ["budi", "Ani", "BUDI", "citra", "ani"]
+
+unik = {n.lower() for n in pemesan}
+print(unik)
+print("Jumlah pelanggan berbeda:", len(unik))`} />
+
+<Callout type="warning">
+  `{}` kosong adalah dict, bukan set. Set kosong ditulis `set()`.
+</Callout>
+
+## `zip()` dan `enumerate()` di dalam comprehension
+
+`zip()` memasangkan isi dari dua list sesuai urutannya. Ini cara cepat membuat dict dari dua
+list:
+
+<Playground initialCode={`nama = ["Budi", "Ani", "Citra"]
+nilai = [85, 92, 78]
+
+rapor = {n: v for n, v in zip(nama, nilai)}
+print(rapor)
+
+# Untuk pasangan apa adanya, dict(zip(...)) juga cukup
+print(dict(zip(nama, nilai)))`} />
+
+`enumerate()` memberi nomor urut, misalnya untuk nomor antrean ojek:
+
+<Playground initialCode={`antrean = ["Budi", "Ani", "Citra", "Dodi"]
+
+nomor_antrean = {nomor: nama for nomor, nama in enumerate(antrean, start=1)}
+print(nomor_antrean)
+
+label = [f"{i}. {nama}" for i, nama in enumerate(antrean, start=1)]
+print(label)`} />
+
+## Comprehension bersarang: meratakan list
+
+Kamu boleh menulis dua `for` dalam satu comprehension. Urutannya sama seperti loop
+bersarang biasa: `for` luar dulu, lalu `for` dalam. Contoh paling umum adalah meratakan list
+berisi list:
+
+<Playground initialCode={`pesanan_per_meja = [["es teh", "kopi"], ["nasi goreng"], ["es teh", "mie ayam"]]
+
+semua = [menu for meja in pesanan_per_meja for menu in meja]
+print(semua)
+
+# Sama dengan:
+semua = []
+for meja in pesanan_per_meja:
+    for menu in meja:
+        semua.append(menu)
+print(semua)`} />
+
+Lebih dari dua `for` biasanya sudah sulit dibaca. Di situ, kembali ke loop biasa.
+
+## Sekilas: generator expression
+
+Kalau kurung siku diganti kurung biasa, hasilnya bukan list, melainkan **generator**: nilainya
+dibuat satu per satu saat dibutuhkan, tanpa menyimpan seluruh list di memori. Ini praktis
+kalau hasilnya langsung dipakai oleh fungsi seperti `sum()` atau `max()`:
+
+<Playground initialCode={`harga = [5000, 8000, 18000, 12000]
+
+total = sum(h for h in harga)
+print("Total:", total)
+
+print("Ada yang di atas 15000?", any(h > 15000 for h in harga))`} />
+
+Generator akan dibahas lebih dalam di modul Generator nanti.
+
+## Latihan
+
+Buat dict stok warung dari dua list dengan `zip()`, lalu buat set berisi nama barang yang
+stoknya habis (0).
+
+<Playground initialCode={`barang = ["beras", "telur", "minyak", "gula", "kopi"]
+stok = [12, 0, 5, 0, 8]
+
+# TODO: dict comprehension dengan zip(), contoh hasil: beras ke 12, telur ke 0, dst.
+stok_warung = {}
+
+# TODO: set comprehension berisi barang yang stoknya 0
+habis = set()
+
+print(stok_warung)
+print(habis)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil {x: x * x for x in range(3)}?",
+      options: ["{0: 0, 1: 1, 2: 4}", "[0, 1, 4]", "{0, 1, 4}"],
+      answer: 0,
+      explanation: "Ada titik dua, jadi hasilnya dict dengan kunci x dan nilai x * x.",
+    },
+    {
+      question: "Apa hasil len({h.lower() for h in 'AaBb'})?",
+      options: ["4", "1", "2"],
+      answer: 2,
+      explanation: "Set comprehension menghasilkan set {'a', 'b'} karena isi kembar dibuang.",
+    },
+    {
+      question: "Apa hasil [y for x in [[1, 2], [3]] for y in x]?",
+      options: ["[[1, 2], [3]]", "[1, 2, 3]", "[3, 1, 2]"],
+      answer: 1,
+      explanation: "for luar mengambil setiap list, lalu for dalam mengambil isinya, sehingga list menjadi rata.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Dict comprehension: `{kunci: nilai for item in kumpulan}`, bisa ditambah filter `if`.
+- Set comprehension: `{ekspresi for item in kumpulan}`, otomatis membuang isi kembar.
+- `zip()` memasangkan dua list, `enumerate()` memberi nomor urut; keduanya cocok dipakai di comprehension.
+- Dua `for` dalam satu comprehension bisa meratakan list bersarang.
+- Kurung biasa membuat generator expression, praktis untuk `sum()`, `any()`, dan `max()`.

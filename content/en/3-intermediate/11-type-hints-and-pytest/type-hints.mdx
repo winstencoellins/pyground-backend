@@ -1,0 +1,193 @@
+---
+title: Type Hints
+slug: type-hints
+stage: 3
+module: Type Hints and pytest
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Write the expected data types on variables and functions so code is clearer and mistakes are caught early by your editor and mypy.
+---
+
+# Type Hints
+
+Look at a function `calculate(a, b)`. Is `a` a number? A string? A list? You'd have to read
+the whole function to know. A **type hint** is a small note in your code that says which data
+type is expected, making code easier to read for you, your teammates, and your editor.
+
+## Annotating variables
+
+Write a colon and the type after the variable name:
+
+<Playground initialCode={`name: str = "Budi"
+age: int = 17
+height: float = 165.5
+paid_kos_rent: bool = False
+
+print(name, age, height, paid_kos_rent)`} />
+
+For ordinary variables, hints like these are rarely needed because the value already makes
+the type obvious. Type hints are most useful on **functions**.
+
+## Annotating parameters and return values
+
+Give each parameter a type, then write `->` and the return type before the colon:
+
+<Playground initialCode={`def calculate_total(price: int, quantity: int) -> int:
+    return price * quantity
+
+def greet(name: str, polite: bool = True) -> str:
+    if polite:
+        return f"Selamat pagi, Kak {name}!"
+    return f"Halo, {name}!"
+
+def print_receipt(total: int) -> None:
+    print(f"Shopping total: Rp{total:,}")
+
+total = calculate_total(15000, 3)
+print(greet("Ani"))
+print_receipt(total)`} />
+
+A function that returns nothing is written `-> None`. Now, just by reading the `def` line, you
+know how to use the function.
+
+## Collection types: `list[int]` and `dict[str, int]`
+
+For lists, dicts, and tuples, also write the type of their contents in square brackets:
+
+<Playground initialCode={`def average(scores: list[int]) -> float:
+    return sum(scores) / len(scores)
+
+def total_stock(stock: dict[str, int]) -> int:
+    return sum(stock.values())
+
+def describe_point(position: tuple[float, float]) -> str:
+    return f"x={position[0]}, y={position[1]}"
+
+print(average([80, 90, 75]))
+print(total_stock({"beras": 10, "telur": 30, "gula": 5}))
+print(describe_point((1.5, 2.0)))`} />
+
+- `list[int]`: a list whose items are `int`.
+- `dict[str, int]`: a dict with `str` keys and `int` values.
+- `tuple[float, float]`: a tuple of exactly two `float`s.
+
+## Values that may be missing: `X | None`
+
+Sometimes a function doesn't always find a result. Write `str | None` to say "the result is a
+`str`, or `None` if there isn't one":
+
+<Playground initialCode={`def find_number(name: str, phone_book: dict[str, str]) -> str | None:
+    return phone_book.get(name)
+
+contacts = {"Budi": "0812-1111", "Citra": "0813-2222"}
+
+for name in ["Budi", "Dodi"]:
+    number = find_number(name, contacts)
+    if number is None:
+        print(f"{name} is not in your contacts")
+    else:
+        print(f"{name}: {number}")`} />
+
+This hint reminds anyone calling the function to check for `None` first. The `|` here needs
+Python 3.10 or later. In older code you might see `Optional[str]` from the `typing` module,
+which means the same thing.
+
+## Type hints aren't checked while the program runs
+
+This often surprises people: Python does **not** enforce type hints. Hints are only notes. The
+program still runs even if the types are wrong:
+
+<Playground initialCode={`def calculate_total(price: int, quantity: int) -> int:
+    return price * quantity
+
+# Should be an int, but we pass a string
+result = calculate_total("Rp", 3)
+print(result)
+print(type(result))
+
+# The hints are stored on the function, but not used for checking
+print(calculate_total.__annotations__)`} />
+
+The result is `RpRpRp`, not an error! Bugs like this can slip through unnoticed. That's why we
+need tools that read the hints and check them **before** the program runs.
+
+## Why editors and mypy care
+
+Editors like VS Code read type hints to give autocomplete (type `name.` and the editor knows
+`name` is a `str`), and draw a red underline when types don't match.
+
+**mypy** is a tool that checks a whole file. Say you have `shop.py`:
+
+```python
+def calculate_total(price: int, quantity: int) -> int:
+    return price * quantity
+
+result = calculate_total("Rp", 3)
+```
+
+Install mypy and run it:
+
+<TerminalBlock command="pip install mypy" />
+
+<TerminalBlock command="mypy shop.py" output={`shop.py:4: error: Argument 1 to "calculate_total" has incompatible type "str"; expected "int"  [arg-type]
+Found 1 error in 1 file (checked 1 source file)`} />
+
+mypy found the bug on line 4 without running the program.
+
+<Callout type="tip">
+  You don't have to add hints everywhere. Start with function parameters and return values,
+  because that's where hints help the most.
+</Callout>
+
+## Exercise
+
+Add type hints to the functions below: their parameters and return values. The program already
+runs, so make sure it still runs after you add the hints.
+
+<Playground initialCode={`# TODO: add type hints to every parameter and return value
+
+def price_after_discount(price, percent):
+    return price - price * percent // 100
+
+def passing_students(scores, pass_mark):
+    return [name for name, score in scores.items() if score >= pass_mark]
+
+def find_price(menu, name):
+    return menu.get(name)
+
+print(price_after_discount(20000, 10))
+print(passing_students({"Ani": 85, "Budi": 60, "Citra": 90}, 75))
+print(find_price({"bakso": 15000}, "soto"))`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What does def find(name: str) -> int | None mean?",
+      options: ["The function takes a str and returns an int or None", "The function takes an int or None", "The function must return None"],
+      answer: 0,
+      explanation: "The type after the colon is the parameter type, and the type after -> is the return type, here an int or None.",
+    },
+    {
+      question: "The function def double(x: int) -> int: return x * 2 is called as double('ab'). What happens?",
+      options: ["A TypeError because the hint says int", "The program runs and returns 'abab'", "Python automatically converts 'ab' to an int"],
+      answer: 1,
+      explanation: "Python doesn't check type hints while the program runs. Tools like mypy are what catch this mistake.",
+    },
+    {
+      question: "Which hint fits a dict of item names and their stock counts, such as {'beras': 10}?",
+      options: ["list[str, int]", "dict[int, str]", "dict[str, int]"],
+      answer: 2,
+      explanation: "The keys are str (item names) and the values are int (stock counts), so dict[str, int].",
+    },
+  ]}
+/>
+
+## Summary
+
+- Type hints state the expected type: `name: str`, `def f(x: int) -> str`.
+- Collections are written with their contents: `list[int]`, `dict[str, int]`, `tuple[float, float]`.
+- `str | None` means the value can be a `str` or `None`.
+- Python doesn't enforce hints at runtime; your editor and **mypy** check them.

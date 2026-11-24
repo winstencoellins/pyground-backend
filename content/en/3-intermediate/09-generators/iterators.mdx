@@ -1,0 +1,159 @@
+---
+title: Meet Iterators
+slug: iterators
+stage: 3
+module: Generators
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Understand the difference between iterables and iterators, and how a for loop works under the hood.
+---
+
+# Meet Iterators
+
+You have often used `for` with lists, strings, dicts, `range()`, and even files. But how can
+one `for` statement work for all of those kinds of data? The answer is the **iterator**.
+
+## Iterables and iterators
+
+These two terms sound alike, but they are different:
+
+- An **iterable** is something that **can** be walked through one item at a time: lists,
+  tuples, strings, dicts, sets, `range`, files.
+- An **iterator** is a "pointer" moving along an iterable that knows the **next** item.
+
+The `iter()` function makes an iterator from an iterable, and `next()` fetches the next
+item:
+
+<Playground initialCode={`queue = ["Budi", "Ani", "Citra"]
+
+pointer = iter(queue)
+print(type(queue))
+print(type(pointer))
+
+print(next(pointer))
+print(next(pointer))
+print(next(pointer))`} />
+
+Think of the list as a book, and the iterator as a bookmark marking the last page you read.
+
+## When it runs out: `StopIteration`
+
+An iterator can only move forward. Once it is used up and you call `next()` again, Python
+raises `StopIteration`:
+
+<Playground expectError initialCode={`queue = ["Budi", "Ani"]
+pointer = iter(queue)
+
+print(next(pointer))
+print(next(pointer))
+print(next(pointer))`} />
+
+A used-up iterator cannot be restarted. To start over, create a new iterator with `iter()`
+again. You can also give `next()` a fallback value so it does not raise an error:
+
+<Playground initialCode={`pointer = iter([10, 20])
+print(next(pointer, "done"))
+print(next(pointer, "done"))
+print(next(pointer, "done"))`} />
+
+## How `for` works under the hood
+
+Every time you write `for`, Python actually does this: it calls `iter()` once, then calls
+`next()` again and again until it hits `StopIteration`, and then stops quietly. We can
+imitate it with `while` and `try`/`except`:
+
+<Playground initialCode={`menu = ["soto", "bakso", "gado-gado"]
+
+# The usual version
+for food in menu:
+    print(food)
+
+print()
+
+# What Python really does
+pointer = iter(menu)
+while True:
+    try:
+        food = next(pointer)
+    except StopIteration:
+        break
+    print(food)`} />
+
+<Callout type="info">
+  That is why `for` works on anything iterable. As long as an object can be passed to
+  `iter()`, `for` can walk through it.
+</Callout>
+
+## Iterators over dicts, ranges, and files
+
+Each kind of iterable decides for itself what its iterator produces:
+
+<Playground initialCode={`prices = {"tea": 3000, "coffee": 5000}
+it = iter(prices)
+print(next(it))          # a dict produces its keys
+
+it_items = iter(prices.items())
+print(next(it_items))    # .items() produces (key, value) pairs
+
+it_range = iter(range(0, 10, 3))
+print(next(it_range), next(it_range))
+
+with open("attendance.txt", "w") as f:
+    f.write("Budi")
+    f.write(chr(10))
+    f.write("Ani")
+    f.write(chr(10))
+
+with open("attendance.txt") as f:
+    print(next(f).strip())  # a file produces one line at a time
+    for line in f:
+        print("Next:", line.strip())`} />
+
+Look at the file example: after `next(f)` takes the first line, the `for` loop continues
+from the second line, because both use the same iterator. `chr(10)` is the newline
+character.
+
+## Exercise
+
+Without using `for`, print the first three names from `attendance` with `iter()` and
+`next()`. Then print the remaining names using `for` with the same iterator.
+
+<Playground initialCode={`attendance = ["Ani", "Budi", "Citra", "Dodi", "Eka"]
+
+# TODO: create an iterator with iter()
+# TODO: print the first 3 names with next()
+# TODO: print the rest with for
+pass`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which function makes an iterator from a list?",
+      options: ["next()", "list()", "iter()"],
+      answer: 2,
+      explanation: "iter() makes an iterator, while next() fetches the next item from an iterator.",
+    },
+    {
+      question: "What happens if next() is called on a used-up iterator (with no fallback value)?",
+      options: ["It returns None", "StopIteration is raised", "It starts again from the beginning"],
+      answer: 1,
+      explanation: "A used-up iterator raises StopIteration. A for loop catches it to know when to stop.",
+    },
+    {
+      question: "If it = iter({'a': 1, 'b': 2}), what is next(it)?",
+      options: ["'a'", "1", "('a', 1)"],
+      answer: 0,
+      explanation: "Iterating over a dict produces its keys. For pairs, use .items().",
+    },
+  ]}
+/>
+
+## Summary
+
+- An iterable can be walked through item by item; an iterator is a pointer that knows the next item.
+- `iter()` makes an iterator, `next()` fetches the next item.
+- A used-up iterator raises `StopIteration` and cannot be restarted.
+- Under the hood, `for` calls `iter()` once and then `next()` until `StopIteration`.

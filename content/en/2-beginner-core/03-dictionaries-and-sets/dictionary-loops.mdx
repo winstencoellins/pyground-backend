@@ -1,0 +1,158 @@
+---
+title: Loops and Nested Data
+slug: dictionary-loops
+stage: 2
+module: Dictionaries and Sets
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Walk through dictionaries with loops, count things, and turn nested data into a tidy report.
+---
+
+# Loops and Nested Data
+
+Dictionaries really shine when you combine them with loops. In this lesson you'll walk
+through a dictionary, count things, and build a small report.
+
+## `keys()`, `values()`, and `items()`
+
+- `keys()` gives all the keys. A plain `for k in d` loop also gives the keys.
+- `values()` gives all the values.
+- `items()` gives the key and value pairs together.
+
+<Playground initialCode={`scores = {"Budi": 85, "Ani": 92, "Citra": 78}
+
+for name in scores.keys():
+    print("Student:", name)
+
+print("Total score:", sum(scores.values()))
+
+for name, score in scores.items():
+    print(f"{name} got {score}")`} />
+
+<Callout type="tip">
+  `items()` is the most common choice. You get two variables at once, just like
+  `enumerate()` on a list.
+</Callout>
+
+## Counting with a dictionary
+
+A very common pattern: a dictionary as a **counter**. The key is the thing being counted and
+the value is how many. `get(key, 0)` keeps the first addition safe:
+
+<Playground initialCode={`orders = ["es teh", "kopi", "es teh", "jus", "es teh", "kopi"]
+counts = {}
+
+for drink in orders:
+    counts[drink] = counts.get(drink, 0) + 1
+
+print(counts)
+
+sentence = "i like coffee and i like tea"
+word_counts = {}
+for word in sentence.split():
+    word_counts[word] = word_counts.get(word, 0) + 1
+print(word_counts)`} />
+
+## A list of dictionaries
+
+Real-world data often looks like a **list of dictionaries**: each dictionary is one record.
+For example, a list of ojek rides:
+
+<Playground initialCode={`rides = [
+    {"driver": "Dodi", "distance": 5, "fare": 15000},
+    {"driver": "Budi", "distance": 3, "fare": 10000},
+    {"driver": "Dodi", "distance": 8, "fare": 22000},
+]
+
+total = 0
+for r in rides:
+    print(r["driver"], "rode", r["distance"], "km")
+    total = total + r["fare"]
+
+print("Total fares: Rp", total)
+print("Driver of the second ride:", rides[1]["driver"])`} />
+
+Look at `rides[1]["driver"]`: the index `[1]` picks the second dictionary, then
+`["driver"]` picks its value.
+
+## A dictionary of lists
+
+The other way round works too: dictionary values can be lists. That's handy for grouping
+data, such as a class cleaning rota by day:
+
+<Playground initialCode={`rota = {
+    "Monday": ["Ani", "Budi"],
+    "Tuesday": ["Citra"],
+}
+
+rota["Tuesday"].append("Dodi")
+rota["Wednesday"] = ["Eka", "Fajar"]
+
+for day, people in rota.items():
+    print(day, ":", ", ".join(people))`} />
+
+`", ".join(people)` combines the list items into one string, with `", "` between each item.
+
+## Printing a tidy report
+
+Put it all together with f-strings. The format `:<10` left-aligns text in 10 characters and
+`:>8` right-aligns in 8, so the columns line up:
+
+<Playground initialCode={`sales = {"nasi goreng": 12, "mie ayam": 8, "soto": 15}
+prices = {"nasi goreng": 15000, "mie ayam": 12000, "soto": 13000}
+
+print("WARUNG REPORT FOR TODAY")
+print("-" * 32)
+total = 0
+for dish, portions in sales.items():
+    revenue = portions * prices[dish]
+    total = total + revenue
+    print(f"{dish:<12}{portions:>4} plates  Rp{revenue:>8}")
+print("-" * 32)
+print(f"{'Total':<25}Rp{total:>8}")`} />
+
+## Exercise
+
+Count how many students picked each extracurricular, then print the results one per line.
+
+<Playground initialCode={`choices = ["futsal", "music", "futsal", "scouts", "music", "futsal"]
+counts = {}
+
+# 1. Loop over choices and count with counts.get(club, 0) + 1
+
+# 2. Loop over counts.items() and print "futsal: 3" and so on
+
+print(counts)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which method gives the key and value pairs together?",
+      options: ["keys()", "items()", "values()"],
+      answer: 1,
+      explanation: "items() gives (key, value) pairs, so you can use two variables in the for loop.",
+    },
+    {
+      question: "If data = [{'name': 'Ani'}, {'name': 'Budi'}], what is data[1]['name']?",
+      options: ["Budi", "Ani", "KeyError"],
+      answer: 0,
+      explanation: "data[1] is the second dictionary, then ['name'] gets its value, 'Budi'.",
+    },
+    {
+      question: "Why does a counter use counts.get(x, 0) + 1 instead of counts[x] + 1?",
+      options: ["To make it faster", "To keep the result sorted", "To avoid a KeyError when x isn't there yet"],
+      answer: 2,
+      explanation: "The first time x appears, its key doesn't exist yet. get() supplies 0 as the starting count.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `for k in d` and `d.keys()` give keys, `d.values()` gives values, `d.items()` gives both.
+- Counter pattern: `d[x] = d.get(x, 0) + 1`.
+- A list of dictionaries suits a list of records; a dictionary of lists suits grouping.
+- The f-string formats `:<10` and `:>8` give you a report with neat columns.

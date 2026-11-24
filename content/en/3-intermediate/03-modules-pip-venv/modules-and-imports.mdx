@@ -1,0 +1,163 @@
+---
+title: Modules and Imports
+slug: modules-and-imports
+stage: 3
+module: Modules, pip, and venv
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Use code from other files with import, from-import, and aliases, then meet the if __name__ == '__main__' pattern.
+---
+
+# Modules and Imports
+
+The bigger your program gets, the harder it is to keep everything in one file. Python lets
+you split code across several files and reuse it with `import`. Every `.py` file that can be
+imported is called a **module**.
+
+## `import` a built-in module
+
+Python already ships with many ready-to-use modules. Write `import module_name`, then reach
+its contents with a dot:
+
+<Playground initialCode={`import math
+
+print(math.sqrt(144))
+print(math.pi)
+print(math.ceil(4.2))  # round up`} />
+
+The `math.` prefix shows where the function comes from. So `math`'s `sqrt` never clashes with
+a `sqrt` variable of your own.
+
+## `from ... import` and aliases
+
+If you only need a few things from a module, take them directly with `from`. If the module
+name is long, give it a short name (an alias) with `as`:
+
+<Playground initialCode={`from math import sqrt, pi
+import statistics as stat
+
+print(sqrt(81))         # no math. needed
+print(round(pi, 2))
+
+scores = [80, 90, 70]
+print(stat.mean(scores))`} />
+
+<Callout type="warning">
+  Avoid `from math import *`. Every name from the module comes in unseen, and it can
+  overwrite your own variables without you noticing.
+</Callout>
+
+## Your own `.py` file is a module
+
+Modules don't have to be built in. Any file you write can be imported by another file in the
+same folder. For example, this warung project has two files:
+
+<FileTree>
+{`warung/
+├── prices.py
+└── main.py`}
+</FileTree>
+
+Contents of `prices.py`:
+
+```python
+TAX = 0.11
+
+def total_due(price, quantity):
+    subtotal = price * quantity
+    return subtotal + subtotal * TAX
+```
+
+Contents of `main.py`:
+
+```python
+import prices
+
+due = prices.total_due(15000, 2)
+print(f"Total: Rp{due:,.0f}")
+print("Tax:", prices.TAX)
+```
+
+Run `main.py` from inside the `warung` folder:
+
+<TerminalBlock command="python main.py" output={`Total: Rp33,300
+Tax: 0.11`} />
+
+A module's name is its file name without `.py`. So `prices.py` is imported as `import prices`.
+
+<Callout type="info">
+  A Pyground playground holds only one file, so try two-file examples like this one on your
+  own computer.
+</Callout>
+
+## `if __name__ == "__main__":`
+
+Every module has a special variable called `__name__`. If the file is run directly, it holds
+`"__main__"`. If the file is imported, it holds the module's name (for example `"prices"`).
+
+<Playground initialCode={`print("This module's name:", __name__)`} />
+
+That's why code that should only run when the file is run directly (a small test or a main
+menu, say) goes under `if __name__ == "__main__":`. When the file is imported, that part is
+skipped:
+
+<Playground initialCode={`def total_due(price, quantity):
+    return price * quantity
+
+def main():
+    print("Try a calculation:", total_due(5000, 3))
+
+if __name__ == "__main__":
+    main()`} />
+
+If `prices.py` has a block like this, `import prices` from `main.py` won't also run
+`prices.py`'s `main()`.
+
+## Exercise
+
+Use `from ... import` to take `floor` and `ceil` from `math`, then round an ojek fare down and
+up. Wrap the code in the `if __name__ == "__main__":` pattern.
+
+<Playground initialCode={`# TODO: import floor and ceil from math
+
+fare = 12750.6
+
+def main():
+    # TODO: print the fare rounded down and rounded up
+    print("Fare:", fare)
+
+# TODO: call main() only when the file is run directly
+main()`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "You have a file discount.py. How do you import it from another file in the same folder?",
+      options: ["import discount", "import discount.py", "from discount.py import *"],
+      answer: 0,
+      explanation: "A module's name is the file name without .py, so import discount is enough.",
+    },
+    {
+      question: "After import statistics as stat, how do you call mean?",
+      options: ["statistics.mean(data)", "mean(data)", "stat.mean(data)"],
+      answer: 2,
+      explanation: "The alias stat replaces the name statistics, so call stat.mean(data).",
+    },
+    {
+      question: "What does __name__ hold when a file is imported by another file?",
+      options: ["'__main__'", "The module's name, for example 'prices'", "None"],
+      answer: 1,
+      explanation: "__name__ is '__main__' only when the file is run directly. When imported, it holds the module's name.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Every `.py` file is a module you can import by its name (without `.py`).
+- `import module` then `module.thing`, or `from module import thing` to use `thing` directly.
+- `import module as alias` gives a short name; avoid `from module import *`.
+- Code under `if __name__ == "__main__":` only runs when the file is run directly.

@@ -1,0 +1,163 @@
+---
+title: Modul dan Import
+slug: modules-and-imports
+stage: 3
+module: Modul, pip, dan venv
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Pakai kode dari file lain dengan import, from-import, dan alias, lalu kenali pola if __name__ == '__main__'.
+---
+
+# Modul dan Import
+
+Semakin besar programmu, semakin repot kalau semuanya ditulis di satu file. Python
+membiarkan kamu memecah kode ke beberapa file, lalu memakainya kembali dengan `import`.
+Setiap file `.py` yang bisa di-import disebut **modul**.
+
+## `import` modul bawaan
+
+Python sudah membawa banyak modul siap pakai. Tulis `import nama_modul`, lalu panggil isinya
+dengan titik:
+
+<Playground initialCode={`import math
+
+print(math.sqrt(144))
+print(math.pi)
+print(math.ceil(4.2))  # bulatkan ke atas`} />
+
+Nama `math.` di depan menunjukkan dari mana fungsi itu berasal. Jadi `sqrt` milik `math`
+tidak akan bentrok dengan variabel `sqrt` buatanmu sendiri.
+
+## `from ... import` dan alias
+
+Kalau kamu hanya butuh beberapa isi modul, ambil langsung dengan `from`. Kalau nama modulnya
+panjang, beri nama pendek (alias) dengan `as`:
+
+<Playground initialCode={`from math import sqrt, pi
+import statistics as stat
+
+print(sqrt(81))         # tidak perlu math. lagi
+print(round(pi, 2))
+
+nilai = [80, 90, 70]
+print(stat.mean(nilai))`} />
+
+<Callout type="warning">
+  Hindari `from math import *`. Semua nama dari modul itu ikut masuk tanpa terlihat, dan
+  bisa menimpa variabelmu sendiri tanpa kamu sadari.
+</Callout>
+
+## File `.py` kamu sendiri adalah modul
+
+Modul tidak harus bawaan Python. File apa pun yang kamu tulis bisa di-import oleh file lain
+di folder yang sama. Misalnya proyek warung ini punya dua file:
+
+<FileTree>
+{`warung/
+├── harga.py
+└── main.py`}
+</FileTree>
+
+Isi `harga.py`:
+
+```python
+PAJAK = 0.11
+
+def total_bayar(harga, jumlah):
+    subtotal = harga * jumlah
+    return subtotal + subtotal * PAJAK
+```
+
+Isi `main.py`:
+
+```python
+import harga
+
+bayar = harga.total_bayar(15000, 2)
+print(f"Total: Rp{bayar:,.0f}")
+print("Pajak:", harga.PAJAK)
+```
+
+Jalankan `main.py` dari dalam folder `warung`:
+
+<TerminalBlock command="python main.py" output={`Total: Rp33,300
+Pajak: 0.11`} />
+
+Nama modul adalah nama file tanpa `.py`. Jadi `harga.py` di-import sebagai `import harga`.
+
+<Callout type="info">
+  Playground di Pyground hanya berisi satu file, jadi contoh dua file seperti ini perlu kamu
+  coba di komputermu sendiri.
+</Callout>
+
+## `if __name__ == "__main__":`
+
+Setiap modul punya variabel khusus `__name__`. Kalau file dijalankan langsung, isinya
+`"__main__"`. Kalau file di-import, isinya nama modulnya (misalnya `"harga"`).
+
+<Playground initialCode={`print("Nama modul ini:", __name__)`} />
+
+Karena itu, kode yang hanya boleh jalan saat file dijalankan langsung (misalnya tes kecil atau
+menu utama) diletakkan di bawah `if __name__ == "__main__":`. Saat file itu di-import, bagian
+ini dilewati:
+
+<Playground initialCode={`def total_bayar(harga, jumlah):
+    return harga * jumlah
+
+def main():
+    print("Coba hitung:", total_bayar(5000, 3))
+
+if __name__ == "__main__":
+    main()`} />
+
+Kalau `harga.py` punya blok seperti ini, `import harga` dari `main.py` tidak akan ikut
+menjalankan `main()` milik `harga.py`.
+
+## Latihan
+
+Pakai `from ... import` untuk mengambil `floor` dan `ceil` dari `math`, lalu bulatkan ongkos
+ojek ke bawah dan ke atas. Bungkus kodenya dengan pola `if __name__ == "__main__":`.
+
+<Playground initialCode={`# TODO: import floor dan ceil dari math
+
+ongkos = 12750.6
+
+def main():
+    # TODO: tampilkan ongkos dibulatkan ke bawah dan ke atas
+    print("Ongkos:", ongkos)
+
+# TODO: panggil main() hanya kalau file dijalankan langsung
+main()`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kamu punya file diskon.py. Bagaimana cara meng-import-nya dari file lain di folder yang sama?",
+      options: ["import diskon", "import diskon.py", "from diskon.py import *"],
+      answer: 0,
+      explanation: "Nama modul adalah nama file tanpa .py, jadi cukup import diskon.",
+    },
+    {
+      question: "Setelah import statistics as stat, bagaimana cara memanggil mean?",
+      options: ["statistics.mean(data)", "mean(data)", "stat.mean(data)"],
+      answer: 2,
+      explanation: "Alias stat menggantikan nama statistics, jadi panggil stat.mean(data).",
+    },
+    {
+      question: "Apa isi __name__ saat sebuah file di-import oleh file lain?",
+      options: ["'__main__'", "Nama modulnya, misalnya 'harga'", "None"],
+      answer: 1,
+      explanation: "__name__ bernilai '__main__' hanya kalau file dijalankan langsung. Saat di-import, isinya nama modul.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Setiap file `.py` adalah modul yang bisa di-import dengan namanya (tanpa `.py`).
+- `import modul` lalu `modul.isi`, atau `from modul import isi` untuk memakai `isi` langsung.
+- `import modul as alias` memberi nama pendek; hindari `from modul import *`.
+- Kode di bawah `if __name__ == "__main__":` hanya jalan saat file dijalankan langsung.

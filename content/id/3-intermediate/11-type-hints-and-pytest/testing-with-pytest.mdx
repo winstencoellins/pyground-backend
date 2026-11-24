@@ -1,0 +1,235 @@
+---
+title: Menguji Kode dengan pytest
+slug: testing-with-pytest
+stage: 3
+module: Type Hint dan pytest
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Tulis tes otomatis dengan assert, lalu jalankan dengan pytest supaya kamu yakin kodenya benar setiap kali diubah.
+---
+
+# Menguji Kode dengan pytest
+
+Selama ini kamu mengecek kode dengan menjalankannya lalu melihat hasil `print()` dengan mata.
+Itu bekerja untuk program kecil. Tapi begitu programmu membesar, mengecek semuanya secara
+manual setiap kali ada perubahan jadi melelahkan dan mudah terlewat. **Tes otomatis** adalah
+kode yang mengecek kodemu sendiri.
+
+## Kenapa perlu tes?
+
+Bayangkan kamu membuat fungsi diskon untuk kasir warung. Minggu depan kamu mengubahnya untuk
+menambah fitur baru. Bagaimana kamu tahu perhitungan lamanya masih benar? Dengan tes, cukup
+jalankan satu perintah dan semua kasus dicek ulang dalam hitungan detik.
+
+Tes yang baik:
+
+- memastikan kode bekerja seperti yang kamu harapkan,
+- menangkap bug saat kamu mengubah kode (disebut *regresi*),
+- sekaligus menjadi contoh cara memakai fungsimu.
+
+## `assert`: senjata utama tes
+
+`assert kondisi` tidak melakukan apa-apa kalau kondisinya `True`, dan langsung memberi
+`AssertionError` kalau `False`:
+
+<Playground initialCode={`def harga_diskon(harga, persen):
+    return harga - harga * persen // 100
+
+assert harga_diskon(20000, 10) == 18000
+assert harga_diskon(15000, 0) == 15000
+print("Semua pengecekan lolos!")`} />
+
+Kalau ada yang salah, program berhenti dan memberi tahu kamu. Kamu juga bisa menambahkan pesan
+setelah koma:
+
+<Playground expectError initialCode={`def harga_diskon(harga, persen):
+    return harga - persen  # bug: lupa menghitung persennya
+
+hasil = harga_diskon(20000, 10)
+assert hasil == 18000, f"Seharusnya 18000, tapi dapat {hasil}"`} />
+
+## Menulis fungsi tes
+
+Biasanya setiap pengecekan dibungkus dalam fungsi yang namanya diawali **`test_`**. Satu fungsi
+tes mengecek satu perilaku. Di playground, kita panggil fungsinya sendiri:
+
+<Playground initialCode={`def harga_diskon(harga, persen):
+    return harga - harga * persen // 100
+
+def test_diskon_10_persen():
+    assert harga_diskon(20000, 10) == 18000
+
+def test_tanpa_diskon():
+    assert harga_diskon(15000, 0) == 15000
+
+def test_diskon_penuh():
+    assert harga_diskon(5000, 100) == 0
+
+# Di playground kita panggil manual; pytest nanti melakukannya otomatis
+test_diskon_10_persen()
+test_tanpa_diskon()
+test_diskon_penuh()
+print("3 tes lulus")`} />
+
+Memanggil satu per satu seperti ini cepat merepotkan. Inilah pekerjaan **pytest**: mencari
+semua fungsi `test_` dan menjalankannya untukmu.
+
+## Menjalankan tes dengan pytest
+
+pytest adalah library pihak ketiga, jadi pasang dulu:
+
+<TerminalBlock command="pip install pytest" />
+
+Pisahkan kode dan tesnya ke file berbeda. pytest otomatis mencari file yang namanya diawali
+`test_`:
+
+<FileTree>
+{`kasir/
+├── diskon.py
+└── test_diskon.py`}
+</FileTree>
+
+Isi `diskon.py`:
+
+```python
+def harga_diskon(harga: int, persen: int) -> int:
+    if not 0 <= persen <= 100:
+        raise ValueError("Persen diskon harus 0 sampai 100")
+    return harga - harga * persen // 100
+```
+
+Isi `test_diskon.py`:
+
+```python
+from diskon import harga_diskon
+
+def test_diskon_10_persen():
+    assert harga_diskon(20000, 10) == 18000
+
+def test_tanpa_diskon():
+    assert harga_diskon(15000, 0) == 15000
+
+def test_diskon_penuh():
+    assert harga_diskon(5000, 100) == 0
+```
+
+Dari dalam folder `kasir`, jalankan `pytest -v` (`-v` artinya *verbose*, menampilkan setiap
+tes):
+
+<TerminalBlock command="pytest -v" output={`============================= test session starts ==============================
+platform linux -- Python 3.12.4, pytest-8.3.2, pluggy-1.5.0
+rootdir: /home/budi/kasir
+collected 3 items
+
+test_diskon.py::test_diskon_10_persen PASSED                             [ 33%]
+test_diskon.py::test_tanpa_diskon PASSED                                 [ 66%]
+test_diskon.py::test_diskon_penuh PASSED                                 [100%]
+
+============================== 3 passed in 0.01s ===============================`} />
+
+Kalau sebuah tes gagal, pytest menandainya `FAILED` dan menunjukkan nilai yang diharapkan
+dan nilai yang didapat, jadi kamu langsung tahu di mana masalahnya.
+
+<Callout type="tip">
+  Kamu tidak perlu `print()` atau memanggil fungsi tes sendiri. Cukup tulis fungsi `test_`
+  dengan `assert` di dalamnya, dan pytest yang mengurus sisanya.
+</Callout>
+
+## Menguji exception dengan `pytest.raises`
+
+`harga_diskon` memberi `ValueError` kalau persennya tidak masuk akal. Itu juga perilaku yang
+perlu dites. Pakai `pytest.raises` sebagai blok `with`: tesnya lulus **hanya kalau** kode di
+dalamnya memberi exception tersebut:
+
+```python
+import pytest
+from diskon import harga_diskon
+
+def test_persen_negatif_ditolak():
+    with pytest.raises(ValueError):
+        harga_diskon(20000, -5)
+
+def test_persen_lebih_dari_100_ditolak():
+    with pytest.raises(ValueError, match="0 sampai 100"):
+        harga_diskon(20000, 150)
+```
+
+`match` mengecek bahwa pesan error-nya mengandung teks tertentu.
+
+## Banyak kasus sekaligus dengan `parametrize`
+
+Kalau kamu menulis banyak tes yang mirip dan hanya berbeda angkanya, pakai
+`@pytest.mark.parametrize`. Decorator ini menjalankan satu fungsi tes untuk setiap baris data:
+
+```python
+import pytest
+from diskon import harga_diskon
+
+@pytest.mark.parametrize("harga, persen, hasil", [
+    (20000, 10, 18000),
+    (15000, 0, 15000),
+    (5000, 100, 0),
+    (12000, 25, 9000),
+])
+def test_harga_diskon(harga, persen, hasil):
+    assert harga_diskon(harga, persen) == hasil
+```
+
+pytest akan melaporkannya sebagai 4 tes terpisah.
+
+## Latihan
+
+Tulis fungsi tes untuk `nilai_huruf()` di bawah, lalu panggil semuanya. Satu tes sudah dibuat
+sebagai contoh.
+
+<Playground initialCode={`def nilai_huruf(angka):
+    if angka >= 85:
+        return "A"
+    elif angka >= 70:
+        return "B"
+    elif angka >= 55:
+        return "C"
+    return "D"
+
+def test_nilai_a():
+    assert nilai_huruf(90) == "A"
+
+# TODO: tulis test_nilai_b, test_nilai_c, dan test_nilai_d
+# TODO: tambahkan tes untuk batas, misalnya nilai_huruf(85) dan nilai_huruf(70)
+
+test_nilai_a()
+print("Tes lulus")`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Bagaimana pytest menemukan tes yang harus dijalankan?",
+      options: ["Dari file dan fungsi yang namanya diawali test_", "Dari semua fungsi yang berisi print()", "Dari daftar tes yang ditulis di pytest.txt"],
+      answer: 0,
+      explanation: "pytest mencari file test_*.py dan menjalankan setiap fungsi yang namanya diawali test_.",
+    },
+    {
+      question: "Apa yang terjadi saat Python menjalankan assert 2 + 2 == 5?",
+      options: ["Tidak terjadi apa-apa", "Muncul AssertionError", "Python mencetak False"],
+      answer: 1,
+      explanation: "assert memberi AssertionError ketika kondisinya bernilai False.",
+    },
+    {
+      question: "Untuk mengetes bahwa sebuah fungsi MEMBERI ValueError, kamu memakai...",
+      options: ["try/except di luar fungsi tes", "assert ValueError", "with pytest.raises(ValueError):"],
+      answer: 2,
+      explanation: "pytest.raises membuat tes lulus hanya kalau kode di dalam blok with memberi exception tersebut.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Tes otomatis mengecek kodemu setiap kali diubah, sehingga bug cepat ketahuan.
+- Fungsi tes diawali `test_` dan berisi `assert` yang mengecek hasil.
+- `pytest -v` mencari file `test_*.py` dan menjalankan semua tesnya.
+- `pytest.raises` mengetes exception, dan `@pytest.mark.parametrize` menjalankan satu tes
+  untuk banyak data.

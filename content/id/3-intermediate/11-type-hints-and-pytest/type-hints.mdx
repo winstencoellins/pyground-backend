@@ -1,0 +1,194 @@
+---
+title: Type Hint
+slug: type-hints
+stage: 3
+module: Type Hint dan pytest
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Tulis tipe data yang diharapkan pada variabel dan fungsi supaya kode lebih jelas dan kesalahan cepat ketahuan oleh editor dan mypy.
+---
+
+# Type Hint
+
+Lihat fungsi `hitung(a, b)`. Apakah `a` angka? String? List? Kamu harus membaca seluruh isi
+fungsinya untuk tahu. **Type hint** adalah catatan kecil di kode yang memberi tahu tipe data
+apa yang diharapkan, sehingga kode lebih mudah dibaca oleh kamu, temanmu, dan editormu.
+
+## Anotasi variabel
+
+Tulis titik dua dan tipenya setelah nama variabel:
+
+<Playground initialCode={`nama: str = "Budi"
+umur: int = 17
+tinggi: float = 165.5
+sudah_bayar_kos: bool = False
+
+print(nama, umur, tinggi, sudah_bayar_kos)`} />
+
+Untuk variabel biasa, hint seperti ini jarang diperlukan karena nilainya sudah jelas. Type
+hint paling berguna di **fungsi**.
+
+## Anotasi parameter dan nilai kembalian
+
+Beri tipe pada setiap parameter, lalu tulis `->` dan tipe nilai yang dikembalikan sebelum
+titik dua:
+
+<Playground initialCode={`def hitung_total(harga: int, jumlah: int) -> int:
+    return harga * jumlah
+
+def sapa(nama: str, sopan: bool = True) -> str:
+    if sopan:
+        return f"Selamat pagi, Kak {nama}!"
+    return f"Halo, {nama}!"
+
+def cetak_struk(total: int) -> None:
+    print(f"Total belanja: Rp{total:,}")
+
+total = hitung_total(15000, 3)
+print(sapa("Ani"))
+cetak_struk(total)`} />
+
+Fungsi yang tidak mengembalikan apa-apa ditulis `-> None`. Sekarang, hanya dengan membaca
+baris `def`, kamu sudah tahu cara memakai fungsinya.
+
+## Tipe koleksi: `list[int]` dan `dict[str, int]`
+
+Untuk list, dict, dan tuple, tulis juga tipe isinya di dalam kurung siku:
+
+<Playground initialCode={`def rata_rata(nilai: list[int]) -> float:
+    return sum(nilai) / len(nilai)
+
+def total_stok(stok: dict[str, int]) -> int:
+    return sum(stok.values())
+
+def titik_tengah(posisi: tuple[float, float]) -> str:
+    return f"x={posisi[0]}, y={posisi[1]}"
+
+print(rata_rata([80, 90, 75]))
+print(total_stok({"beras": 10, "telur": 30, "gula": 5}))
+print(titik_tengah((1.5, 2.0)))`} />
+
+- `list[int]`: list yang isinya `int`.
+- `dict[str, int]`: dict dengan kunci `str` dan nilai `int`.
+- `tuple[float, float]`: tuple berisi tepat dua `float`.
+
+## Nilai yang boleh kosong: `X | None`
+
+Kadang fungsi tidak selalu menemukan hasil. Tulis `str | None` untuk berkata "hasilnya `str`,
+atau `None` kalau tidak ada":
+
+<Playground initialCode={`def cari_nomor(nama: str, buku_telepon: dict[str, str]) -> str | None:
+    return buku_telepon.get(nama)
+
+kontak = {"Budi": "0812-1111", "Citra": "0813-2222"}
+
+for nama in ["Budi", "Dodi"]:
+    nomor = cari_nomor(nama, kontak)
+    if nomor is None:
+        print(f"{nama} tidak ada di kontak")
+    else:
+        print(f"{nama}: {nomor}")`} />
+
+Hint ini mengingatkan siapa pun yang memanggil fungsinya untuk memeriksa `None` lebih dulu.
+Tanda `|` di sini butuh Python 3.10 ke atas. Di kode lama kamu mungkin melihat
+`Optional[str]` dari modul `typing`, artinya sama.
+
+## Type hint tidak dicek saat program berjalan
+
+Ini yang sering mengejutkan: Python **tidak** memaksa type hint. Hint hanyalah catatan.
+Program tetap berjalan walaupun tipenya salah:
+
+<Playground initialCode={`def hitung_total(harga: int, jumlah: int) -> int:
+    return harga * jumlah
+
+# Seharusnya int, tapi kita kirim string
+hasil = hitung_total("Rp", 3)
+print(hasil)
+print(type(hasil))
+
+# Hint tersimpan di fungsinya, tapi tidak dipakai untuk memeriksa
+print(hitung_total.__annotations__)`} />
+
+Hasilnya `RpRpRp`, bukan error! Bug seperti ini bisa lolos tanpa disadari. Karena itulah kita
+butuh alat yang membaca hint dan memeriksanya **sebelum** program dijalankan.
+
+## Kenapa editor dan mypy peduli
+
+Editor seperti VS Code membaca type hint untuk memberi saran otomatis (ketik `nama.` dan editor
+tahu `nama` adalah `str`), dan memberi garis merah saat tipenya tidak cocok.
+
+**mypy** adalah alat yang memeriksa seluruh file. Misalkan kamu punya `toko.py`:
+
+```python
+def hitung_total(harga: int, jumlah: int) -> int:
+    return harga * jumlah
+
+hasil = hitung_total("Rp", 3)
+```
+
+Pasang mypy lalu jalankan:
+
+<TerminalBlock command="pip install mypy" />
+
+<TerminalBlock command="mypy toko.py" output={`toko.py:4: error: Argument 1 to "hitung_total" has incompatible type "str"; expected "int"  [arg-type]
+Found 1 error in 1 file (checked 1 source file)`} />
+
+mypy menemukan bug di baris 4 tanpa menjalankan programnya.
+
+<Callout type="tip">
+  Kamu tidak harus memberi hint di semua tempat. Mulailah dari parameter dan nilai kembalian
+  fungsi, karena di situlah hint paling membantu.
+</Callout>
+
+## Latihan
+
+Tambahkan type hint pada fungsi-fungsi di bawah: parameter dan nilai kembaliannya. Programnya
+sudah berjalan, jadi pastikan tetap berjalan setelah kamu menambahkan hint.
+
+<Playground initialCode={`# TODO: tambahkan type hint pada setiap parameter dan nilai kembalian
+
+def harga_setelah_diskon(harga, persen):
+    return harga - harga * persen // 100
+
+def siswa_lulus(nilai, batas):
+    return [nama for nama, angka in nilai.items() if angka >= batas]
+
+def cari_harga(menu, nama):
+    return menu.get(nama)
+
+print(harga_setelah_diskon(20000, 10))
+print(siswa_lulus({"Ani": 85, "Budi": 60, "Citra": 90}, 75))
+print(cari_harga({"bakso": 15000}, "soto"))`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa arti def cari(nama: str) -> int | None?",
+      options: ["Fungsi menerima str dan mengembalikan int atau None", "Fungsi menerima int atau None", "Fungsi wajib mengembalikan None"],
+      answer: 0,
+      explanation: "Tipe setelah titik dua adalah tipe parameter, dan tipe setelah -> adalah tipe kembalian, di sini int atau None.",
+    },
+    {
+      question: "Fungsi def dobel(x: int) -> int: return x * 2 dipanggil dengan dobel('ab'). Apa yang terjadi?",
+      options: ["TypeError karena hint-nya int", "Program berjalan dan menghasilkan 'abab'", "Python otomatis mengubah 'ab' menjadi int"],
+      answer: 1,
+      explanation: "Python tidak memeriksa type hint saat program berjalan. Alat seperti mypy yang menemukan kesalahan ini.",
+    },
+    {
+      question: "Hint mana yang cocok untuk dict berisi nama barang dan jumlah stoknya, misalnya {'beras': 10}?",
+      options: ["list[str, int]", "dict[int, str]", "dict[str, int]"],
+      answer: 2,
+      explanation: "Kuncinya str (nama barang) dan nilainya int (jumlah stok), jadi dict[str, int].",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Type hint menulis tipe yang diharapkan: `nama: str`, `def f(x: int) -> str`.
+- Koleksi ditulis beserta isinya: `list[int]`, `dict[str, int]`, `tuple[float, float]`.
+- `str | None` berarti nilainya bisa `str` atau `None`.
+- Python tidak memaksa hint saat program berjalan; editor dan **mypy** yang memeriksanya.

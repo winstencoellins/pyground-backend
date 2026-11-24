@@ -44,10 +44,47 @@ describe("real content", () => {
       "list-methods",
       "list-slicing",
       "tuples",
+      "dictionaries",
+      "dictionary-loops",
+      "sets",
+      "functions",
+      "parameters-and-return",
+      "default-and-keyword-arguments",
+      "variable-scope",
+      "reading-tracebacks",
+      "common-errors",
+      "debugging-techniques",
+      "grade-book-project",
       "try-except",
+      "raising-exceptions",
+      "files-basics",
+      "csv-files",
+      "json-files",
+      "modules-and-imports",
+      "standard-library",
+      "pip-and-venv",
+      "list-comprehensions",
+      "dict-and-set-comprehensions",
+      "classes-and-objects",
+      "instance-methods",
+      "class-attributes",
+      "inheritance",
+      "special-methods",
+      "dataclasses",
+      "args-and-kwargs",
+      "unpacking-arguments",
+      "functions-as-objects",
+      "decorators",
+      "iterators",
+      "generators",
+      "datetime-basics",
+      "http-requests",
+      "type-hints",
+      "testing-with-pytest",
+      "expense-tracker-project",
       "how-the-web-works",
     ]);
-    expect(catalog.byLocale.en.size).toBe(24);
+    expect(catalog.byLocale.en.size).toBe(61);
   });
 
   it("every <Playground initialCode> is valid Python", () => {
@@ -169,22 +206,9 @@ describe("GET /api/lessons", () => {
       title: "Apa Itu Pemrograman",
     });
     expect(lessons(idx)[0]).toMatchObject({ slug: "what-is-programming", locked: false });
-    expect(
-      lessons(idx)
-        .filter((l) => l.locked)
-        .map((l) => l.slug),
-    ).toEqual([
-      "for-loops",
-      "while-loops",
-      "break-and-continue",
-      "loop-patterns",
-      "lists",
-      "list-methods",
-      "list-slicing",
-      "tuples",
-      "try-except",
-      "how-the-web-works",
-    ]);
+    const paidStages = idx.stages.slice(1).flatMap((s) => s.modules.flatMap((m) => m.lessons));
+    expect(paidStages.length).toBe(47);
+    expect(paidStages.every((l) => l.locked)).toBe(true);
     expect(idx.stages[0]!.modules.flatMap((m) => m.lessons).some((l) => l.locked)).toBe(false);
   });
 
@@ -203,7 +227,7 @@ describe("GET /api/lessons", () => {
     const idx = (await (
       await call("/api/lessons", { headers: { cookie: expired } })
     ).json()) as Index;
-    expect(lessons(idx).filter((l) => l.locked).length).toBe(10);
+    expect(lessons(idx).filter((l) => l.locked).length).toBe(47);
   });
 
   it("rejects unknown locales", async () => {

@@ -1,0 +1,175 @@
+---
+title: Reading and Writing Files
+slug: files-basics
+stage: 3
+module: Files
+order: 1
+isFree: false
+estimatedMinutes: 20
+description: Save data to a text file and read it back with open(), the r/w/a modes, and the with statement.
+---
+
+# Reading and Writing Files
+
+Until now, all the data in your programs vanished as soon as the program ended. To use data
+again tomorrow, you need to save it to a **file**. Python opens files with the `open()`
+function.
+
+## Opening a file with `open()`
+
+`open()` takes a file name and a **mode**:
+
+| Mode | Meaning |
+| --- | --- |
+| `"r"` | read: read a file (the default). The file must already exist. |
+| `"w"` | write: write a new file. If the file exists, its contents are **erased** first. |
+| `"a"` | append: add to the end of the file without erasing the old contents. |
+
+Let's write a file first, then read it back:
+
+<Playground initialCode={`f = open("note.txt", "w")
+f.write("Buy 5 kg of rice at Bu Ani's warung")
+f.close()
+
+f = open("note.txt", "r")
+content = f.read()
+f.close()
+
+print(content)`} />
+
+Every file you open must be **closed** with `close()`. A file you forget to close may not have
+its data fully saved yet.
+
+## The `with` statement
+
+Remembering `close()` is a hassle, especially when an error happens halfway. The `with`
+statement closes the file **automatically** as soon as its block ends, even when there is an
+error:
+
+<Playground initialCode={`with open("note.txt", "w", encoding="utf-8") as f:
+    f.write("Pay the kos rent for July")
+
+print("Closed already?", f.closed)
+
+with open("note.txt", "r", encoding="utf-8") as f:
+    print(f.read())`} />
+
+From now on, always use `with` to open files.
+
+<Callout type="info">
+  `encoding="utf-8"` makes sure letters like é, emoji, and other symbols are saved and read
+  correctly on every computer. Without it, Windows may use a different encoding and your text
+  gets garbled. Make a habit of always writing it.
+</Callout>
+
+## Writing several lines and the `"a"` mode
+
+`f.write()` does **not** add a new line by itself. The easiest way to write line by line is
+`print(..., file=f)`, which adds a new line automatically just like a normal `print()`. Mode
+`"a"` then adds lines at the end of the file:
+
+<Playground initialCode={`with open("expenses.txt", "w", encoding="utf-8") as f:
+    print("Monday: lunch Rp15000", file=f)
+    print("Tuesday: ojek Rp12000", file=f)
+
+with open("expenses.txt", "a", encoding="utf-8") as f:
+    print("Wednesday: phone credit Rp25000", file=f)
+
+with open("expenses.txt", encoding="utf-8") as f:
+    print(f.read())`} />
+
+<Callout type="warning">
+  Be careful with mode `"w"`: opening an existing file with `"w"` empties it right away. Use
+  `"a"` when you only want to add.
+</Callout>
+
+## Reading line by line
+
+You can loop over a file with `for`, one line per round. Each line still carries a newline
+character at its end, so clean it with `strip()`:
+
+<Playground initialCode={`with open("students.txt", "w", encoding="utf-8") as f:
+    print("Budi", file=f)
+    print("Ani", file=f)
+    print("Citra", file=f)
+
+with open("students.txt", encoding="utf-8") as f:
+    for number, line in enumerate(f, start=1):
+        name = line.strip()
+        print(f"{number}. {name} ({len(name)} letters long)")`} />
+
+Try removing `.strip()` and run it again: you get extra blank lines and every name is one
+character longer, because the newline character is counted too.
+
+## When the file does not exist
+
+Reading a file that does not exist raises `FileNotFoundError`:
+
+<Playground expectError initialCode={`with open("missing.txt", encoding="utf-8") as f:
+    print(f.read())`} />
+
+Handle it with the `try`/`except` you already know:
+
+<Playground initialCode={`def read_note(file_name):
+    try:
+        with open(file_name, encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "(no notes yet)"
+
+with open("today.txt", "w", encoding="utf-8") as f:
+    f.write("Study Python for 30 minutes")
+
+print(read_note("today.txt"))
+print(read_note("yesterday.txt"))`} />
+
+## Exercise
+
+The program below writes a list of kos residents. Complete the reading part: count the
+residents and print each name in capital letters.
+
+<Playground initialCode={`with open("kos_residents.txt", "w", encoding="utf-8") as f:
+    print("Dodi", file=f)
+    print("Citra", file=f)
+    print("Budi", file=f)
+
+count = 0
+with open("kos_residents.txt", encoding="utf-8") as f:
+    for line in f:
+        # TODO: clean the line with strip(), print it in capitals, add to count
+        pass
+
+print("Number of residents:", count)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which mode adds to the end of a file without erasing the old contents?",
+      options: ["'w'", "'a'", "'r'"],
+      answer: 1,
+      explanation: "'a' (append) adds to the end. 'w' empties the file first.",
+    },
+    {
+      question: "What is the main benefit of with open(...) as f?",
+      options: ["The file is closed automatically, even when an error happens", "The file is read faster", "The file cannot be deleted"],
+      answer: 0,
+      explanation: "with closes the file as soon as its block ends, so you do not have to remember to call close().",
+    },
+    {
+      question: "Why do we call strip() when reading a file line by line?",
+      options: ["To make the letters lowercase", "To close the file", "To remove the newline character at the end of each line"],
+      answer: 2,
+      explanation: "Each line you read carries a newline character; strip() removes spaces and newlines at both ends.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `open(name, mode)` opens a file: `"r"` read, `"w"` overwrite, `"a"` add to the end.
+- Always use `with open(...) as f:` so the file closes automatically.
+- Write `encoding="utf-8"` so text is safe on every computer.
+- A `for line in f:` loop reads line by line; clean each line with `strip()`.
+- Handle a missing file with `except FileNotFoundError`.

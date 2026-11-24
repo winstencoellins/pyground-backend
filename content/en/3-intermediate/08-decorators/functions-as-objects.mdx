@@ -1,0 +1,157 @@
+---
+title: Functions Are Values Too
+slug: functions-as-objects
+stage: 3
+module: Decorators
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Store, pass, and return functions like ordinary values, then meet lambda and closures.
+---
+
+# Functions Are Values Too
+
+In Python, functions are nothing special. A function is an **object**, just like a number, a
+string, or a list. That means a function can be stored in a variable, passed to another
+function, and returned from a function. This is the key groundwork for understanding
+decorators in the next lesson.
+
+## Storing a function in a variable
+
+Notice the difference between `greet` (the function) and `greet()` (the result of calling
+it):
+
+<Playground initialCode={`def greet(name):
+    return f"Hello, {name}!"
+
+call = greet          # no (), so the function does not run
+print(call)
+print(call("Budi"))
+
+functions = [len, str.upper, greet]
+for f in functions:
+    print(f("ani"))`} />
+
+`call` and `greet` now point to the same function. Functions can even be stored in a list.
+
+## Passing a function to another function
+
+Functions that take other functions as arguments are very useful. For example, one function
+that applies any pricing rule to the whole menu:
+
+<Playground initialCode={`def discount_10(price):
+    return price * 90 // 100
+
+def add_tax(price):
+    return price * 111 // 100
+
+def apply(rule, prices):
+    return [rule(p) for p in prices]
+
+prices = [10000, 25000, 8000]
+print(apply(discount_10, prices))
+print(apply(add_tax, prices))`} />
+
+## Small functions with `lambda`
+
+For a short one-line function, you can use `lambda` without needing `def`. It is most often
+used as the `key` in `sorted()`, to decide what gets compared:
+
+<Playground initialCode={`students = [("Budi", 78), ("Ani", 92), ("Citra", 85), ("Dodi", 66)]
+
+by_score = sorted(students, key=lambda s: s[1], reverse=True)
+print(by_score)
+
+by_name = sorted(students, key=lambda s: s[0])
+print(by_name)
+
+square = lambda x: x * x
+print(square(7))`} />
+
+`lambda s: s[1]` is the same as a function that takes `s` and returns `s[1]`.
+
+<Callout type="tip">
+  Use `lambda` only for very short functions. If the logic needs more than one expression,
+  write it with `def` so it stays easy to read.
+</Callout>
+
+## Functions inside functions and closures
+
+A function can be created **inside** another function and then returned. The inner function
+still **remembers** the variables of the outer function, even after the outer function has
+finished. This is called a **closure**:
+
+<Playground initialCode={`def make_discount(percent):
+    def calculate(price):
+        return price - price * percent // 100
+    return calculate
+
+student_discount = make_discount(20)
+lebaran_discount = make_discount(50)
+
+print(student_discount(15000))
+print(lebaran_discount(15000))`} />
+
+`make_discount` is a "function factory". Each function it produces keeps its own `percent`
+value.
+
+A closure can also hold state that changes. Use `nonlocal` to change a variable that belongs
+to the outer function:
+
+<Playground initialCode={`def make_counter():
+    count = 0
+    def add():
+        nonlocal count
+        count += 1
+        return count
+    return add
+
+warung_queue = make_counter()
+print(warung_queue())
+print(warung_queue())
+print(warung_queue())`} />
+
+## Exercise
+
+Write a function `make_fare(rate_per_km)` that returns a function to calculate an ojek fare
+from a distance. Then sort the list of orders by distance with `sorted` and `lambda`.
+
+<Playground initialCode={`def make_fare(rate_per_km):
+    # TODO: create an inner function that takes a distance and returns the fare
+    pass
+
+orders = [("Ani", 7), ("Budi", 3), ("Citra", 12)]
+# TODO: sort orders by distance (index 1)
+print(orders)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "If f = greet (without parentheses), what happens?",
+      options: ["greet runs immediately", "f points to the greet function", "An error because the parentheses are missing"],
+      answer: 1,
+      explanation: "Without (), the function is not called. f simply becomes another name for the same function.",
+    },
+    {
+      question: "What is sorted([3, -5, 1], key=lambda x: abs(x))?",
+      options: ["[1, 3, -5]", "[-5, 1, 3]", "[3, 1, -5]"],
+      answer: 0,
+      explanation: "What gets compared is abs(x), which is 3, 5, 1. Smallest first: 1, 3, -5.",
+    },
+    {
+      question: "What is a closure?",
+      options: ["A function without a name", "A function that closes a file", "An inner function that remembers variables from its outer function"],
+      answer: 2,
+      explanation: "A closure is an inner function that carries along the variables from where it was created.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Functions are objects: they can be stored in variables, passed around, and returned.
+- `function_name` refers to the function, `function_name()` runs it.
+- `lambda` creates a one-expression function, often used as the `key` in `sorted()`.
+- A closure is an inner function that remembers its outer function's variables; use `nonlocal` to change them.

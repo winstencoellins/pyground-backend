@@ -1,0 +1,179 @@
+---
+title: Classes and Objects
+slug: classes-and-objects
+stage: 3
+module: OOP Part 1
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Meet classes as blueprints and objects as what they produce, then build your first object with __init__ and self.
+---
+
+# Classes and Objects
+
+So far you've stored data in variables, lists, and dicts, and processed it with functions.
+That works, but as programs grow, the data and the functions that handle it start to drift
+apart. A **class** lets you keep both in one place.
+
+## Why classes?
+
+Imagine tracking students with dicts. Each student needs its own dict, and the function that
+works on it lives separately from the data.
+
+<Playground initialCode={`budi = {"name": "Budi", "class": "XI Science 1", "scores": [80, 75, 90]}
+ani = {"name": "Ani", "class": "XI Science 2", "scores": [88, 92, 85]}
+
+def average(student):
+    return sum(student["scores"]) / len(student["scores"])
+
+print(budi["name"], average(budi))
+print(ani["name"], average(ani))`} />
+
+Nothing guarantees every dict has the same keys, and a typo like `"scors"` only shows up when
+the program runs. A class gives your data a clear shape: data (**attributes**) and behaviour
+(**methods**) live together.
+
+## A class is a blueprint, an object is the result
+
+Think of a cake mould. There's only one mould, but you can bake many cakes, and each cake can
+have a different topping.
+
+- **Class** = the mould. It describes what data something has and what it can do.
+- **Object** (or *instance*) = a cake made from that mould.
+
+<Playground initialCode={`class Cat:
+    pass
+
+oyen = Cat()
+belang = Cat()
+
+print(oyen)
+print(type(oyen))
+print(oyen is belang)`} />
+
+`Cat()` creates a new object. `oyen` and `belang` are both `Cat`s, but they are two separate
+objects. Class names usually start each word with a capital letter, for example `BankAccount`.
+
+## `__init__` and `self`
+
+The special method `__init__` runs automatically every time a new object is created. This is
+where you fill in the object's starting data.
+
+<Playground initialCode={`class Student:
+    def __init__(self, name, classroom):
+        self.name = name
+        self.classroom = classroom
+
+budi = Student("Budi", "XI Science 1")
+print(budi.name)
+print(budi.classroom)`} />
+
+The first parameter, `self`, is the object being created. You don't pass it yourself: Python
+fills it in. So `Student("Budi", "XI Science 1")` sends `"Budi"` to `name` and
+`"XI Science 1"` to `classroom`. The line `self.name = name` means "store this name on this
+object".
+
+<Callout type="tip">
+  `__init__` starts and ends with **two** underscores. If you write `_init_` or `__init`,
+  Python won't run it and your attributes never get set.
+</Callout>
+
+## Attributes: data that belongs to an object
+
+You read and change attributes with a dot, just like calling a list method.
+
+<Playground initialCode={`class Student:
+    def __init__(self, name, classroom):
+        self.name = name
+        self.classroom = classroom
+        self.scores = []
+
+citra = Student("Citra", "X Social 2")
+citra.scores.append(85)
+citra.scores.append(90)
+citra.classroom = "XI Social 2"
+
+print(citra.name, citra.classroom, citra.scores)`} />
+
+Attributes don't have to come from parameters. `self.scores = []` gives every student an empty
+list of their own.
+
+If you read an attribute that doesn't exist, Python raises an `AttributeError`.
+
+<Playground expectError initialCode={`class Student:
+    def __init__(self, name):
+        self.name = name
+
+dodi = Student("Dodi")
+print(dodi.age)`} />
+
+## Many objects from one class
+
+This is where classes shine: write once, use many times. Each object keeps its own data.
+
+<Playground initialCode={`class Student:
+    def __init__(self, name, scores):
+        self.name = name
+        self.scores = scores
+
+    def average(self):
+        return sum(self.scores) / len(self.scores)
+
+classroom = [
+    Student("Budi", [80, 75, 90]),
+    Student("Ani", [88, 92, 85]),
+    Student("Citra", [70, 65, 80]),
+]
+
+for s in classroom:
+    print(s.name, round(s.average(), 1))`} />
+
+`average` is a **method**: a function written inside a class. You'll dig into methods in the
+next lesson.
+
+## Exercise
+
+Write a `Motorbike` class for ojek data. Each motorbike has a `plate`, a `brand`, and a
+`driver`. Create two objects and print their data.
+
+<Playground initialCode={`class Motorbike:
+    def __init__(self, plate, brand, driver):
+        # TODO: store all three values on self
+        pass
+
+# TODO: create two Motorbike objects, for example Budi's and Dodi's
+
+# TODO: print each motorbike's plate and driver
+print("Done")`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "How are classes and objects related?",
+      options: ["A class is a blueprint, an object is made from that blueprint", "An object is the blueprint, a class is the result", "Class and object are two names for the same thing"],
+      answer: 0,
+      explanation: "One class can create many objects, each with its own data.",
+    },
+    {
+      question: "When does __init__ run?",
+      options: ["When the class is written", "Only when you call obj.__init__()", "Automatically every time a new object is created"],
+      answer: 2,
+      explanation: "Writing Student('Budi', 'XI') creates a new object and immediately runs __init__.",
+    },
+    {
+      question: "Inside a method, what does self refer to?",
+      options: ["The class itself", "The object being used", "The first argument you pass"],
+      answer: 1,
+      explanation: "self is the object being created or used. Python fills it in automatically.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A class bundles data (attributes) and behaviour (methods) in one place.
+- A class is a blueprint; you create an object (instance) by calling the class, like `Student()`.
+- `__init__` runs automatically when an object is created and sets attributes through `self`.
+- Each object keeps its own attributes, so one class can produce many objects.

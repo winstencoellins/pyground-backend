@@ -1,0 +1,192 @@
+---
+title: Membuat Generator
+slug: generators
+stage: 3
+module: Generator
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Buat iterator sendiri dengan yield, hemat memori dengan evaluasi malas, dan rangkai generator menjadi pipeline.
+---
+
+# Membuat Generator
+
+Di pelajaran sebelumnya kamu memakai iterator yang sudah disediakan Python. Sekarang kamu
+akan membuat iterator sendiri dengan cara paling mudah: **generator**. Generator adalah
+fungsi yang memakai `yield` alih-alih `return`.
+
+## Kata kunci `yield`
+
+`return` mengembalikan nilai lalu fungsi selesai. `yield` memberikan satu nilai lalu fungsi
+**berhenti sejenak**, dan akan melanjutkan dari baris yang sama saat `next()` dipanggil lagi:
+
+<Playground initialCode={`def nomor_antrean():
+    print("Mulai")
+    yield 1
+    print("Lanjut")
+    yield 2
+    print("Lanjut lagi")
+    yield 3
+
+gen = nomor_antrean()
+print(type(gen))
+print(next(gen))
+print(next(gen))
+print(next(gen))`} />
+
+Perhatikan bahwa memanggil `nomor_antrean()` belum menjalankan isinya sama sekali. Kode baru
+berjalan saat `next()` dipanggil. Generator adalah iterator, jadi bisa langsung dipakai di
+`for`:
+
+<Playground initialCode={`def hitung_mundur(n):
+    while n > 0:
+        yield n
+        n -= 1
+
+for angka in hitung_mundur(5):
+    print(angka)
+print("Ojek berangkat!")`} />
+
+## Evaluasi malas dan hemat memori
+
+Generator bersifat **malas** (lazy): nilai dibuat satu per satu hanya saat diminta, bukan
+sekaligus di awal. Bandingkan ukuran list dan generator untuk data yang sama:
+
+<Playground initialCode={`import sys
+
+def bilangan(n):
+    for i in range(n):
+        yield i
+
+daftar = [i for i in range(100000)]
+gen = bilangan(100000)
+
+print("Ukuran list:", sys.getsizeof(daftar), "byte")
+print("Ukuran generator:", sys.getsizeof(gen), "byte")
+
+print(sum(bilangan(1000000)))`} />
+
+List harus menyimpan 100.000 angka di memori, sedangkan generator hanya menyimpan
+posisinya saat ini. Itulah sebabnya kita bisa menjumlahkan sejuta angka tanpa
+membuat list sebesar itu.
+
+## Generator expression
+
+Kamu sudah kenal list comprehension. Ganti kurung siku dengan kurung biasa, dan kamu
+mendapat **generator expression**:
+
+<Playground initialCode={`harga = [12000, 8000, 25000, 5000]
+
+list_pajak = [h * 11 // 100 for h in harga]
+gen_pajak = (h * 11 // 100 for h in harga)
+
+print(list_pajak)
+print(gen_pajak)
+print(list(gen_pajak))
+
+# Langsung di dalam fungsi, kurungnya boleh tidak ditulis dua kali
+print(sum(h * 11 // 100 for h in harga))`} />
+
+<Callout type="warning">
+  Seperti iterator lain, generator hanya bisa dipakai **sekali**. Setelah `list(gen_pajak)`,
+  generatornya sudah habis. Kalau butuh datanya berkali-kali, pakai list.
+</Callout>
+
+## Generator tak terbatas dan `itertools.islice`
+
+Karena malas, generator boleh tidak pernah berhenti. Ini aman selama kamu hanya mengambil
+sebagian. `itertools.islice` mengambil sejumlah nilai pertama dari iterator apa pun:
+
+<Playground initialCode={`import itertools
+
+def nomor_struk():
+    nomor = 1
+    while True:
+        yield f"STRUK-{nomor:04d}"
+        nomor += 1
+
+gen = nomor_struk()
+for struk in itertools.islice(gen, 5):
+    print(struk)
+
+print(list(itertools.islice(gen, 3)))`} />
+
+Jangan pernah menulis `list(nomor_struk())` atau `for` tanpa `break` pada generator tak
+terbatas, karena programnya tidak akan pernah selesai.
+
+## Pipeline generator
+
+Generator bisa dirangkai: keluaran satu generator menjadi masukan generator berikutnya.
+Setiap data mengalir satu per satu melewati semua tahap, tanpa list perantara:
+
+<Playground initialCode={`with open("penjualan.txt", "w") as f:
+    for baris in ["nasi goreng,15000", "", "es teh,3000", "soto,12000"]:
+        f.write(baris + chr(10))
+
+def baca_baris(nama_file):
+    with open(nama_file) as f:
+        for baris in f:
+            yield baris.strip()
+
+def buang_kosong(baris_baris):
+    for baris in baris_baris:
+        if baris:
+            yield baris
+
+def ambil_harga(baris_baris):
+    for baris in baris_baris:
+        menu, harga = baris.split(",")
+        yield int(harga)
+
+total = sum(ambil_harga(buang_kosong(baca_baris("penjualan.txt"))))
+print("Total penjualan:", total)`} />
+
+Pola ini cocok untuk mengolah file log atau data yang sangat besar, karena hanya satu baris
+yang berada di memori pada satu waktu.
+
+## Latihan
+
+Buat generator `kelipatan(n)` yang menghasilkan kelipatan `n` tanpa batas (n, 2n, 3n, ...).
+Lalu ambil 5 nilai pertama dengan `itertools.islice` dan cetak hasilnya.
+
+<Playground initialCode={`import itertools
+
+def kelipatan(n):
+    # TODO: pakai while True dan yield
+    pass
+
+# TODO: ambil 5 nilai pertama dari kelipatan(7) dengan itertools.islice
+print("Selesai")`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang membedakan yield dari return?",
+      options: ["yield memberi nilai lalu fungsi berhenti sejenak dan bisa dilanjutkan", "yield langsung mengakhiri fungsi", "yield hanya bisa dipakai di dalam class"],
+      answer: 0,
+      explanation: "yield mengirim satu nilai lalu menjeda fungsi; next() berikutnya melanjutkan dari baris yang sama.",
+    },
+    {
+      question: "Mana yang merupakan generator expression?",
+      options: ["[x * 2 for x in data]", "{x * 2 for x in data}", "(x * 2 for x in data)"],
+      answer: 2,
+      explanation: "Kurung biasa membuat generator expression; kurung siku membuat list, kurung kurawal membuat set.",
+    },
+    {
+      question: "Bagaimana cara aman mengambil 10 nilai dari generator tak terbatas gen?",
+      options: ["list(gen)", "itertools.islice(gen, 10)", "len(gen)"],
+      answer: 1,
+      explanation: "islice hanya mengambil 10 nilai pertama. list(gen) tidak akan pernah selesai.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Fungsi dengan `yield` adalah generator: memberi nilai satu per satu dan bisa dilanjutkan.
+- Generator bersifat malas, jadi hemat memori untuk data besar.
+- `(x for x in data)` adalah generator expression, versi malas dari list comprehension.
+- Ambil sebagian dari generator tak terbatas dengan `itertools.islice`.
+- Generator bisa dirangkai menjadi pipeline untuk mengolah data tahap demi tahap.

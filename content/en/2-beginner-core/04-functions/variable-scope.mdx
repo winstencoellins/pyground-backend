@@ -1,0 +1,140 @@
+---
+title: Variable Scope
+slug: variable-scope
+stage: 2
+module: Functions
+order: 4
+isFree: false
+estimatedMinutes: 15
+description: Understand local versus global variables, and why data should go in and out of functions through parameters and return.
+---
+
+# Variable Scope
+
+Every variable has an "area" where it can be used. This area is called its **scope**.
+Understanding scope will save you from confusing errors once you start writing lots of functions.
+
+## Local variables
+
+Variables created inside a function, including its parameters, are **local variables**. They only
+live while the function runs, and cannot be used from outside:
+
+<Playground expectError initialCode={`def calculate_shopping():
+    total = 15000 + 8000
+    print("Inside the function:", total)
+
+calculate_shopping()
+print("Outside the function:", total)`} />
+
+Once `calculate_shopping()` finishes, `total` is gone, so the last line raises a `NameError`.
+
+## Global variables
+
+Variables created outside every function are called **global variables**. A function can
+**read** a global variable:
+
+<Playground initialCode={`warung_name = "Warung Bu Ani"
+
+def print_title():
+    print("Welcome to", warung_name)
+
+print_title()`} />
+
+A local and a global variable can share a name. They are still different variables:
+
+<Playground initialCode={`price = 10000
+
+def change_price():
+    price = 99999
+    print("local price:", price)
+
+change_price()
+print("global price:", price)`} />
+
+The line `price = 99999` creates a new local variable. The global `price` is untouched.
+
+## Changing a global from inside a function
+
+Now try adding to a global balance from inside a function:
+
+<Playground expectError initialCode={`balance = 50000
+
+def top_up(amount):
+    balance = balance + amount
+
+top_up(20000)
+print(balance)`} />
+
+The result is an `UnboundLocalError`. Because there is a `balance = ...` inside the function,
+Python treats `balance` as a **local** variable throughout that function. Then, when it computes
+`balance + amount`, the local `balance` has no value yet.
+
+<Callout type="info">
+  Python has a `global` keyword that forces a function to change a global variable. But it makes
+  code hard to follow, because any function could quietly change your data. It is best avoided.
+</Callout>
+
+## A better way: in through parameters, out through return
+
+Send the data a function needs through parameters, then hand back the new result with `return`.
+The caller decides where to store it:
+
+<Playground initialCode={`def top_up(balance, amount):
+    return balance + amount
+
+budi_balance = 50000
+budi_balance = top_up(budi_balance, 20000)
+budi_balance = top_up(budi_balance, 15000)
+print("Budi's balance:", budi_balance)`} />
+
+Functions like this are easy to test and reuse. `top_up()` works for Ani's, Citra's, or anyone's
+balance, without depending on variables outside.
+
+## Exercise
+
+The code below uses a global variable `points` and does not work correctly yet. Change
+`add_points()` so it receives `points` as a parameter and returns the new points, then fix how it
+is called.
+
+<Playground initialCode={`points = 0
+
+def add_points(amount):
+    # TODO: add a points parameter, then return points + amount
+    pass
+
+# TODO: store the result of add_points in points
+add_points(10)
+add_points(5)
+print("Dodi's points:", points)  # should be 15`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is a variable created inside a function called?",
+      options: ["A global variable", "A local variable", "A default parameter"],
+      answer: 1,
+      explanation: "A variable created inside a function is local, and only exists while the function runs.",
+    },
+    {
+      question: "x = 1, then def f(): x = 5. After calling f(), what is x outside the function?",
+      options: ["5", "An error", "1"],
+      answer: 2,
+      explanation: "x = 5 inside the function creates a new local variable, so the global x stays 1.",
+    },
+    {
+      question: "Why does balance = balance + 1 inside a function raise UnboundLocalError?",
+      options: ["Because of the assignment, Python treats balance as a local that has no value yet", "Because global variables cannot be read from functions", "Because + cannot be used inside functions"],
+      answer: 0,
+      explanation: "An assignment anywhere in a function makes that name local throughout the function, including on the right side of =.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Variables inside a function are local and disappear when the function finishes.
+- Functions can read global variables, but an assignment inside a function creates a new local one.
+- Changing a global with `x = x + 1` inside a function raises `UnboundLocalError`.
+- Send data in through parameters and get results out with `return`, not with `global`.

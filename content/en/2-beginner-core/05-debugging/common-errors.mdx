@@ -1,0 +1,174 @@
+---
+title: Common Errors
+slug: common-errors
+stage: 2
+module: Debugging
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Get to know the most common Python errors, their usual causes and how to fix them, including silent logic bugs.
+---
+
+# Common Errors
+
+Good news: most errors you will meet come from a short list. Once you know the patterns, you can
+fix them in seconds.
+
+## SyntaxError and IndentationError
+
+These two appear **before** your program even runs. Python reads your code and finds writing that
+breaks the rules.
+
+```python
+price = 5000
+if price > 3000
+    print("Expensive")
+# SyntaxError: expected ':'
+```
+
+```python
+for item in ["rice", "sugar"]:
+print(item)
+# IndentationError: expected an indented block after 'for' statement on line 1
+```
+
+Common causes: a missing colon `:`, an unclosed bracket or quote, or a block body that isn't
+indented. The fix: check the line shown **and the line before it**, because a missing closing
+bracket is often only noticed on the next line.
+
+## NameError
+
+Python doesn't know a name you used. Usually it's a typo, a difference in upper and lower case, or
+a variable used before it was created.
+
+<Playground expectError initialCode={`student_name = "Citra"
+print("Hello,", Student_name)`} />
+
+The fix: match the spelling exactly, and make sure the variable is created before it is used.
+
+## TypeError
+
+You did an operation on data types that don't fit together, such as joining text with a number, or
+calling a function with the wrong number of arguments.
+
+<Playground expectError initialCode={`age = 17
+print("Dodi's age: " + age)`} />
+
+The fix: convert the type first (`str(age)`), or use an f-string `f"Dodi's age: {age}"`, which
+handles the conversion for you.
+
+## IndexError and KeyError
+
+You asked for something that isn't there. `IndexError` is for a list or tuple index past the end,
+`KeyError` is for a key that isn't in a dict.
+
+<Playground expectError initialCode={`queue = ["Ani", "Budi", "Citra"]
+print(queue[3])`} />
+
+<Playground expectError initialCode={`menu_prices = {"nasi goreng": 15000, "es teh": 4000}
+print(menu_prices["mie ayam"])`} />
+
+The fix: remember indexes start at 0, so a list of 3 has indexes 0 to 2. For a dict, check first
+with `in` or use `.get()`:
+
+<Playground initialCode={`menu_prices = {"nasi goreng": 15000, "es teh": 4000}
+print(menu_prices.get("mie ayam", "Not on the menu"))`} />
+
+## ValueError and ZeroDivisionError
+
+`ValueError` appears when the type is right but the **value** can't be used, such as turning the
+text `"five"` into a number. `ZeroDivisionError` appears when you divide by zero.
+
+<Playground expectError initialCode={`count = int("five")
+print(count)`} />
+
+<Playground expectError initialCode={`total_score = 0
+student_count = 0
+print(total_score / student_count)`} />
+
+The fix: make sure the text contains digits before calling `int()` (for example with
+`.isdigit()`), and check the divisor with `if` before dividing.
+
+| Error | Common cause | Fix |
+| --- | --- | --- |
+| `SyntaxError` | missing `:`, bracket or quote | check that line and the one before |
+| `IndentationError` | block body not indented | tidy the leading spaces |
+| `NameError` | misspelled name | match the spelling |
+| `TypeError` | types don't fit | convert the type or use an f-string |
+| `IndexError` | index past the end | remember indexes start at 0 |
+| `KeyError` | key doesn't exist | check with `in` or `.get()` |
+| `ValueError` | value can't be used | check the value first |
+| `ZeroDivisionError` | dividing by zero | check the divisor with `if` |
+
+## Logic bugs: no error, but the result is wrong
+
+The trickiest kind of bug raises **no** error at all. The program runs smoothly, but the result is
+wrong. Try to predict the output before you run it:
+
+<Playground initialCode={`scores = [80, 90, 70]
+average = sum(scores) / 2
+print("Average:", average)
+
+age = 17
+if age > 17:
+    print("Can get an ID card")
+else:
+    print("Can't get an ID card yet")`} />
+
+The average is 120, impossible for scores under 100. It should divide by `len(scores)`. And at 17
+you can already get a KTP (ID card), so the condition should be `age >= 17`.
+
+<Callout type="warning">
+  Python can't guess what you meant. For logic bugs, you have to check whether the result makes
+  sense yourself. The next lesson gives you techniques for that.
+</Callout>
+
+## Exercise
+
+This code runs without errors, but it has two logic bugs. The shopping total and the number of
+expensive items (price above 10000) are wrong. Find and fix both.
+
+<Playground initialCode={`groceries = {"rice": 65000, "eggs": 28000, "salt": 3000, "soy sauce": 10000}
+
+total = 0
+expensive = 0
+for item, price in groceries.items():
+    total = price  # TODO: does this really add things up?
+    if price >= 10000:  # TODO: check the condition again
+        expensive += 1
+
+print("Shopping total:", total)  # should be 106000
+print("Expensive items:", expensive)   # should be 2`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What error does print('Score: ' + 90) raise?",
+      options: ["ValueError", "NameError", "TypeError"],
+      answer: 2,
+      explanation: "Text and a number can't be joined with +, so the types don't fit: TypeError.",
+    },
+    {
+      question: "The dict menu has no key 'soto'. What happens with menu['soto']?",
+      options: ["KeyError", "It returns None", "IndexError"],
+      answer: 0,
+      explanation: "Accessing a missing dict key raises KeyError. Use .get() to avoid it.",
+    },
+    {
+      question: "A program runs with no error but the total is wrong. What kind of bug is this?",
+      options: ["SyntaxError", "A logic bug", "IndentationError"],
+      answer: 1,
+      explanation: "Logic bugs raise no error; the code is valid but does the wrong thing.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `SyntaxError` and `IndentationError` appear before the program runs; also check the line before.
+- `NameError` is usually a typo, `TypeError` is usually mismatched types.
+- `IndexError` and `KeyError` mean asking for something that isn't there; `.get()` helps for dicts.
+- `ValueError` means the value can't be used, `ZeroDivisionError` means dividing by zero.
+- Logic bugs raise no error, so always check whether the result makes sense.

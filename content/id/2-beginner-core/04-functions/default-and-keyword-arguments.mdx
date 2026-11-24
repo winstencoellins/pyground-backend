@@ -1,0 +1,126 @@
+---
+title: Nilai Default dan Argumen Kata Kunci
+slug: default-and-keyword-arguments
+stage: 2
+module: Fungsi
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Beri parameter nilai default supaya boleh dilewati, dan panggil fungsi dengan menyebut nama parameternya.
+---
+
+# Nilai Default dan Argumen Kata Kunci
+
+Semakin banyak parameter sebuah fungsi, semakin repot memanggilnya, apalagi kalau sebagian besar
+nilainya hampir selalu sama. Python punya dua fitur untuk membantu: **nilai default** dan
+**argumen kata kunci**.
+
+## Nilai default
+
+Kamu bisa memberi parameter nilai bawaan dengan `=` di definisi fungsi. Kalau pemanggil tidak
+mengirim argumen untuk parameter itu, nilai default yang dipakai:
+
+<Playground initialCode={`def pesan_kopi(menu, gula="normal"):
+    print(f"Satu {menu}, gula {gula}")
+
+pesan_kopi("kopi susu")
+pesan_kopi("kopi hitam", "sedikit")`} />
+
+`print()` sendiri memakai trik ini. Parameter `sep` dan `end` punya nilai default, makanya kamu
+jarang perlu menyebutnya.
+
+## Argumen kata kunci
+
+Saat memanggil fungsi, kamu boleh menyebut nama parameternya: `nama_parameter=nilai`. Ini disebut
+**argumen kata kunci**. Urutannya jadi bebas, dan kodenya lebih mudah dibaca:
+
+<Playground initialCode={`def hitung_ongkos_ojek(jarak_km, tarif_per_km=2500, malam=False):
+    ongkos = jarak_km * tarif_per_km
+    if malam:
+        ongkos = ongkos + 5000
+    return ongkos
+
+print(hitung_ongkos_ojek(6))
+print(hitung_ongkos_ojek(6, malam=True))
+print(hitung_ongkos_ojek(tarif_per_km=3000, jarak_km=6))`} />
+
+Coba bandingkan `hitung_ongkos_ojek(6, 2500, True)` dengan `hitung_ongkos_ojek(6, malam=True)`.
+Versi kedua langsung jelas maksudnya tanpa perlu membuka definisi fungsinya.
+
+## Aturan urutan
+
+Ada dua aturan yang perlu kamu ingat.
+
+**Saat membuat fungsi:** parameter tanpa default harus ditulis lebih dulu, baru parameter yang
+punya default. Kalau dibalik, Python langsung menolak:
+
+<Playground expectError initialCode={`def daftar_siswa(kelas="10A", nama):
+    print(nama, kelas)`} />
+
+**Saat memanggil fungsi:** argumen biasa (berdasarkan posisi) harus ditulis sebelum argumen kata
+kunci:
+
+<Playground expectError initialCode={`def daftar_siswa(nama, kelas="10A"):
+    print(nama, kelas)
+
+daftar_siswa(kelas="11B", "Citra")`} />
+
+Versi yang benar:
+
+<Playground initialCode={`def daftar_siswa(nama, kelas="10A"):
+    print(f"{nama} masuk kelas {kelas}")
+
+daftar_siswa("Citra")
+daftar_siswa("Dodi", kelas="11B")
+daftar_siswa(nama="Ani", kelas="12C")`} />
+
+<Callout type="warning">
+  Jangan memakai list atau dict kosong sebagai nilai default, misalnya `def tambah(barang, keranjang=[])`.
+  Nilai default dibuat hanya sekali, jadi list yang sama terus dipakai ulang di setiap panggilan dan
+  isinya menumpuk. Pakai `keranjang=None`, lalu di dalam fungsi buat list baru kalau isinya `None`.
+</Callout>
+
+## Latihan
+
+Lengkapi fungsi `buat_struk()`. Parameter `diskon` (dalam persen) punya default `0`, dan `pajak`
+punya default `True` (tambah 10%). Lalu panggil fungsinya memakai argumen kata kunci.
+
+<Playground initialCode={`def buat_struk(total, diskon=0, pajak=True):
+    # TODO: kurangi total dengan diskon persen
+    # TODO: kalau pajak True, tambahkan 10%
+    return total
+
+print(buat_struk(100000))
+# TODO: panggil buat_struk dengan diskon=20 dan pajak=False`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Dengan def sapa(nama, salam='Halo'), apa yang tampil dari sapa('Budi') kalau isinya print(salam, nama)?",
+      options: ["Halo Budi", "Budi Halo", "Error karena salam tidak dikirim"],
+      answer: 0,
+      explanation: "salam punya nilai default 'Halo', jadi boleh dilewati.",
+    },
+    {
+      question: "Definisi fungsi mana yang ditolak Python?",
+      options: ["def f(a, b=1):", "def f(a, b):", "def f(a=1, b):"],
+      answer: 2,
+      explanation: "Parameter tanpa default (b) tidak boleh ditulis setelah parameter yang punya default (a=1).",
+    },
+    {
+      question: "Pemanggilan mana yang valid untuk def kirim(barang, tujuan)?",
+      options: ["kirim(tujuan='Bandung', 'beras')", "kirim('beras', tujuan='Bandung')", "Keduanya valid"],
+      answer: 1,
+      explanation: "Argumen posisi harus ditulis sebelum argumen kata kunci.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `def f(x, y=10):` memberi `y` nilai default, sehingga boleh dilewati saat memanggil.
+- Argumen kata kunci (`y=5`) menyebut nama parameter, jadi urutannya bebas dan lebih jelas dibaca.
+- Di definisi, parameter tanpa default ditulis dulu; saat memanggil, argumen posisi ditulis dulu.
+- Hindari list atau dict sebagai nilai default; pakai `None`.

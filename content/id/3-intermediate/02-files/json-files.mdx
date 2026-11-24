@@ -1,0 +1,176 @@
+---
+title: Menyimpan Data dengan JSON
+slug: json-files
+stage: 3
+module: File
+order: 3
+isFree: false
+estimatedMinutes: 20
+description: Ubah dict dan list menjadi JSON, simpan ke file, lalu muat kembali untuk menyimpan data aplikasi seperti daftar tugas.
+---
+
+# Menyimpan Data dengan JSON
+
+CSV cocok untuk tabel, tapi bagaimana dengan data bertingkat, misalnya dict yang berisi list?
+Untuk itu ada **JSON** (JavaScript Object Notation). Bentuknya sangat mirip dict dan list di
+Python, dan hampir semua bahasa pemrograman dan aplikasi web bisa membacanya.
+
+```json
+{"nama": "Budi", "umur": 17, "hobi": ["futsal", "gitar"], "aktif": true}
+```
+
+Modul bawaan `json` mengubah data Python menjadi teks JSON dan sebaliknya.
+
+## `json.dumps()` dan `json.loads()`
+
+`dumps()` (dump **s**tring) mengubah dict atau list menjadi **teks** JSON. `loads()` mengubah
+teks JSON kembali menjadi data Python:
+
+<Playground initialCode={`import json
+
+siswa = {"nama": "Budi", "umur": 17, "hobi": ["futsal", "gitar"], "aktif": True}
+
+teks = json.dumps(siswa)
+print(teks)
+print(type(teks))
+
+kembali = json.loads(teks)
+print(kembali["hobi"][0])
+print(type(kembali))`} />
+
+Perhatikan: `True` di Python menjadi `true` di JSON, dan `None` menjadi `null`. Hasil
+`dumps()` hanyalah string biasa, jadi bisa disimpan di file atau dikirim lewat internet.
+
+## `indent` dan `ensure_ascii=False`
+
+Secara bawaan, JSON ditulis dalam satu baris, dan huruf non-ASCII (seperti é atau emoji)
+diubah menjadi kode aneh. Dua parameter ini membuatnya enak dibaca:
+
+<Playground initialCode={`import json
+
+menu = {"warung": "Café Bu Ani", "favorit": ["kopi susu ☕", "pisang goreng"]}
+
+print(json.dumps(menu))
+print()
+print(json.dumps(menu, indent=2, ensure_ascii=False))`} />
+
+- `indent=2` menulis setiap isi di baris sendiri dengan indentasi 2 spasi.
+- `ensure_ascii=False` membiarkan huruf seperti é dan emoji tetap apa adanya.
+
+## `json.dump()` dan `json.load()` untuk file
+
+Tanpa huruf **s**, `dump()` menulis langsung ke file dan `load()` membaca langsung dari file:
+
+<Playground initialCode={`import json
+
+profil = {"nama": "Citra", "kota": "Bandung", "nilai": [88, 92, 79]}
+
+with open("profil.json", "w", encoding="utf-8") as f:
+    json.dump(profil, f, indent=2, ensure_ascii=False)
+
+with open("profil.json", encoding="utf-8") as f:
+    data = json.load(f)
+
+print(data)
+print("Rata-rata nilai", data["nama"], "=", sum(data["nilai"]) / len(data["nilai"]))`} />
+
+<Callout type="tip">
+  Cara mengingatnya: yang berakhiran **s** (`dumps`, `loads`) bekerja dengan **s**tring.
+  Yang tanpa s (`dump`, `load`) bekerja dengan file.
+</Callout>
+
+## Menyimpan data aplikasi: daftar tugas
+
+Inilah kegunaan utama JSON di program kecil: menyimpan **keadaan aplikasi** supaya tidak
+hilang saat program ditutup. Kita buat dua fungsi, satu untuk memuat dan satu untuk menyimpan:
+
+<Playground initialCode={`import json
+
+def muat_tugas(nama_file):
+    try:
+        with open(nama_file, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+def simpan_tugas(nama_file, tugas):
+    with open(nama_file, "w", encoding="utf-8") as f:
+        json.dump(tugas, f, indent=2, ensure_ascii=False)
+
+print("File belum ada:", muat_tugas("belum_ada.json"))
+
+# Sesi pertama: mulai dari daftar kosong, tambah tugas, simpan
+tugas = []
+tugas.append({"judul": "Kerjakan PR matematika", "selesai": False})
+tugas.append({"judul": "Bayar uang kos", "selesai": False})
+simpan_tugas("todo.json", tugas)
+
+# Sesi berikutnya: muat lagi dari file, tandai satu tugas selesai
+tugas = muat_tugas("todo.json")
+tugas[1]["selesai"] = True
+simpan_tugas("todo.json", tugas)
+
+for nomor, t in enumerate(muat_tugas("todo.json"), start=1):
+    tanda = "x" if t["selesai"] else " "
+    print(f"{nomor}. [{tanda}] {t['judul']}")`} />
+
+`muat_tugas()` mengembalikan list kosong kalau file belum ada, jadi aplikasi tetap jalan saat
+pertama kali dipakai.
+
+<Callout type="warning">
+  JSON hanya mengenal string, angka, `true`/`false`, `null`, list, dan dict dengan kunci
+  string. Tuple akan kembali sebagai list, dan kunci angka di dict akan kembali sebagai string.
+</Callout>
+
+## Latihan
+
+Lengkapi fungsi `tambah_kontak()` supaya menambahkan kontak baru ke file `kontak.json`: muat
+dulu isinya, tambahkan kontak, lalu simpan lagi.
+
+<Playground initialCode={`import json
+
+with open("kontak.json", "w", encoding="utf-8") as f:
+    json.dump({"Budi": "0812-1111"}, f)
+
+def tambah_kontak(nama, nomor):
+    # TODO: muat dict dari kontak.json dengan json.load()
+    # TODO: tambahkan kontak[nama] = nomor
+    # TODO: simpan lagi dengan json.dump(..., indent=2)
+    pass
+
+tambah_kontak("Ani", "0813-2222")
+
+with open("kontak.json", encoding="utf-8") as f:
+    print(f.read())`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Fungsi mana yang mengubah dict menjadi teks JSON (string)?",
+      options: ["json.loads()", "json.load()", "json.dumps()"],
+      answer: 2,
+      explanation: "dumps() = dump string. loads() melakukan kebalikannya, dan dump()/load() bekerja dengan file.",
+    },
+    {
+      question: "Apa fungsi ensure_ascii=False?",
+      options: ["Membuat JSON lebih pendek", "Membiarkan huruf seperti é dan emoji tetap terbaca apa adanya", "Mengurutkan kunci dict"],
+      answer: 1,
+      explanation: "Tanpa ensure_ascii=False, huruf non-ASCII diubah menjadi kode seperti \\u00e9 yang sulit dibaca.",
+    },
+    {
+      question: "Nilai Python True disimpan sebagai apa di JSON?",
+      options: ["true", "True", "'True'"],
+      answer: 0,
+      explanation: "JSON memakai huruf kecil: true, false, dan null untuk None.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- JSON menyimpan data bertingkat (dict dan list) sebagai teks yang bisa dibaca banyak bahasa.
+- `json.dumps()` / `json.loads()` bekerja dengan string; `json.dump()` / `json.load()` dengan file.
+- `indent=2` membuat JSON rapi, `ensure_ascii=False` menjaga huruf non-ASCII tetap utuh.
+- Pola muat-ubah-simpan, dengan `FileNotFoundError` sebagai awal kosong, cocok untuk menyimpan data aplikasi.

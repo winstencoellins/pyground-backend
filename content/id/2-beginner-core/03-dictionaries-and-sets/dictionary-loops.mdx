@@ -1,0 +1,158 @@
+---
+title: Loop dan Data Bersarang
+slug: dictionary-loops
+stage: 2
+module: Dictionary dan Set
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Telusuri dictionary dengan loop, hitung kemunculan data, dan olah data bersarang menjadi laporan rapi.
+---
+
+# Loop dan Data Bersarang
+
+Dictionary jadi benar-benar berguna saat kamu menggabungkannya dengan loop. Di pelajaran ini
+kamu akan menelusuri isi dictionary, menghitung data, dan menyusun laporan kecil.
+
+## `keys()`, `values()`, dan `items()`
+
+- `keys()` memberi semua kunci. Loop `for k in d` juga langsung mengambil kunci.
+- `values()` memberi semua nilai.
+- `items()` memberi pasangan kunci dan nilai sekaligus.
+
+<Playground initialCode={`nilai = {"Budi": 85, "Ani": 92, "Citra": 78}
+
+for nama in nilai.keys():
+    print("Siswa:", nama)
+
+print("Total nilai:", sum(nilai.values()))
+
+for nama, angka in nilai.items():
+    print(f"{nama} mendapat {angka}")`} />
+
+<Callout type="tip">
+  `items()` adalah cara paling umum. Kamu langsung dapat dua variabel, persis seperti
+  `enumerate()` pada list.
+</Callout>
+
+## Menghitung dengan dictionary
+
+Pola yang sering dipakai: dictionary sebagai **penghitung**. Kuncinya adalah benda yang
+dihitung, nilainya jumlahnya. `get(kunci, 0)` membuat penambahan pertama tetap aman:
+
+<Playground initialCode={`pesanan = ["es teh", "kopi", "es teh", "jus", "es teh", "kopi"]
+jumlah = {}
+
+for minuman in pesanan:
+    jumlah[minuman] = jumlah.get(minuman, 0) + 1
+
+print(jumlah)
+
+kalimat = "aku suka kopi dan aku suka teh"
+hitung_kata = {}
+for kata in kalimat.split():
+    hitung_kata[kata] = hitung_kata.get(kata, 0) + 1
+print(hitung_kata)`} />
+
+## List berisi dictionary
+
+Data dunia nyata sering berbentuk **list berisi dictionary**: setiap dictionary adalah satu
+catatan. Misalnya daftar perjalanan ojek:
+
+<Playground initialCode={`perjalanan = [
+    {"pengemudi": "Dodi", "jarak": 5, "ongkos": 15000},
+    {"pengemudi": "Budi", "jarak": 3, "ongkos": 10000},
+    {"pengemudi": "Dodi", "jarak": 8, "ongkos": 22000},
+]
+
+total = 0
+for p in perjalanan:
+    print(p["pengemudi"], "menempuh", p["jarak"], "km")
+    total = total + p["ongkos"]
+
+print("Total ongkos: Rp", total)
+print("Pengemudi perjalanan kedua:", perjalanan[1]["pengemudi"])`} />
+
+Perhatikan `perjalanan[1]["pengemudi"]`: indeks `[1]` mengambil dictionary kedua, lalu
+`["pengemudi"]` mengambil nilainya.
+
+## Dictionary berisi list
+
+Kebalikannya juga bisa: nilai dictionary berupa list. Cocok untuk mengelompokkan data,
+misalnya jadwal piket per hari:
+
+<Playground initialCode={`piket = {
+    "Senin": ["Ani", "Budi"],
+    "Selasa": ["Citra"],
+}
+
+piket["Selasa"].append("Dodi")
+piket["Rabu"] = ["Eka", "Fajar"]
+
+for hari, petugas in piket.items():
+    print(hari, ":", ", ".join(petugas))`} />
+
+`", ".join(petugas)` menggabungkan isi list menjadi satu teks, dengan `", "` di antara setiap isinya.
+
+## Mencetak laporan yang rapi
+
+Gabungkan semuanya dengan f-string. Format `:<10` membuat teks rata kiri selebar 10
+karakter, dan `:>8` rata kanan selebar 8, sehingga kolom jadi lurus:
+
+<Playground initialCode={`penjualan = {"nasi goreng": 12, "mie ayam": 8, "soto": 15}
+harga = {"nasi goreng": 15000, "mie ayam": 12000, "soto": 13000}
+
+print("LAPORAN WARUNG HARI INI")
+print("-" * 32)
+total = 0
+for menu, porsi in penjualan.items():
+    pendapatan = porsi * harga[menu]
+    total = total + pendapatan
+    print(f"{menu:<12}{porsi:>4} porsi  Rp{pendapatan:>8}")
+print("-" * 32)
+print(f"{'Total':<24}Rp{total:>8}")`} />
+
+## Latihan
+
+Hitung berapa siswa yang memilih setiap ekskul, lalu tampilkan hasilnya satu per baris.
+
+<Playground initialCode={`pilihan = ["futsal", "musik", "futsal", "pramuka", "musik", "futsal"]
+jumlah = {}
+
+# 1. Loop pilihan dan hitung dengan jumlah.get(ekskul, 0) + 1
+
+# 2. Loop jumlah.items() dan cetak "futsal: 3" dan seterusnya
+
+print(jumlah)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Method mana yang memberi pasangan kunci dan nilai sekaligus?",
+      options: ["keys()", "items()", "values()"],
+      answer: 1,
+      explanation: "items() memberi pasangan (kunci, nilai), jadi bisa dipakai dengan dua variabel di for.",
+    },
+    {
+      question: "Kalau data = [{'nama': 'Ani'}, {'nama': 'Budi'}], apa hasil data[1]['nama']?",
+      options: ["Budi", "Ani", "KeyError"],
+      answer: 0,
+      explanation: "data[1] adalah dictionary kedua, lalu ['nama'] mengambil nilainya, yaitu 'Budi'.",
+    },
+    {
+      question: "Kenapa penghitung memakai jumlah.get(x, 0) + 1, bukan jumlah[x] + 1?",
+      options: ["Supaya lebih cepat", "Supaya hasilnya terurut", "Supaya tidak KeyError saat x belum ada"],
+      answer: 2,
+      explanation: "Saat x pertama kali muncul, kuncinya belum ada. get() memberi 0 sebagai awal hitungan.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `for k in d` dan `d.keys()` memberi kunci, `d.values()` memberi nilai, `d.items()` memberi keduanya.
+- Pola penghitung: `d[x] = d.get(x, 0) + 1`.
+- List berisi dictionary cocok untuk daftar catatan; dictionary berisi list cocok untuk mengelompokkan.
+- Format `:<10` dan `:>8` di f-string membuat laporan berkolom rapi.

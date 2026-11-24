@@ -1,0 +1,151 @@
+---
+title: Membongkar Argumen
+slug: unpacking-arguments
+stage: 3
+module: Argumen Fleksibel
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Pakai tanda bintang saat memanggil fungsi, menggabungkan dict, dan membongkar list ke beberapa variabel.
+---
+
+# Membongkar Argumen
+
+Di pelajaran sebelumnya, `*` dan `**` dipakai di **definisi** fungsi untuk mengumpulkan
+argumen. Sekarang kita balik arahnya: `*` dan `**` di **pemanggilan** fungsi untuk
+**membongkar** list atau dict menjadi argumen satu per satu.
+
+## Membongkar list dengan `*`
+
+Misalkan data sudah tersimpan di list, tapi fungsinya meminta tiga argumen terpisah:
+
+<Playground initialCode={`def info_kos(nama, kota, harga):
+    print(f"Kos {nama} di {kota}, Rp{harga:,} per bulan")
+
+data = ["Melati", "Yogyakarta", 850000]
+
+info_kos(data[0], data[1], data[2])  # cara panjang
+info_kos(*data)                      # cara singkat`} />
+
+`info_kos(*data)` sama dengan `info_kos("Melati", "Yogyakarta", 850000)`. Isi list dibongkar
+dan dikirim sebagai argumen posisi. Ini juga berlaku untuk tuple dan bahkan `print()`:
+
+<Playground initialCode={`menu = ["nasi goreng", "mie ayam", "soto"]
+print(menu)
+print(*menu)
+print(*menu, sep=" | ")`} />
+
+## Membongkar dict dengan `**`
+
+`**` membongkar dict menjadi argumen bernama. Kunci dict harus sama dengan nama parameter:
+
+<Playground initialCode={`def info_kos(nama, kota, harga):
+    print(f"Kos {nama} di {kota}, Rp{harga:,} per bulan")
+
+data = {"kota": "Malang", "harga": 700000, "nama": "Mawar"}
+info_kos(**data)`} />
+
+Urutan kunci tidak penting, karena setiap nilai dicocokkan lewat namanya.
+
+<Callout type="warning">
+  Kalau dict punya kunci yang tidak dikenal fungsi, misalnya `"wifi"`, Python akan memberi
+  `TypeError: got an unexpected keyword argument`.
+</Callout>
+
+## Menggabungkan dict dengan `{**a, **b}`
+
+`**` juga bisa dipakai di dalam dict literal untuk menggabungkan beberapa dict. Kalau ada
+kunci yang sama, nilai dari dict yang **belakang** yang menang:
+
+<Playground initialCode={`bawaan = {"ukuran": "sedang", "pedas": False, "es": True}
+pesanan_ani = {"pedas": True, "ukuran": "besar"}
+
+final = {**bawaan, **pesanan_ani}
+print(final)`} />
+
+Pola ini sering dipakai untuk menimpa pengaturan bawaan dengan pilihan pengguna.
+
+## Unpacking lanjutan: `pertama, *sisa = ...`
+
+Kamu sudah tahu `a, b = [1, 2]`. Dengan `*`, satu variabel bisa menampung "sisanya"
+sebagai list:
+
+<Playground initialCode={`antrean = ["Budi", "Ani", "Citra", "Dodi"]
+
+pertama, *sisa = antrean
+print("Dilayani:", pertama)
+print("Menunggu:", sisa)
+
+*depan, terakhir = antrean
+print("Paling belakang:", terakhir)
+
+juara1, *tengah, juru_kunci = [95, 88, 76, 60]
+print(juara1, tengah, juru_kunci)`} />
+
+## Parameter khusus nama setelah `*`
+
+Kalau kamu menulis `*` sendirian di daftar parameter, semua parameter sesudahnya **wajib**
+diisi dengan nama. Ini membuat pemanggilan lebih jelas dibaca:
+
+<Playground initialCode={`def transfer(jumlah, *, ke, catatan=""):
+    print(f"Transfer Rp{jumlah:,} ke {ke}. Catatan: {catatan}")
+
+transfer(50000, ke="Ani", catatan="uang kas")
+transfer(25000, ke="Dodi")`} />
+
+Memanggil `transfer(50000, "Ani")` akan gagal, karena `ke` harus ditulis namanya:
+
+<Playground expectError initialCode={`def transfer(jumlah, *, ke, catatan=""):
+    print(f"Transfer Rp{jumlah:,} ke {ke}")
+
+transfer(50000, "Ani")`} />
+
+## Latihan
+
+Gabungkan pengaturan bawaan dan pilihan Citra, lalu kirim hasilnya ke fungsi `pesan` dengan
+`**`. Setelah itu, bongkar `nilai` menjadi nilai tertinggi dan sisanya.
+
+<Playground initialCode={`def pesan(menu, ukuran, pedas):
+    print(f"{menu} ukuran {ukuran}, pedas: {pedas}")
+
+bawaan = {"menu": "mie ayam", "ukuran": "sedang", "pedas": False}
+pilihan_citra = {"pedas": True}
+
+# TODO: gabungkan kedua dict, lalu panggil pesan(**...)
+
+nilai = [98, 85, 80, 72]
+# TODO: tertinggi, *sisa = ...
+pass`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Jika angka = [1, 2, 3], apa yang dicetak print(*angka)?",
+      options: ["[1, 2, 3]", "(1, 2, 3)", "1 2 3"],
+      answer: 2,
+      explanation: "*angka membongkar list menjadi tiga argumen terpisah, jadi print mencetak 1 2 3.",
+    },
+    {
+      question: "Apa hasil {**{'a': 1, 'b': 2}, **{'b': 9}}?",
+      options: ["{'a': 1, 'b': 9}", "{'a': 1, 'b': 2}", "Error karena kunci ganda"],
+      answer: 0,
+      explanation: "Saat kunci sama, nilai dari dict yang ditulis belakangan yang dipakai.",
+    },
+    {
+      question: "Setelah a, *b = [10, 20, 30], apa isi b?",
+      options: ["20", "[20, 30]", "(20, 30)"],
+      answer: 1,
+      explanation: "Variabel bertanda * menampung sisa nilai sebagai list.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Saat memanggil fungsi, `*daftar` membongkar list atau tuple menjadi argumen posisi.
+- `**kamus` membongkar dict menjadi argumen bernama yang cocok dengan nama parameter.
+- `{**a, **b}` menggabungkan dict; kunci yang sama diambil dari dict belakang.
+- `pertama, *sisa = ...` menampung sisa nilai sebagai list.
+- Parameter setelah `*` sendirian wajib diisi dengan namanya.

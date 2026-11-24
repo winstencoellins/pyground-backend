@@ -1,0 +1,222 @@
+---
+title: Instance Methods
+slug: instance-methods
+stage: 3
+module: OOP Part 1
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Write methods that read and change an object's data, return values, and reject bad input with ValueError.
+---
+
+# Instance Methods
+
+Objects aren't just containers for data. Through **methods**, an object can also *do*
+something with its own data. In this lesson we build a `BankAccount` class that accepts
+deposits and withdrawals.
+
+## Methods read the object's data
+
+A method is a function inside a class. Its first parameter is always `self`, so the method can
+read the attributes of the object that called it.
+
+<Playground initialCode={`class BankAccount:
+    def __init__(self, owner, balance):
+        self.owner = owner
+        self.balance = balance
+
+    def info(self):
+        print("Account", self.owner, "balance Rp", self.balance)
+
+budi_acc = BankAccount("Budi", 50000)
+ani_acc = BankAccount("Ani", 120000)
+
+budi_acc.info()
+ani_acc.info()`} />
+
+When you write `budi_acc.info()`, Python actually runs `BankAccount.info(budi_acc)`. That's why
+`self` inside the method holds `budi_acc`.
+
+## Methods change the object's data
+
+Methods can also change attributes. The change is stored on the object, so other methods see it.
+
+<Playground initialCode={`class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+
+    def withdraw(self, amount):
+        self.balance -= amount
+
+acc = BankAccount("Citra")
+acc.deposit(100000)
+acc.withdraw(25000)
+acc.deposit(10000)
+print("Citra's balance:", acc.balance)`} />
+
+## Returning values
+
+Like regular functions, methods can use `return`. That's handy when you need a result, not just
+printed output.
+
+<Playground initialCode={`class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+        return self.balance
+
+    def can_withdraw(self, amount):
+        return amount <= self.balance
+
+acc = BankAccount("Dodi", 30000)
+new_balance = acc.deposit(20000)
+print("New balance:", new_balance)
+print("Can withdraw 40000?", acc.can_withdraw(40000))
+print("Can withdraw 90000?", acc.can_withdraw(90000))`} />
+
+## Rejecting bad input with `ValueError`
+
+A negative deposit or a withdrawal bigger than the balance makes no sense. A method should keep
+the object's data valid by raising an error with `raise`.
+
+<Playground initialCode={`class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise ValueError("Deposit amount must be more than 0")
+        self.balance += amount
+
+    def withdraw(self, amount):
+        if amount > self.balance:
+            raise ValueError("Insufficient balance")
+        self.balance -= amount
+
+acc = BankAccount("Ani", 50000)
+
+try:
+    acc.withdraw(80000)
+except ValueError as e:
+    print("Failed:", e)
+
+acc.withdraw(20000)
+print("Ani's balance:", acc.balance)`} />
+
+If the error isn't caught with `try`/`except`, the program stops. That's better than quietly
+storing a negative balance.
+
+<Playground expectError initialCode={`class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise ValueError("Deposit amount must be more than 0")
+        self.balance += amount
+
+acc = BankAccount("Budi")
+acc.deposit(-5000)`} />
+
+<Callout type="warning">
+  Don't forget `self.` when changing an attribute. If you write `balance += amount`, Python
+  treats `balance` as a local variable in the method and raises an error, while the object's
+  balance stays the same.
+</Callout>
+
+## Objects in a list
+
+Objects can be stored in a list like any other value. It's the usual way to manage lots of
+records at once.
+
+<Playground initialCode={`class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+
+customers = [
+    BankAccount("Budi", 50000),
+    BankAccount("Ani", 120000),
+    BankAccount("Citra", 75000),
+]
+
+for acc in customers:
+    acc.deposit(10000)
+
+total = sum(acc.balance for acc in customers)
+print("Total balance of all customers:", total)
+
+richest = customers[0]
+for acc in customers:
+    if acc.balance > richest.balance:
+        richest = acc
+print("Largest balance belongs to", richest.owner)`} />
+
+## Exercise
+
+Complete the `EMoneyCard` class for riding the KRL. The `top_up` method adds to the balance
+(reject amounts `<= 0`), and the `pay` method subtracts the fare (reject it if the balance is
+too low).
+
+<Playground initialCode={`class EMoneyCard:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.balance = balance
+
+    def top_up(self, amount):
+        # TODO: raise ValueError if amount <= 0, then add to the balance
+        pass
+
+    def pay(self, fare):
+        # TODO: raise ValueError if the balance is too low, then subtract the fare
+        pass
+
+card = EMoneyCard("Dodi")
+card.top_up(20000)
+card.pay(5000)
+print("Remaining balance:", card.balance)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What happens when you call acc.deposit(10000)?",
+      options: ["Python runs BankAccount.deposit(acc, 10000)", "Python creates a new BankAccount object", "Python passes 10000 to the self parameter"],
+      answer: 0,
+      explanation: "The object before the dot is passed automatically as self, and 10000 goes to amount.",
+    },
+    {
+      question: "Inside a method, which line actually changes the object's balance?",
+      options: ["balance += amount", "amount += self.balance", "self.balance += amount"],
+      answer: 2,
+      explanation: "Object attributes are always accessed through self. Without self., balance is treated as a local variable.",
+    },
+    {
+      question: "Why should withdraw raise a ValueError when the balance is too low?",
+      options: ["To make the program faster", "So the object's data never becomes wrong, and the caller knows something went wrong", "Because Python requires every method to raise"],
+      answer: 1,
+      explanation: "The error stops a change that makes no sense, and the caller can handle it with try/except.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A method is a function inside a class; its first parameter is `self`.
+- `obj.method(x)` is the same as `Class.method(obj, x)`.
+- Methods can read and change attributes through `self`, and return values with `return`.
+- Use `raise ValueError(...)` to reject input that would make the object's data wrong.
+- Objects can live in lists and be processed with loops or `sum()`.

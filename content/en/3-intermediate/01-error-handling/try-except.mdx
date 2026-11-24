@@ -13,7 +13,7 @@ description: Keep your program running when things go wrong, with try, except, e
 
 A good program doesn't just crash when a user types something unexpected. Try running this:
 
-<Playground initialCode={`age = int("twenty")
+<Playground expectError initialCode={`age = int("twenty")
 print(age)`} />
 
 Python shows a `ValueError` and the program stops. Errors like this are called **exceptions**.

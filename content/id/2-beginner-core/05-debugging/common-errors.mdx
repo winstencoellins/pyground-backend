@@ -1,0 +1,174 @@
+---
+title: Error yang Sering Muncul
+slug: common-errors
+stage: 2
+module: Debugging
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Kenali error Python yang paling sering muncul, penyebab umumnya, dan cara memperbaikinya, termasuk bug logika yang diam-diam.
+---
+
+# Error yang Sering Muncul
+
+Kabar baiknya: kebanyakan error yang akan kamu temui berasal dari daftar yang pendek. Begitu
+kamu kenal polanya, kamu bisa memperbaikinya dalam hitungan detik.
+
+## SyntaxError dan IndentationError
+
+Dua error ini muncul **sebelum** program sempat berjalan. Python membaca kodemu dan
+menemukan tulisan yang tidak sesuai aturan.
+
+```python
+harga = 5000
+if harga > 3000
+    print("Mahal")
+# SyntaxError: expected ':'
+```
+
+```python
+for barang in ["beras", "gula"]:
+print(barang)
+# IndentationError: expected an indented block after 'for' statement on line 1
+```
+
+Penyebab umum: lupa titik dua `:`, kurung atau tanda kutip yang tidak ditutup, atau isi
+blok yang tidak menjorok. Perbaikannya: cek baris yang ditunjuk **dan baris sebelumnya**,
+karena kurung yang lupa ditutup sering baru ketahuan di baris berikutnya.
+
+## NameError
+
+Python tidak kenal nama yang kamu pakai. Biasanya karena salah ketik, beda huruf besar
+kecil, atau variabelnya dipakai sebelum dibuat.
+
+<Playground expectError initialCode={`nama_siswa = "Citra"
+print("Halo,", Nama_siswa)`} />
+
+Perbaikannya: samakan ejaannya persis, dan pastikan variabel dibuat sebelum dipakai.
+
+## TypeError
+
+Kamu melakukan operasi pada tipe data yang tidak cocok, misalnya menggabung teks dengan
+angka, atau memanggil fungsi dengan jumlah argumen yang salah.
+
+<Playground expectError initialCode={`umur = 17
+print("Umur Dodi: " + umur)`} />
+
+Perbaikannya: ubah tipenya dulu (`str(umur)`), atau pakai f-string
+`f"Umur Dodi: {umur}"` yang mengurus konversinya untukmu.
+
+## IndexError dan KeyError
+
+Kamu meminta isi yang tidak ada. `IndexError` untuk indeks list atau tuple yang kelewat
+batas, `KeyError` untuk key yang tidak ada di dict.
+
+<Playground expectError initialCode={`antrean = ["Ani", "Budi", "Citra"]
+print(antrean[3])`} />
+
+<Playground expectError initialCode={`harga_menu = {"nasi goreng": 15000, "es teh": 4000}
+print(harga_menu["mie ayam"])`} />
+
+Perbaikannya: ingat indeks dimulai dari 0, jadi list berisi 3 punya indeks 0 sampai 2. Untuk
+dict, cek dulu dengan `in` atau pakai `.get()`:
+
+<Playground initialCode={`harga_menu = {"nasi goreng": 15000, "es teh": 4000}
+print(harga_menu.get("mie ayam", "Menu tidak ada"))`} />
+
+## ValueError dan ZeroDivisionError
+
+`ValueError` muncul saat tipenya benar tapi **nilainya** tidak bisa dipakai, misalnya
+mengubah teks `"lima"` menjadi angka. `ZeroDivisionError` muncul saat membagi dengan nol.
+
+<Playground expectError initialCode={`jumlah = int("lima")
+print(jumlah)`} />
+
+<Playground expectError initialCode={`total_nilai = 0
+jumlah_siswa = 0
+print(total_nilai / jumlah_siswa)`} />
+
+Perbaikannya: pastikan teks berisi angka sebelum `int()` (misalnya dengan `.isdigit()`), dan
+cek pembaginya dengan `if` sebelum membagi.
+
+| Error | Penyebab umum | Perbaikan |
+| --- | --- | --- |
+| `SyntaxError` | lupa `:`, kurung, atau kutip | cek baris itu dan sebelumnya |
+| `IndentationError` | isi blok tidak menjorok | rapikan spasi awal baris |
+| `NameError` | salah ketik nama | samakan ejaan |
+| `TypeError` | tipe tidak cocok | ubah tipe atau pakai f-string |
+| `IndexError` | indeks kelewat batas | ingat indeks mulai dari 0 |
+| `KeyError` | key tidak ada | cek dengan `in` atau `.get()` |
+| `ValueError` | nilai tidak bisa dipakai | cek nilainya dulu |
+| `ZeroDivisionError` | membagi dengan nol | cek pembagi dengan `if` |
+
+## Bug logika: tidak ada error, tapi hasilnya salah
+
+Jenis bug paling licin justru yang **tidak** memunculkan error. Program berjalan mulus, tapi
+hasilnya keliru. Coba tebak hasil kode ini sebelum menjalankannya:
+
+<Playground initialCode={`nilai = [80, 90, 70]
+rata_rata = sum(nilai) / 2
+print("Rata-rata:", rata_rata)
+
+umur = 17
+if umur > 17:
+    print("Boleh bikin KTP")
+else:
+    print("Belum boleh bikin KTP")`} />
+
+Rata-ratanya 120, mustahil untuk nilai di bawah 100. Seharusnya dibagi `len(nilai)`. Lalu
+umur 17 sudah boleh membuat KTP, jadi syaratnya seharusnya `umur >= 17`.
+
+<Callout type="warning">
+  Python tidak bisa menebak maksudmu. Untuk bug logika, kamu sendiri yang harus memeriksa
+  apakah hasilnya masuk akal. Teknik untuk itu ada di pelajaran berikutnya.
+</Callout>
+
+## Latihan
+
+Kode ini berjalan tanpa error, tapi ada dua bug logika. Total belanjaan dan jumlah barang
+mahal (harga di atas 10000) salah. Temukan dan perbaiki keduanya.
+
+<Playground initialCode={`belanjaan = {"beras": 65000, "telur": 28000, "garam": 3000, "kecap": 10000}
+
+total = 0
+mahal = 0
+for barang, harga in belanjaan.items():
+    total = harga  # TODO: apakah ini benar-benar menjumlahkan?
+    if harga >= 10000:  # TODO: cek lagi syaratnya
+        mahal += 1
+
+print("Total belanja:", total)  # seharusnya 106000
+print("Barang mahal:", mahal)   # seharusnya 2`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kode print('Nilai: ' + 90) memunculkan error apa?",
+      options: ["ValueError", "NameError", "TypeError"],
+      answer: 2,
+      explanation: "Teks dan angka tidak bisa digabung dengan +, jadi tipenya tidak cocok: TypeError.",
+    },
+    {
+      question: "Dict menu tidak punya key 'soto'. Apa yang terjadi pada menu['soto']?",
+      options: ["KeyError", "Hasilnya None", "IndexError"],
+      answer: 0,
+      explanation: "Mengakses key yang tidak ada di dict memunculkan KeyError. Pakai .get() untuk menghindarinya.",
+    },
+    {
+      question: "Program berjalan tanpa error tapi totalnya salah. Ini jenis bug apa?",
+      options: ["SyntaxError", "Bug logika", "IndentationError"],
+      answer: 1,
+      explanation: "Bug logika tidak memunculkan error; kodenya sah tapi melakukan hal yang salah.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `SyntaxError` dan `IndentationError` muncul sebelum program berjalan; cek juga baris sebelumnya.
+- `NameError` biasanya salah ketik, `TypeError` biasanya tipe yang tidak cocok.
+- `IndexError` dan `KeyError` berarti meminta isi yang tidak ada; `.get()` membantu untuk dict.
+- `ValueError` berarti nilainya tidak bisa dipakai, `ZeroDivisionError` berarti membagi dengan nol.
+- Bug logika tidak memunculkan error, jadi selalu periksa apakah hasilnya masuk akal.

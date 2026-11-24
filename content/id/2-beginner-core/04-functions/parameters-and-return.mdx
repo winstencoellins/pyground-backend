@@ -1,0 +1,158 @@
+---
+title: Parameter dan Nilai Kembalian
+slug: parameters-and-return
+stage: 2
+module: Fungsi
+order: 2
+isFree: false
+estimatedMinutes: 18
+description: Kirim data ke fungsi lewat parameter, lalu ambil hasilnya dengan return.
+---
+
+# Parameter dan Nilai Kembalian
+
+Fungsi di pelajaran sebelumnya selalu melakukan hal yang sama persis. Fungsi jadi jauh lebih
+berguna kalau kamu bisa **mengirim data** ke dalamnya dan **menerima hasil** darinya.
+
+## Parameter dan argumen
+
+Tulis nama di dalam tanda kurung saat membuat fungsi. Nama itu disebut **parameter**. Nilai yang
+kamu kirim saat memanggil fungsi disebut **argumen**:
+
+<Playground initialCode={`def sapa(nama):
+    print(f"Halo, {nama}! Selamat datang di kos.")
+
+sapa("Budi")
+sapa("Citra")`} />
+
+Di sini `nama` adalah parameter, sedangkan `"Budi"` dan `"Citra"` adalah argumen. Parameter seperti
+variabel yang isinya diberikan oleh pemanggil.
+
+Fungsi boleh punya lebih dari satu parameter, dipisah koma. Argumen dicocokkan sesuai urutannya:
+
+<Playground initialCode={`def tagih_kos(nama, bulan, harga):
+    print(f"{nama}, sewa kos bulan {bulan}: Rp{harga:,}")
+
+tagih_kos("Dodi", "Maret", 850000)
+tagih_kos("Ani", "April", 900000)`} />
+
+## Mengembalikan hasil dengan `return`
+
+`return` mengirim sebuah nilai kembali ke tempat fungsi dipanggil. Nilai itu bisa kamu simpan ke
+variabel, dicetak, atau dipakai menghitung lagi:
+
+<Playground initialCode={`def hitung_ongkir(jarak_km):
+    return 5000 + jarak_km * 2500
+
+ongkir_budi = hitung_ongkir(4)
+ongkir_ani = hitung_ongkir(10)
+
+print("Ongkir Budi:", ongkir_budi)
+print("Ongkir Ani:", ongkir_ani)
+print("Total:", ongkir_budi + ongkir_ani)`} />
+
+## `return` bukan `print`
+
+Ini kebingungan yang paling sering dialami pemula. `print()` hanya **menampilkan** teks ke layar.
+`return` **mengembalikan nilai** yang masih bisa dipakai. Bandingkan:
+
+<Playground initialCode={`def total_print(harga, jumlah):
+    print(harga * jumlah)
+
+def total_return(harga, jumlah):
+    return harga * jumlah
+
+a = total_print(3000, 4)
+b = total_return(3000, 4)
+
+print("a berisi:", a)
+print("b berisi:", b)`} />
+
+`total_print()` memang menampilkan `12000`, tapi tidak mengembalikan apa-apa, sehingga `a` berisi
+`None`. Kalau kamu mencoba `a + 1000`, hasilnya error. Hanya `b` yang benar-benar menyimpan angka.
+
+<Callout type="tip">
+  Aturan praktis: kalau hasil fungsi masih akan dipakai (dijumlah, dibandingkan, disimpan), pakai
+  `return`. Biarkan `print()` dilakukan di luar fungsi, pada saat hasilnya mau ditampilkan.
+</Callout>
+
+## Mengembalikan beberapa nilai
+
+Satu `return` boleh berisi beberapa nilai yang dipisah koma. Python membungkusnya menjadi
+**tuple**, yang bisa langsung kamu bongkar ke beberapa variabel:
+
+<Playground initialCode={`def statistik_nilai(daftar_nilai):
+    terendah = min(daftar_nilai)
+    tertinggi = max(daftar_nilai)
+    rata_rata = sum(daftar_nilai) / len(daftar_nilai)
+    return terendah, tertinggi, rata_rata
+
+hasil = statistik_nilai([78, 92, 65, 88])
+print(hasil)
+
+rendah, tinggi, rata = statistik_nilai([78, 92, 65, 88])
+print(f"Terendah {rendah}, tertinggi {tinggi}, rata-rata {rata}")`} />
+
+## Keluar lebih awal dengan `return`
+
+Begitu `return` dijalankan, fungsi langsung berhenti. Baris setelahnya tidak dijalankan. Ini
+berguna untuk menangani kasus khusus di awal fungsi:
+
+<Playground initialCode={`def harga_tiket(umur):
+    if umur < 5:
+        return 0
+    if umur >= 60:
+        return 10000
+    return 25000
+
+for umur in [3, 17, 65]:
+    print(f"Umur {umur}: Rp{harga_tiket(umur)}")`} />
+
+Teknik ini disebut **early return**. Kode jadi lebih rata dan mudah dibaca dibanding `if` yang
+bersarang dalam-dalam.
+
+## Latihan
+
+Lengkapi fungsi `hitung_kembalian()` supaya mengembalikan uang kembalian. Kalau uang yang dibayar
+kurang dari total belanja, kembalikan `0` lebih awal.
+
+<Playground initialCode={`def hitung_kembalian(total, dibayar):
+    # TODO: kalau dibayar kurang dari total, return 0
+    # TODO: selain itu, return selisihnya
+    pass
+
+print(hitung_kembalian(27000, 50000))  # harusnya 23000
+print(hitung_kembalian(27000, 20000))  # harusnya 0`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Pada def sapa(nama): ... lalu sapa('Ani'), mana yang disebut argumen?",
+      options: ["nama", "sapa", "'Ani'"],
+      answer: 2,
+      explanation: "Parameter adalah nama di definisi fungsi (nama). Argumen adalah nilai yang dikirim saat memanggil ('Ani').",
+    },
+    {
+      question: "Fungsi tanpa return dipanggil dengan x = f(). Apa isi x?",
+      options: ["None", "0", "Teks yang di-print"],
+      answer: 0,
+      explanation: "Fungsi yang tidak menjalankan return selalu mengembalikan None.",
+    },
+    {
+      question: "Apa tipe hasil dari return 1, 2?",
+      options: ["list", "tuple", "Error"],
+      answer: 1,
+      explanation: "Beberapa nilai yang dipisah koma di return dibungkus menjadi tuple, yaitu (1, 2).",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Parameter adalah nama di definisi fungsi; argumen adalah nilai yang dikirim saat memanggil.
+- `return` mengembalikan nilai yang bisa disimpan dan dipakai lagi; `print()` hanya menampilkan.
+- Fungsi tanpa `return` mengembalikan `None`.
+- `return a, b` mengembalikan tuple yang bisa dibongkar ke beberapa variabel.
+- `return` langsung menghentikan fungsi, berguna untuk menangani kasus khusus lebih awal.

@@ -1,0 +1,252 @@
+---
+title: Project Student Grade Book
+slug: grade-book-project
+stage: 2
+module: Project
+order: 1
+isFree: false
+estimatedMinutes: 25
+description: Build a student grade book step by step with dicts, lists, functions, if/elif, f-strings, and an input menu.
+---
+
+# Project: Student Grade Book
+
+Time to combine everything you learned in Stage 2. You will build a **grade book** for a homeroom
+teacher: store each student's test scores, compute averages, assign letter grades, print a tidy
+report, and offer a simple menu.
+
+We'll build it bit by bit. You can run every step on its own.
+
+## Step 1: Storing the data
+
+Each student has several scores. A good shape for this is a **dict** with the student's name as
+the key and a **list** of scores as the value:
+
+<Playground initialCode={`grade_book = {
+    "Ani": [85, 92, 78],
+    "Budi": [70, 65, 80],
+    "Citra": [95, 88, 91],
+}
+
+print(grade_book)
+print("Budi's scores:", grade_book["Budi"])
+print("Number of students:", len(grade_book))`} />
+
+## Step 2: Adding a score
+
+The `add_score` function takes the grade book, a name, and a score. If the student isn't there yet,
+we create an empty list first. Scores outside 0 to 100 are rejected.
+
+<Playground initialCode={`def add_score(book, name, score):
+    if score < 0 or score > 100:
+        print(f"Score {score} is invalid, it must be 0 to 100")
+        return
+    if name not in book:
+        book[name] = []
+    book[name].append(score)
+
+grade_book = {"Ani": [85, 92]}
+add_score(grade_book, "Ani", 78)
+add_score(grade_book, "Dodi", 88)
+add_score(grade_book, "Dodi", 120)
+print(grade_book)`} />
+
+Notice that this function changes the dict passed to it, so it doesn't need to `return` a new value.
+
+## Step 3: Average and letter grade
+
+Two small functions, each with one job. `average` must be safe for a student with no scores yet
+(remember `ZeroDivisionError`!), and `letter_grade` uses `if/elif`.
+
+<Playground initialCode={`def average(scores):
+    if len(scores) == 0:
+        return 0
+    return sum(scores) / len(scores)
+
+def letter_grade(avg):
+    if avg >= 90:
+        return "A"
+    elif avg >= 80:
+        return "B"
+    elif avg >= 70:
+        return "C"
+    elif avg >= 60:
+        return "D"
+    else:
+        return "E"
+
+print(average([85, 92, 78]), letter_grade(average([85, 92, 78])))
+print(average([]), letter_grade(average([])))
+
+# Check boundary values, as in the debugging lesson
+assert letter_grade(90) == "A"
+assert letter_grade(89.9) == "B"
+assert letter_grade(60) == "D"
+print("All checks passed")`} />
+
+<Callout type="tip">
+  The three `assert` lines at the end are small tests. If you change the grade boundaries later and
+  something breaks, you'll know straight away.
+</Callout>
+
+## Step 4: A tidy report
+
+f-strings can set column widths. `:<8` means left-aligned in 8 characters, `:>6.1f` means
+right-aligned in 6 characters with one digit after the decimal point.
+
+<Playground initialCode={`def average(scores):
+    if len(scores) == 0:
+        return 0
+    return sum(scores) / len(scores)
+
+def letter_grade(avg):
+    if avg >= 90:
+        return "A"
+    elif avg >= 80:
+        return "B"
+    elif avg >= 70:
+        return "C"
+    elif avg >= 60:
+        return "D"
+    else:
+        return "E"
+
+def print_report(book):
+    print(f"{'Name':<8}{'Count':>7}{'Avg':>7}{'Grade':>7}")
+    print("-" * 29)
+    for name in sorted(book):
+        scores = book[name]
+        avg = average(scores)
+        print(f"{name:<8}{len(scores):>7}{avg:>7.1f}{letter_grade(avg):>7}")
+
+grade_book = {
+    "Citra": [95, 88, 91],
+    "Ani": [85, 92, 78],
+    "Budi": [70, 65, 80],
+    "Dodi": [],
+}
+print_report(grade_book)`} />
+
+`sorted(book)` sorts the dict's keys, so the report is always in alphabetical order.
+
+## Step 5: A menu with `input()`
+
+Finally, we put it all together in a `while` loop. The user picks menu options until they type
+`quit`. Since we haven't learned error handling yet, we check with `.isdigit()` before calling
+`int()` so no `ValueError` happens.
+
+<Playground initialCode={`def add_score(book, name, score):
+    if score < 0 or score > 100:
+        print(f"Score {score} is invalid, it must be 0 to 100")
+        return
+    if name not in book:
+        book[name] = []
+    book[name].append(score)
+
+def average(scores):
+    if len(scores) == 0:
+        return 0
+    return sum(scores) / len(scores)
+
+def letter_grade(avg):
+    if avg >= 90:
+        return "A"
+    elif avg >= 80:
+        return "B"
+    elif avg >= 70:
+        return "C"
+    elif avg >= 60:
+        return "D"
+    else:
+        return "E"
+
+def print_report(book):
+    print(f"{'Name':<8}{'Count':>7}{'Avg':>7}{'Grade':>7}")
+    print("-" * 29)
+    for name in sorted(book):
+        scores = book[name]
+        avg = average(scores)
+        print(f"{name:<8}{len(scores):>7}{avg:>7.1f}{letter_grade(avg):>7}")
+
+grade_book = {"Ani": [85, 92, 78], "Budi": [70, 65, 80]}
+
+while True:
+    print()
+    print("1. Add a score")
+    print("2. Show report")
+    choice = input("Choose 1, 2, or type quit: ").strip().lower()
+
+    if choice == "quit":
+        print("See you!")
+        break
+    elif choice == "1":
+        name = input("Student name: ").strip().title()
+        score_text = input("Score: ").strip()
+        if score_text.isdigit():
+            add_score(grade_book, name, int(score_text))
+        else:
+            print("The score must be a number")
+    elif choice == "2":
+        print_report(grade_book)
+    else:
+        print("Unknown choice")`} />
+
+Try adding a score for a new student, then view the report, then type `quit`.
+
+## Exercise
+
+Add a `top_student` function that returns the **name** of the student with the highest average.
+Then, if you still have energy, try one of these extensions:
+
+- A menu option to **remove** a student.
+- Show the **whole class** average below the report.
+- Show each student's highest and lowest score with `max()` and `min()`.
+- Use a **set** to record students whose average is below 70 (they need remedial work).
+
+<Playground initialCode={`def average(scores):
+    if len(scores) == 0:
+        return 0
+    return sum(scores) / len(scores)
+
+def top_student(book):
+    # TODO: loop over every student, keep the name with the highest average
+    pass
+
+grade_book = {
+    "Ani": [85, 92, 78],
+    "Budi": [70, 65, 80],
+    "Citra": [95, 88, 91],
+}
+print("Top student:", top_student(grade_book))  # should be Citra`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Why is the grade book stored as a dict of lists?",
+      options: ["So each student name links to many scores", "Because lists can't hold numbers", "Because dicts are always sorted alphabetically"],
+      answer: 0,
+      explanation: "The dict key is the student name and the value is a list, so one student can have many scores.",
+    },
+    {
+      question: "Why does average check len(scores) == 0 first?",
+      options: ["To make it faster", "To get a whole number", "To avoid a ZeroDivisionError"],
+      answer: 2,
+      explanation: "A student with no scores has an empty list; dividing by a len() of zero raises ZeroDivisionError.",
+    },
+    {
+      question: "What does the format :>7.1f mean in an f-string?",
+      options: ["Left-aligned, 7 digits after the decimal point", "Right-aligned in 7 characters, one decimal digit", "Multiplied by 7 then rounded"],
+      answer: 1,
+      explanation: "The > means right-aligned, 7 is the column width, and .1f means one decimal digit.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A dict of lists suits "one name, many values" data.
+- Split the program into small functions: `add_score`, `average`, `letter_grade`, `print_report`.
+- Guard special cases such as an empty list, and test boundary values with `assert`.
+- f-strings with column widths make a tidy report, and a `while` loop with `input()` makes a menu.

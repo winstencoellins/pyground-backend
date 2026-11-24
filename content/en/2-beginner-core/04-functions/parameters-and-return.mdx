@@ -1,0 +1,159 @@
+---
+title: Parameters and Return Values
+slug: parameters-and-return
+stage: 2
+module: Functions
+order: 2
+isFree: false
+estimatedMinutes: 18
+description: Send data into a function through parameters, then get the result back with return.
+---
+
+# Parameters and Return Values
+
+The functions in the previous lesson always did exactly the same thing. A function becomes far
+more useful when you can **send data** into it and **receive a result** from it.
+
+## Parameters and arguments
+
+Put a name inside the parentheses when you create a function. That name is called a
+**parameter**. The value you send when you call the function is called an **argument**:
+
+<Playground initialCode={`def greet(name):
+    print(f"Hi, {name}! Welcome to the kos.")
+
+greet("Budi")
+greet("Citra")`} />
+
+Here `name` is the parameter, while `"Budi"` and `"Citra"` are arguments. A parameter is like a
+variable whose value is supplied by the caller.
+
+A function can have more than one parameter, separated by commas. Arguments are matched by their
+order:
+
+<Playground initialCode={`def bill_rent(name, month, price):
+    print(f"{name}, kos rent for {month}: Rp{price:,}")
+
+bill_rent("Dodi", "March", 850000)
+bill_rent("Ani", "April", 900000)`} />
+
+## Returning a result with `return`
+
+`return` sends a value back to the place where the function was called. You can store that value
+in a variable, print it, or use it in more calculations:
+
+<Playground initialCode={`def delivery_fee(distance_km):
+    return 5000 + distance_km * 2500
+
+fee_budi = delivery_fee(4)
+fee_ani = delivery_fee(10)
+
+print("Budi's fee:", fee_budi)
+print("Ani's fee:", fee_ani)
+print("Total:", fee_budi + fee_ani)`} />
+
+## `return` is not `print`
+
+This is the most common beginner confusion. `print()` only **shows** text on the screen.
+`return` **gives back a value** you can keep using. Compare:
+
+<Playground initialCode={`def total_print(price, qty):
+    print(price * qty)
+
+def total_return(price, qty):
+    return price * qty
+
+a = total_print(3000, 4)
+b = total_return(3000, 4)
+
+print("a holds:", a)
+print("b holds:", b)`} />
+
+`total_print()` does show `12000`, but it returns nothing, so `a` holds `None`. If you tried
+`a + 1000`, you would get an error. Only `b` actually holds the number.
+
+<Callout type="tip">
+  Rule of thumb: if the function's result will be used again (added, compared, stored), use
+  `return`. Leave the `print()` outside the function, at the moment you want to show the result.
+</Callout>
+
+## Returning several values
+
+A single `return` can hold several comma-separated values. Python packs them into a **tuple**,
+which you can unpack straight into several variables:
+
+<Playground initialCode={`def score_stats(scores):
+    lowest = min(scores)
+    highest = max(scores)
+    average = sum(scores) / len(scores)
+    return lowest, highest, average
+
+result = score_stats([78, 92, 65, 88])
+print(result)
+
+low, high, avg = score_stats([78, 92, 65, 88])
+print(f"Lowest {low}, highest {high}, average {avg}")`} />
+
+## Leaving early with `return`
+
+As soon as `return` runs, the function stops. The lines after it do not run. This is handy for
+handling special cases at the top of a function:
+
+<Playground initialCode={`def ticket_price(age):
+    if age < 5:
+        return 0
+    if age >= 60:
+        return 10000
+    return 25000
+
+for age in [3, 17, 65]:
+    print(f"Age {age}: Rp{ticket_price(age)}")`} />
+
+This technique is called an **early return**. The code stays flat and easier to read than deeply
+nested `if` statements.
+
+## Exercise
+
+Complete `calculate_change()` so it returns the change. If the amount paid is less than the total,
+return `0` early.
+
+<Playground initialCode={`def calculate_change(total, paid):
+    # TODO: if paid is less than total, return 0
+    # TODO: otherwise, return the difference
+    pass
+
+print(calculate_change(27000, 50000))  # should be 23000
+print(calculate_change(27000, 20000))  # should be 0`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "In def greet(name): ... followed by greet('Ani'), which one is the argument?",
+      options: ["name", "greet", "'Ani'"],
+      answer: 2,
+      explanation: "The parameter is the name in the function definition (name). The argument is the value sent when calling ('Ani').",
+    },
+    {
+      question: "A function with no return is called with x = f(). What does x hold?",
+      options: ["None", "0", "The printed text"],
+      answer: 0,
+      explanation: "A function that never runs return always returns None.",
+    },
+    {
+      question: "What type does return 1, 2 give back?",
+      options: ["list", "tuple", "An error"],
+      answer: 1,
+      explanation: "Comma-separated values in a return are packed into a tuple, (1, 2).",
+    },
+  ]}
+/>
+
+## Summary
+
+- A parameter is the name in the function definition; an argument is the value sent when calling.
+- `return` gives back a value you can store and reuse; `print()` only shows it.
+- A function without `return` returns `None`.
+- `return a, b` returns a tuple you can unpack into several variables.
+- `return` stops the function immediately, which is handy for handling special cases early.

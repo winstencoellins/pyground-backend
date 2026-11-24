@@ -1,0 +1,167 @@
+---
+title: pip and Virtual Environments
+slug: pip-and-venv
+stage: 3
+module: Modules, pip, and venv
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Install third-party libraries with pip inside a virtual environment, and record your project's needs in requirements.txt.
+---
+
+# pip and Virtual Environments
+
+The standard library is rich, but sometimes you need a library someone else wrote, such as
+`requests` for fetching data from the internet. Libraries like that are installed with
+**pip**, ideally inside a **virtual environment** (venv).
+
+<Callout type="info">
+  The Pyground playground runs in your browser and can't run `pip install`. Type every
+  command in this lesson in a terminal on your own computer.
+</Callout>
+
+## Which Python is running?
+
+Before installing anything, get to know the Python you're using. The `sys` module can tell
+you its version and location:
+
+<Playground initialCode={`import sys
+
+print(sys.version)
+print(sys.prefix)`} />
+
+On your computer, check from the terminal too:
+
+<TerminalBlock command="python --version" output={`Python 3.12.4`} />
+
+## Why a virtual environment?
+
+Imagine two projects: a school assignment that needs `requests` version 2.28, and a warung
+cashier app that needs version 2.32. If every library is installed into the same Python, the
+two projects get in each other's way.
+
+A virtual environment is a folder holding a "private Python" for one project. Each project
+gets its own venv, so their libraries never mix.
+
+## Creating and activating a venv
+
+Go into your project folder, then create a venv named `.venv`:
+
+<TerminalBlock command="python -m venv .venv" />
+
+Activating it differs per operating system. On macOS and Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+On Windows (Command Prompt or PowerShell):
+
+```bash
+.venv\Scripts\activate
+```
+
+Once active, your terminal usually shows `(.venv)` at the start of the prompt. To leave the
+venv, type `deactivate`.
+
+The structure looks roughly like this:
+
+<FileTree>
+{`warung-cashier/
+├── .venv/
+├── main.py
+└── requirements.txt`}
+</FileTree>
+
+<Callout type="tip">
+  Don't upload the `.venv` folder to Git. Add `.venv/` to your `.gitignore` file. Sharing
+  `requirements.txt` is enough.
+</Callout>
+
+## Installing libraries with pip
+
+With the venv active, install a library:
+
+<TerminalBlock command="pip install requests" output={`Collecting requests
+...
+Successfully installed certifi charset-normalizer idna requests urllib3`} />
+
+A few other pip commands you'll use often:
+
+```bash
+pip list                  # see installed libraries
+pip install requests==2.32.3   # install a specific version
+pip uninstall requests    # remove a library
+```
+
+## `pip freeze` and `requirements.txt`
+
+`pip freeze` prints every library with its version. Save the output to `requirements.txt` so
+others (or you, on another computer) can install exactly the same libraries:
+
+<TerminalBlock command="pip freeze > requirements.txt" />
+
+`requirements.txt` then looks something like this:
+
+```text
+certifi==2024.8.30
+charset-normalizer==3.4.0
+idna==3.10
+requests==2.32.3
+urllib3==2.2.3
+```
+
+A classmate just creates their own venv, activates it, and runs:
+
+<TerminalBlock command="pip install -r requirements.txt" />
+
+## Exercise
+
+Do this exercise on your own computer, not in the playground:
+
+1. Create a folder `learn-venv`, then create a venv inside it with `python -m venv .venv`.
+2. Activate the venv for your operating system.
+3. Install `requests`, then save the library list with `pip freeze > requirements.txt`.
+
+Then run this code on your computer with the venv active. If `sys.prefix` differs from
+`sys.base_prefix`, you're inside a venv. In the playground, the result is `False`:
+
+<Playground initialCode={`import sys
+
+in_venv = sys.prefix != sys.base_prefix
+print("Inside a venv?", in_venv)
+# TODO: if in_venv is True, print the venv location (sys.prefix)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which command creates a virtual environment named .venv?",
+      options: ["pip install venv", "python -m venv .venv", "venv create .venv"],
+      answer: 1,
+      explanation: "python -m venv .venv runs Python's built-in venv module to create the .venv folder.",
+    },
+    {
+      question: "What is requirements.txt for?",
+      options: ["Recording libraries and their versions so they can be reinstalled", "Storing the main program code", "Activating the virtual environment"],
+      answer: 0,
+      explanation: "pip install -r requirements.txt installs every library listed in that file.",
+    },
+    {
+      question: "Why should each project have its own venv?",
+      options: ["So Python runs faster", "Because pip only works inside a venv", "So libraries and their versions don't clash between projects"],
+      answer: 2,
+      explanation: "Each venv has its own libraries, so projects needing different versions don't interfere.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A virtual environment keeps each project's libraries separate; create one with `python -m venv .venv`.
+- Activate it with `source .venv/bin/activate` (macOS/Linux) or `.venv\Scripts\activate`
+  (Windows), and leave with `deactivate`.
+- `pip install name` installs a library, `pip freeze > requirements.txt` records it.
+- `pip install -r requirements.txt` reinstalls every library on another computer.
+- The browser playground can't `pip install`; do pip practice on your own computer.

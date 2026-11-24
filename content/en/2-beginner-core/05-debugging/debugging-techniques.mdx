@@ -1,0 +1,163 @@
+---
+title: Debugging Techniques
+slug: debugging-techniques
+stage: 2
+module: Debugging
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Find bugs faster with print debugging, assert, shrinking the problem, and rubber duck debugging.
+---
+
+# Debugging Techniques
+
+Debugging is detective work: you collect clues until you find where reality differs from what you
+expected. This lesson gives you the detective tools used most often.
+
+## Print debugging
+
+The simplest and most powerful approach: show variable values in the middle of the program so you
+can see what is really happening.
+
+<Playground initialCode={`prices = [12000, 8000, 15000]
+total = 0
+for p in prices:
+    total = total + p
+    print("debug: p =", p, "total =", total)
+
+print("Shopping total:", total)`} />
+
+This way you can watch `total` change on every pass. If something looks odd, you know exactly on
+which pass the problem starts.
+
+## The `f"{x=}"` trick
+
+Writing the variable name twice is tiring. f-strings have a shortcut: add `=` after the variable
+name, and Python shows both the name and its value.
+
+<Playground initialCode={`name = "Ani"
+pocket_money = 25000
+snacks = [5000, 7000, 3000]
+
+print(f"{name=}")
+print(f"{pocket_money=}")
+print(f"{sum(snacks)=}")
+print(f"{pocket_money - sum(snacks)=}")`} />
+
+It also works for expressions like `sum(snacks)`. Once you've found the bug, remember to remove
+your debug prints.
+
+## Checking assumptions with `assert`
+
+`assert` writes your assumption as code. If the assumption holds, nothing happens. If it doesn't,
+the program stops with an `AssertionError` right there, not far down the line.
+
+<Playground initialCode={`def average(numbers):
+    return sum(numbers) / len(numbers)
+
+result = average([80, 90, 70])
+assert result == 80, "the average should be 80"
+print("All good, the average is", result)`} />
+
+Now see what happens when the assumption is wrong:
+
+<Playground expectError initialCode={`def discount(price, percent):
+    return price * percent
+
+final_price = 50000 - discount(50000, 10)
+assert final_price >= 0, "final price must not be negative"
+print("Final price:", final_price)`} />
+
+The message after the comma shows up in the traceback, so write one that explains your assumption.
+The bug here: `percent` should be divided by 100.
+
+## Shrinking the problem
+
+If your program is long and you don't know which part is wrong, **shrink** it. Copy the suspicious
+part somewhere separate, give it the smallest possible data, and test it on its own.
+
+<Playground initialCode={`def letter_grade(score):
+    if score >= 90:
+        return "A"
+    elif score >= 80:
+        return "B"
+    elif score > 70:
+        return "C"
+    else:
+        return "D"
+
+# Test this function alone with a few boundary values
+for score in [95, 90, 80, 75, 70, 50]:
+    print(score, letter_grade(score))`} />
+
+Testing the boundary values one by one makes it obvious: a score of 70 gets `D`, when it should get
+`C`. A tiny bug like `>` that should be `>=` is far easier to spot in code this short than in a
+hundred-line program.
+
+## The rubber duck and reading the error
+
+**Rubber duck debugging**: explain your code line by line, out loud, to anything at all, such as a
+toy duck, the cat at your kos, or a friend. When you force yourself to say "this line does X", you
+often realise on your own that it actually does Y.
+
+<Callout type="tip">
+  Before googling, read the last line of the traceback first. The error type and message are often
+  enough. If you still need to search, copy **only the error type and message**, without your own
+  variable names, so the results are relevant.
+</Callout>
+
+A routine you can follow whenever you're stuck:
+
+1. Read the traceback from the bottom up.
+2. Show the suspicious values with `f"{x=}"`.
+3. Write your assumption with `assert`.
+4. Shrink the problem down to a few lines.
+5. Explain it to the rubber duck. Only then search the internet.
+
+## Exercise
+
+The `calculate_change` function gives the wrong result. Use `f"{x=}"` to look at the values, add an
+`assert` for your assumption, then fix the function.
+
+<Playground initialCode={`def calculate_change(paid, purchases):
+    total = 0
+    for price in purchases:
+        total = price
+    return paid - total
+
+change = calculate_change(50000, [12000, 15000, 8000])
+# TODO: show the value with a debug f-string, for example print(f"{change=}")
+# TODO: add assert change == 15000 once the function is fixed
+print("Change:", change)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "If x = 5, what does print(f'{x=}') show?",
+      options: ["5", "x=5", "x"],
+      answer: 1,
+      explanation: "An = inside the f-string braces shows both the name and the value.",
+    },
+    {
+      question: "What happens when the condition of an assert is False?",
+      options: ["The program stops with an AssertionError", "The program carries on as normal", "Python fixes the value"],
+      answer: 0,
+      explanation: "assert stops the program with an AssertionError, along with the message you wrote.",
+    },
+    {
+      question: "What is the best first step when you hit an error?",
+      options: ["Google it straight away", "Delete the failing code", "Read the last line of the traceback"],
+      answer: 2,
+      explanation: "The error type and message on the last line often explain the problem already.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Print debugging shows what really happens; `f"{x=}"` makes it shorter.
+- `assert condition, "message"` stops the program the moment your assumption is wrong.
+- Shrink the problem: test a small part with simple data and boundary values.
+- Explain your code to a rubber duck, and read the error message before searching online.

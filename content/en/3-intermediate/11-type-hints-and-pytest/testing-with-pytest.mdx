@@ -1,0 +1,233 @@
+---
+title: Testing Your Code with pytest
+slug: testing-with-pytest
+stage: 3
+module: Type Hints and pytest
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Write automated tests with assert, then run them with pytest so you know your code is correct every time you change it.
+---
+
+# Testing Your Code with pytest
+
+So far you've checked your code by running it and eyeballing the `print()` output. That works
+for small programs. But once your program grows, checking everything by hand after every
+change gets tiring and things get missed. **Automated tests** are code that checks your code.
+
+## Why write tests?
+
+Imagine you write a discount function for a warung cashier. Next week you change it to add a
+new feature. How do you know the old calculations are still right? With tests, you run one
+command and every case is checked again in seconds.
+
+Good tests:
+
+- make sure your code works the way you expect,
+- catch bugs when you change code (called *regressions*),
+- double as examples of how to use your functions.
+
+## `assert`: the core of every test
+
+`assert condition` does nothing if the condition is `True`, and immediately raises an
+`AssertionError` if it's `False`:
+
+<Playground initialCode={`def discounted_price(price, percent):
+    return price - price * percent // 100
+
+assert discounted_price(20000, 10) == 18000
+assert discounted_price(15000, 0) == 15000
+print("All checks passed!")`} />
+
+If something is wrong, the program stops and tells you. You can also add a message after a
+comma:
+
+<Playground expectError initialCode={`def discounted_price(price, percent):
+    return price - percent  # bug: forgot to calculate the percentage
+
+result = discounted_price(20000, 10)
+assert result == 18000, f"Expected 18000, but got {result}"`} />
+
+## Writing test functions
+
+Usually each check is wrapped in a function whose name starts with **`test_`**. One test
+function checks one behaviour. In the playground, we call the functions ourselves:
+
+<Playground initialCode={`def discounted_price(price, percent):
+    return price - price * percent // 100
+
+def test_10_percent_discount():
+    assert discounted_price(20000, 10) == 18000
+
+def test_no_discount():
+    assert discounted_price(15000, 0) == 15000
+
+def test_full_discount():
+    assert discounted_price(5000, 100) == 0
+
+# In the playground we call them by hand; pytest will do this automatically
+test_10_percent_discount()
+test_no_discount()
+test_full_discount()
+print("3 tests passed")`} />
+
+Calling them one by one quickly gets tedious. That's **pytest**'s job: find every `test_`
+function and run it for you.
+
+## Running tests with pytest
+
+pytest is a third-party library, so install it first:
+
+<TerminalBlock command="pip install pytest" />
+
+Put the code and its tests in separate files. pytest automatically looks for files whose names
+start with `test_`:
+
+<FileTree>
+{`cashier/
+├── discount.py
+└── test_discount.py`}
+</FileTree>
+
+Contents of `discount.py`:
+
+```python
+def discounted_price(price: int, percent: int) -> int:
+    if not 0 <= percent <= 100:
+        raise ValueError("Discount percent must be 0 to 100")
+    return price - price * percent // 100
+```
+
+Contents of `test_discount.py`:
+
+```python
+from discount import discounted_price
+
+def test_10_percent_discount():
+    assert discounted_price(20000, 10) == 18000
+
+def test_no_discount():
+    assert discounted_price(15000, 0) == 15000
+
+def test_full_discount():
+    assert discounted_price(5000, 100) == 0
+```
+
+From inside the `cashier` folder, run `pytest -v` (`-v` means *verbose*, listing every test):
+
+<TerminalBlock command="pytest -v" output={`============================= test session starts ==============================
+platform linux -- Python 3.12.4, pytest-8.3.2, pluggy-1.5.0
+rootdir: /home/budi/cashier
+collected 3 items
+
+test_discount.py::test_10_percent_discount PASSED                        [ 33%]
+test_discount.py::test_no_discount PASSED                                [ 66%]
+test_discount.py::test_full_discount PASSED                              [100%]
+
+============================== 3 passed in 0.01s ===============================`} />
+
+If a test fails, pytest marks it `FAILED` and shows the expected value next to the actual one,
+so you see right away where the problem is.
+
+<Callout type="tip">
+  You don't need `print()` or to call the test functions yourself. Just write `test_`
+  functions with `assert` inside, and pytest takes care of the rest.
+</Callout>
+
+## Testing exceptions with `pytest.raises`
+
+`discounted_price` raises a `ValueError` if the percent makes no sense. That's behaviour worth
+testing too. Use `pytest.raises` as a `with` block: the test passes **only if** the code inside
+raises that exception:
+
+```python
+import pytest
+from discount import discounted_price
+
+def test_negative_percent_rejected():
+    with pytest.raises(ValueError):
+        discounted_price(20000, -5)
+
+def test_percent_over_100_rejected():
+    with pytest.raises(ValueError, match="0 to 100"):
+        discounted_price(20000, 150)
+```
+
+`match` checks that the error message contains certain text.
+
+## Many cases at once with `parametrize`
+
+If you're writing lots of similar tests that differ only in their numbers, use
+`@pytest.mark.parametrize`. This decorator runs one test function for every row of data:
+
+```python
+import pytest
+from discount import discounted_price
+
+@pytest.mark.parametrize("price, percent, expected", [
+    (20000, 10, 18000),
+    (15000, 0, 15000),
+    (5000, 100, 0),
+    (12000, 25, 9000),
+])
+def test_discounted_price(price, percent, expected):
+    assert discounted_price(price, percent) == expected
+```
+
+pytest reports these as 4 separate tests.
+
+## Exercise
+
+Write test functions for `letter_grade()` below, then call them all. One test is already there
+as an example.
+
+<Playground initialCode={`def letter_grade(score):
+    if score >= 85:
+        return "A"
+    elif score >= 70:
+        return "B"
+    elif score >= 55:
+        return "C"
+    return "D"
+
+def test_grade_a():
+    assert letter_grade(90) == "A"
+
+# TODO: write test_grade_b, test_grade_c, and test_grade_d
+# TODO: add tests for the boundaries, such as letter_grade(85) and letter_grade(70)
+
+test_grade_a()
+print("Tests passed")`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "How does pytest find the tests to run?",
+      options: ["From files and functions whose names start with test_", "From every function that contains print()", "From a list of tests written in pytest.txt"],
+      answer: 0,
+      explanation: "pytest looks for test_*.py files and runs every function whose name starts with test_.",
+    },
+    {
+      question: "What happens when Python runs assert 2 + 2 == 5?",
+      options: ["Nothing happens", "An AssertionError is raised", "Python prints False"],
+      answer: 1,
+      explanation: "assert raises an AssertionError when its condition is False.",
+    },
+    {
+      question: "To test that a function RAISES a ValueError, you use...",
+      options: ["try/except outside the test function", "assert ValueError", "with pytest.raises(ValueError):"],
+      answer: 2,
+      explanation: "pytest.raises makes the test pass only if the code inside the with block raises that exception.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Automated tests check your code every time you change it, so bugs show up fast.
+- Test functions start with `test_` and use `assert` to check results.
+- `pytest -v` finds `test_*.py` files and runs all their tests.
+- `pytest.raises` tests exceptions, and `@pytest.mark.parametrize` runs one test for many sets
+  of data.

@@ -1,0 +1,154 @@
+---
+title: List Comprehension
+slug: list-comprehensions
+stage: 3
+module: Comprehension
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Ringkas pola loop dan append menjadi satu baris list comprehension, lengkap dengan filter if dan ekspresi if/else.
+---
+
+# List Comprehension
+
+Kamu sudah sering menulis pola ini: buat list kosong, loop, lalu `append()`. Pola itu
+sangat umum sampai Python punya cara singkat untuknya, yaitu **list comprehension**.
+
+## Dari loop + `append` ke comprehension
+
+Misalnya kamu ingin menghitung harga setelah naik Rp2.000 untuk setiap menu warung:
+
+<Playground initialCode={`harga = [10000, 15000, 8000, 12000]
+
+# Cara lama: loop + append
+harga_baru = []
+for h in harga:
+    harga_baru.append(h + 2000)
+print(harga_baru)
+
+# Cara baru: list comprehension
+harga_baru = [h + 2000 for h in harga]
+print(harga_baru)`} />
+
+Bacanya dari kiri: "`h + 2000`, **untuk** setiap `h` **di** `harga`". Bentuk umumnya:
+
+```python
+[ekspresi for item in kumpulan]
+```
+
+Kumpulannya bisa apa saja yang bisa di-loop, termasuk `range()` dan string:
+
+<Playground initialCode={`kuadrat = [n * n for n in range(1, 6)]
+print(kuadrat)
+
+nama = ["budi", "ani", "citra"]
+print([n.title() for n in nama])
+
+print([huruf for huruf in "kos"])`} />
+
+## Menyaring dengan `if`
+
+Tambahkan `if` di bagian akhir untuk hanya mengambil isi yang memenuhi syarat:
+
+<Playground initialCode={`nilai = [78, 45, 92, 60, 88, 55]
+
+lulus = [n for n in nilai if n >= 70]
+print("Nilai yang lulus:", lulus)
+
+nama = ["Budi", "Ani", "Citra", "Dodi", "Eka"]
+nama_pendek = [n for n in nama if len(n) <= 3]
+print(nama_pendek)`} />
+
+Isi yang tidak lolos syarat `if` tidak masuk ke list baru sama sekali.
+
+## Memilih nilai dengan `if`/`else`
+
+Kalau kamu ingin **setiap** isi tetap masuk, tapi nilainya bergantung pada syarat, pakai
+ekspresi `if`/`else` di **depan** `for`:
+
+<Playground initialCode={`nilai = [78, 45, 92, 60, 88, 55]
+
+status = ["Lulus" if n >= 70 else "Remedial" for n in nilai]
+print(status)
+
+harga = [10000, 25000, 8000, 40000]
+# Diskon 10% hanya untuk harga di atas Rp20.000
+bayar = [h * 0.9 if h > 20000 else h for h in harga]
+print(bayar)`} />
+
+<Callout type="tip">
+  Ingat posisinya. `if` saja (menyaring) ada di **belakang**: `[x for x in data if syarat]`.
+  `if`/`else` (memilih nilai) ada di **depan**: `[a if syarat else b for x in data]`.
+</Callout>
+
+## Kapan sebaiknya tidak pakai comprehension
+
+Comprehension enak dibaca kalau pendek. Kalau isinya mulai panjang, berlapis, atau butuh
+beberapa langkah, loop biasa justru lebih jelas:
+
+<Playground initialCode={`pesanan = [("Budi", 3), ("Ani", 0), ("Citra", 5)]
+
+# Sulit dibaca: terlalu banyak yang dijejalkan dalam satu baris
+hasil = [f"{n}: {j} porsi" if j > 0 else f"{n}: batal" for n, j in pesanan if n != "Dodi"]
+print(hasil)
+
+# Lebih jelas dengan loop biasa
+hasil = []
+for nama, jumlah in pesanan:
+    if jumlah > 0:
+        hasil.append(f"{nama}: {jumlah} porsi")
+    else:
+        hasil.append(f"{nama}: batal")
+print(hasil)`} />
+
+Aturan praktis: kalau kamu perlu membaca comprehension dua kali untuk memahaminya, tulis
+ulang sebagai loop. Jangan juga memakai comprehension hanya untuk efeknya, seperti
+`[print(x) for x in data]`. Untuk itu, cukup pakai `for` biasa.
+
+## Latihan
+
+Dari daftar harga kos per bulan di bawah, buat dua list dengan comprehension: harga yang di
+bawah Rp1.000.000 saja, dan label "murah"/"mahal" untuk setiap harga.
+
+<Playground initialCode={`harga_kos = [850000, 1200000, 950000, 1500000, 700000]
+
+# TODO: harga di bawah 1000000 saja
+murah = []
+
+# TODO: "murah" kalau di bawah 1000000, selain itu "mahal"
+label = []
+
+print(murah)
+print(label)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa hasil [n * 2 for n in range(4)]?",
+      options: ["[0, 2, 4, 6]", "[2, 4, 6, 8]", "[0, 1, 2, 3]"],
+      answer: 0,
+      explanation: "range(4) memberi 0, 1, 2, 3, lalu setiap angka dikali 2.",
+    },
+    {
+      question: "Mana yang menyaring hanya angka genap dari data?",
+      options: ["[x if x % 2 == 0 for x in data]", "[x for x in data if x % 2 == 0]", "[for x in data if x % 2 == 0]"],
+      answer: 1,
+      explanation: "if untuk menyaring ditulis di belakang, setelah bagian for.",
+    },
+    {
+      question: "Apa hasil ['ya' if x > 0 else 'tidak' for x in [3, -1]]?",
+      options: ["['ya']", "['tidak', 'ya']", "['ya', 'tidak']"],
+      answer: 2,
+      explanation: "if/else di depan memilih nilai untuk setiap isi: 3 menjadi 'ya' dan -1 menjadi 'tidak'.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- List comprehension meringkas pola loop + `append`: `[ekspresi for item in kumpulan]`.
+- `if` di belakang menyaring isi: `[x for x in data if syarat]`.
+- `if`/`else` di depan memilih nilai: `[a if syarat else b for x in data]`.
+- Kalau comprehension jadi panjang atau sulit dibaca, pakai loop biasa.

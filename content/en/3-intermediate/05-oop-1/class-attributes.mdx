@@ -1,0 +1,222 @@
+---
+title: Class Attributes and Properties
+slug: class-attributes
+stage: 3
+module: OOP Part 1
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Tell class attributes from instance attributes, avoid the shared list trap, and build computed values with property.
+---
+
+# Class Attributes and Properties
+
+So far every attribute you've created through `self` belonged to a single object. Sometimes
+data should be **shared** by every object of the same class. In this lesson you'll also learn
+to make attributes that compute themselves.
+
+## Class attributes vs instance attributes
+
+- **Instance attributes** are set in `__init__` through `self`. Each object has its own value.
+- **Class attributes** are written directly in the class body. All objects share the value.
+
+<Playground initialCode={`class KosRoom:
+    city = "Yogyakarta"
+
+    def __init__(self, number, price):
+        self.number = number
+        self.price = price
+
+r1 = KosRoom("A1", 800000)
+r2 = KosRoom("B3", 950000)
+
+print(r1.number, r1.price, r1.city)
+print(r2.number, r2.price, r2.city)
+print(KosRoom.city)`} />
+
+When you read `r1.city`, Python looks on the object `r1` first. Since it isn't there, Python
+looks in the class `KosRoom`.
+
+## Counting created objects
+
+Class attributes suit data about the class as a whole, like how many objects have been created.
+Change them through the class name, not through `self`.
+
+<Playground initialCode={`class Order:
+    count_created = 0
+
+    def __init__(self, dish):
+        self.dish = dish
+        Order.count_created += 1
+        self.number = Order.count_created
+
+o1 = Order("Fried rice")
+o2 = Order("Iced tea")
+o3 = Order("Chicken noodles")
+
+print(o3.number, o3.dish)
+print("Total orders today:", Order.count_created)`} />
+
+<Callout type="warning">
+  Writing `self.count_created += 1` does **not** change the class attribute. Python reads the
+  value from the class, then stores the result as a new attribute on that one object only. To
+  change a class attribute, use the class name: `Order.count_created += 1`.
+</Callout>
+
+## The trap: a list as a class attribute
+
+A class attribute holding a list (or dict) is shared. If one object adds to that list, every
+object sees the change.
+
+<Playground initialCode={`class Cart:
+    items = []
+
+    def __init__(self, owner):
+        self.owner = owner
+
+    def add(self, item):
+        self.items.append(item)
+
+cb = Cart("Budi")
+ca = Cart("Ani")
+cb.add("Coffee")
+ca.add("Sugar")
+
+print("Budi's cart:", cb.items)
+print("Ani's cart:", ca.items)`} />
+
+Budi never bought sugar, yet it shows up in his cart. The fix: create a new list in
+`__init__`, so each object gets its own.
+
+<Playground initialCode={`class Cart:
+    def __init__(self, owner):
+        self.owner = owner
+        self.items = []
+
+    def add(self, item):
+        self.items.append(item)
+
+cb = Cart("Budi")
+ca = Cart("Ani")
+cb.add("Coffee")
+ca.add("Sugar")
+
+print("Budi's cart:", cb.items)
+print("Ani's cart:", ca.items)`} />
+
+## `@property`: computed values
+
+Sometimes a value can be computed from other attributes, like a total price from unit price and
+quantity. With `@property`, a method can be read like a normal attribute, without parentheses.
+
+<Playground initialCode={`class ShoppingItem:
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+    @property
+    def total(self):
+        return self.price * self.quantity
+
+eggs = ShoppingItem("Eggs", 2500, 10)
+print(eggs.total)
+
+eggs.quantity = 12
+print(eggs.total)`} />
+
+Because it's recomputed every time it's read, `total` always matches `price` and `quantity`.
+A property without a setter is also **read-only**: assigning to it fails.
+
+<Playground expectError initialCode={`class ShoppingItem:
+    def __init__(self, name, price, quantity):
+        self.name = name
+        self.price = price
+        self.quantity = quantity
+
+    @property
+    def total(self):
+        return self.price * self.quantity
+
+eggs = ShoppingItem("Eggs", 2500, 10)
+eggs.total = 1000`} />
+
+## The leading underscore convention
+
+An attribute whose name starts with one underscore, like `self._balance`, means "this is the
+class's internal business, don't change it directly from outside". Python doesn't block it,
+but other programmers respect the hint. Pair it with `@property` to offer read-only access.
+
+<Playground initialCode={`class BankAccount:
+    def __init__(self, owner):
+        self.owner = owner
+        self._balance = 0
+
+    @property
+    def balance(self):
+        return self._balance
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise ValueError("Amount must be more than 0")
+        self._balance += amount
+
+acc = BankAccount("Citra")
+acc.deposit(50000)
+print(acc.balance)`} />
+
+Now the only official way to change the balance is `deposit()`, which always checks the amount.
+
+## Exercise
+
+Complete the `Student` class. Add a class attribute `student_count` that goes up for every new
+student, and a property `average` that computes the average of the `scores` list.
+
+<Playground initialCode={`class Student:
+    # TODO: add a class attribute student_count = 0
+
+    def __init__(self, name):
+        self.name = name
+        self.scores = []
+        # TODO: increase student_count through the class name
+
+    # TODO: write an @property average
+
+budi = Student("Budi")
+budi.scores.append(80)
+budi.scores.append(90)
+ani = Student("Ani")
+print(budi.name, budi.scores)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Where is a class attribute written?",
+      options: ["Inside __init__ with self", "Directly in the class body, outside any method", "Outside the class after creating an object"],
+      answer: 1,
+      explanation: "Class attributes are written in the class body and shared by all objects.",
+    },
+    {
+      question: "class A: data = []. If a1 and a2 are A objects and you run a1.data.append(5), what is a2.data?",
+      options: ["[]", "An error because a2 has no data yet", "[5]"],
+      answer: 2,
+      explanation: "data is a single list owned by the class, so a1 and a2 see the same list.",
+    },
+    {
+      question: "What's the advantage of an @property total over a plain total attribute?",
+      options: ["It's always recomputed from the latest data and can't be assigned directly", "The program gets faster because the value is stored", "You can call it as obj.total()"],
+      answer: 0,
+      explanation: "A property is computed each time it's read, is read without parentheses, and is read-only without a setter.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Instance attributes (through `self`) belong to one object; class attributes belong to all of them.
+- Change a class attribute through the class name, like `Order.count_created += 1`.
+- Don't use a list or dict as a class attribute if each object needs its own; create it in `__init__`.
+- `@property` lets a method be read like an attribute, perfect for read-only computed values.
+- A name starting with `_` marks an internal attribute that shouldn't be changed from outside.

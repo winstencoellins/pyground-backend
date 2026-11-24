@@ -1,0 +1,167 @@
+---
+title: pip dan Virtual Environment
+slug: pip-and-venv
+stage: 3
+module: Modul, pip, dan venv
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Install library pihak ketiga dengan pip di dalam virtual environment, dan catat kebutuhan proyekmu di requirements.txt.
+---
+
+# pip dan Virtual Environment
+
+Standard library sudah lengkap, tapi kadang kamu butuh library buatan orang lain, misalnya
+`requests` untuk mengambil data dari internet. Library seperti ini di-install dengan **pip**,
+dan sebaiknya di-install di dalam **virtual environment** (venv).
+
+<Callout type="info">
+  Playground Pyground berjalan di browser dan tidak bisa menjalankan `pip install`. Semua
+  perintah di pelajaran ini kamu ketik di terminal komputermu sendiri.
+</Callout>
+
+## Python mana yang sedang berjalan?
+
+Sebelum meng-install apa pun, kenali dulu Python yang kamu pakai. Modul `sys` bisa
+memberitahu versinya dan lokasinya:
+
+<Playground initialCode={`import sys
+
+print(sys.version)
+print(sys.prefix)`} />
+
+Di komputermu, cek juga dari terminal:
+
+<TerminalBlock command="python --version" output={`Python 3.12.4`} />
+
+## Kenapa perlu virtual environment?
+
+Bayangkan kamu punya dua proyek: tugas sekolah yang butuh `requests` versi 2.28, dan
+aplikasi kasir warung yang butuh versi 2.32. Kalau semua library di-install ke satu Python
+yang sama, kedua proyek itu akan saling mengganggu.
+
+Virtual environment adalah folder berisi "Python pribadi" untuk satu proyek. Setiap proyek
+punya venv sendiri, jadi library-nya tidak tercampur.
+
+## Membuat dan mengaktifkan venv
+
+Masuk ke folder proyekmu, lalu buat venv bernama `.venv`:
+
+<TerminalBlock command="python -m venv .venv" />
+
+Cara mengaktifkannya berbeda di setiap sistem operasi. Di macOS dan Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Di Windows (Command Prompt atau PowerShell):
+
+```bash
+.venv\Scripts\activate
+```
+
+Setelah aktif, terminalmu biasanya menampilkan `(.venv)` di depan baris perintah. Untuk
+keluar dari venv, ketik `deactivate`.
+
+Strukturnya kira-kira seperti ini:
+
+<FileTree>
+{`kasir-warung/
+├── .venv/
+├── main.py
+└── requirements.txt`}
+</FileTree>
+
+<Callout type="tip">
+  Folder `.venv` jangan di-upload ke Git. Tambahkan `.venv/` ke file `.gitignore`. Yang
+  dibagikan cukup `requirements.txt`.
+</Callout>
+
+## Install library dengan pip
+
+Dengan venv aktif, install library:
+
+<TerminalBlock command="pip install requests" output={`Collecting requests
+...
+Successfully installed certifi charset-normalizer idna requests urllib3`} />
+
+Beberapa perintah pip lain yang sering dipakai:
+
+```bash
+pip list                  # lihat library yang terpasang
+pip install requests==2.32.3   # install versi tertentu
+pip uninstall requests    # hapus library
+```
+
+## `pip freeze` dan `requirements.txt`
+
+`pip freeze` mencetak semua library beserta versinya. Simpan hasilnya ke `requirements.txt`
+supaya orang lain (atau kamu di komputer lain) bisa memasang library yang persis sama:
+
+<TerminalBlock command="pip freeze > requirements.txt" />
+
+Isi `requirements.txt` kira-kira seperti ini:
+
+```text
+certifi==2024.8.30
+charset-normalizer==3.4.0
+idna==3.10
+requests==2.32.3
+urllib3==2.2.3
+```
+
+Teman sekelasmu cukup membuat venv sendiri, mengaktifkannya, lalu menjalankan:
+
+<TerminalBlock command="pip install -r requirements.txt" />
+
+## Latihan
+
+Latihan ini dikerjakan di komputermu sendiri, bukan di playground:
+
+1. Buat folder `belajar-venv`, lalu buat venv di dalamnya dengan `python -m venv .venv`.
+2. Aktifkan venv sesuai sistem operasimu.
+3. Install `requests`, lalu simpan daftar library dengan `pip freeze > requirements.txt`.
+
+Lalu jalankan kode ini di komputermu dengan venv aktif. Kalau `sys.prefix` berbeda dengan
+`sys.base_prefix`, berarti kamu sedang di dalam venv. Di playground, hasilnya `False`:
+
+<Playground initialCode={`import sys
+
+di_venv = sys.prefix != sys.base_prefix
+print("Sedang di dalam venv?", di_venv)
+# TODO: kalau di_venv True, tampilkan lokasi venv (sys.prefix)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Perintah apa yang membuat virtual environment bernama .venv?",
+      options: ["pip install venv", "python -m venv .venv", "venv create .venv"],
+      answer: 1,
+      explanation: "python -m venv .venv menjalankan modul venv bawaan Python untuk membuat folder .venv.",
+    },
+    {
+      question: "Apa gunanya requirements.txt?",
+      options: ["Mencatat library dan versinya supaya bisa di-install ulang", "Menyimpan kode program utama", "Mengaktifkan virtual environment"],
+      answer: 0,
+      explanation: "pip install -r requirements.txt memasang semua library yang tercatat di file itu.",
+    },
+    {
+      question: "Kenapa setiap proyek sebaiknya punya venv sendiri?",
+      options: ["Supaya Python berjalan lebih cepat", "Karena pip hanya bisa jalan di dalam venv", "Supaya library dan versinya tidak bentrok antar proyek"],
+      answer: 2,
+      explanation: "Setiap venv punya library sendiri, jadi proyek yang butuh versi berbeda tidak saling mengganggu.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Virtual environment memisahkan library setiap proyek; buat dengan `python -m venv .venv`.
+- Aktifkan dengan `source .venv/bin/activate` (macOS/Linux) atau `.venv\Scripts\activate`
+  (Windows), dan keluar dengan `deactivate`.
+- `pip install nama` memasang library, `pip freeze > requirements.txt` mencatatnya.
+- `pip install -r requirements.txt` memasang ulang semua library di komputer lain.
+- Playground di browser tidak bisa `pip install`; latihan pip dikerjakan di komputermu.

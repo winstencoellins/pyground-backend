@@ -1,0 +1,159 @@
+---
+title: Dict and Set Comprehensions
+slug: dict-and-set-comprehensions
+stage: 3
+module: Comprehensions
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Build dicts and sets in one line, combine them with zip() and enumerate(), then meet nested comprehensions and generator expressions.
+---
+
+# Dict and Set Comprehensions
+
+Comprehensions aren't only for lists. With curly braces, you can build **dicts** and
+**sets** just as concisely.
+
+## Dict comprehensions
+
+The form is `{key: value for item in collection}`, written with curly braces and a colon
+between key and value:
+
+<Playground initialCode={`menu = ["es teh", "kopi", "nasi goreng"]
+
+name_lengths = {m: len(m) for m in menu}
+print(name_lengths)
+
+prices = {"es teh": 5000, "kopi": 8000, "nasi goreng": 18000}
+raised = {name: p + 1000 for name, p in prices.items()}
+print(raised)
+
+# An if filter works here too
+cheap = {name: p for name, p in prices.items() if p < 10000}
+print(cheap)`} />
+
+Remember, `.items()` gives key and value pairs, so you can unpack them into `name, p` just
+like in a `for` loop.
+
+## Set comprehensions
+
+Curly braces **without** a colon make a set. Since a set keeps no duplicates, this is great
+for finding unique values:
+
+<Playground initialCode={`customers = ["budi", "Ani", "BUDI", "citra", "ani"]
+
+unique = {c.lower() for c in customers}
+print(unique)
+print("Number of different customers:", len(unique))`} />
+
+<Callout type="warning">
+  An empty `{}` is a dict, not a set. An empty set is written `set()`.
+</Callout>
+
+## `zip()` and `enumerate()` in comprehensions
+
+`zip()` pairs up items from two lists in order. It's a quick way to build a dict from two
+lists:
+
+<Playground initialCode={`names = ["Budi", "Ani", "Citra"]
+scores = [85, 92, 78]
+
+report = {n: s for n, s in zip(names, scores)}
+print(report)
+
+# For plain pairs, dict(zip(...)) works too
+print(dict(zip(names, scores)))`} />
+
+`enumerate()` adds a running number, for example ojek queue numbers:
+
+<Playground initialCode={`queue = ["Budi", "Ani", "Citra", "Dodi"]
+
+queue_numbers = {number: name for number, name in enumerate(queue, start=1)}
+print(queue_numbers)
+
+labels = [f"{i}. {name}" for i, name in enumerate(queue, start=1)]
+print(labels)`} />
+
+## Nested comprehensions: flattening a list
+
+You can write two `for`s in one comprehension. The order matches a regular nested loop: the
+outer `for` first, then the inner one. The most common use is flattening a list of lists:
+
+<Playground initialCode={`orders_per_table = [["es teh", "kopi"], ["nasi goreng"], ["es teh", "mie ayam"]]
+
+everything = [item for table in orders_per_table for item in table]
+print(everything)
+
+# Same as:
+everything = []
+for table in orders_per_table:
+    for item in table:
+        everything.append(item)
+print(everything)`} />
+
+More than two `for`s is usually hard to read. At that point, go back to a regular loop.
+
+## A quick look: generator expressions
+
+Swap the square brackets for parentheses and the result isn't a list but a **generator**:
+values are produced one at a time as needed, without keeping the whole list in memory. It's
+handy when the result goes straight into a function like `sum()` or `max()`:
+
+<Playground initialCode={`prices = [5000, 8000, 18000, 12000]
+
+total = sum(p for p in prices)
+print("Total:", total)
+
+print("Anything above 15000?", any(p > 15000 for p in prices))`} />
+
+Generators are covered in depth later in the Generators module.
+
+## Exercise
+
+Build a warung stock dict from two lists with `zip()`, then build a set of the items that are
+out of stock (0).
+
+<Playground initialCode={`items = ["beras", "telur", "minyak", "gula", "kopi"]
+stock = [12, 0, 5, 0, 8]
+
+# TODO: dict comprehension with zip(), e.g. beras maps to 12, telur to 0, and so on
+warung_stock = {}
+
+# TODO: set comprehension of the items whose stock is 0
+sold_out = set()
+
+print(warung_stock)
+print(sold_out)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "What is {x: x * x for x in range(3)}?",
+      options: ["{0: 0, 1: 1, 2: 4}", "[0, 1, 4]", "{0, 1, 4}"],
+      answer: 0,
+      explanation: "There's a colon, so the result is a dict with key x and value x * x.",
+    },
+    {
+      question: "What is len({h.lower() for h in 'AaBb'})?",
+      options: ["4", "1", "2"],
+      answer: 2,
+      explanation: "The set comprehension gives the set {'a', 'b'} because duplicates are dropped.",
+    },
+    {
+      question: "What is [y for x in [[1, 2], [3]] for y in x]?",
+      options: ["[[1, 2], [3]]", "[1, 2, 3]", "[3, 1, 2]"],
+      answer: 1,
+      explanation: "The outer for takes each list, then the inner for takes its items, so the list is flattened.",
+    },
+  ]}
+/>
+
+## Summary
+
+- Dict comprehension: `{key: value for item in collection}`, optionally with an `if` filter.
+- Set comprehension: `{expression for item in collection}`, which drops duplicates automatically.
+- `zip()` pairs two lists and `enumerate()` adds a running number; both fit nicely in comprehensions.
+- Two `for`s in one comprehension can flatten a nested list.
+- Parentheses make a generator expression, handy for `sum()`, `any()`, and `max()`.

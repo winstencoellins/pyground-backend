@@ -1,0 +1,148 @@
+---
+title: Getting to Know Dictionaries
+slug: dictionaries
+stage: 2
+module: Dictionaries and Sets
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Store key and value pairs in a dictionary, then read, change, and delete its contents.
+---
+
+# Getting to Know Dictionaries
+
+Lists are great for ordered data, but sometimes you want to look something up by **name**,
+not by position. Think of the prices at a warung: you want the price of "nasi goreng", not
+the price of "menu item number 2". For that, Python has the **dictionary** (often shortened
+to *dict*).
+
+## Creating a dictionary
+
+A dictionary is written with curly braces. Each entry is a **key: value** pair, for example
+`{"nasi goreng": 15000}`:
+
+<Playground initialCode={`menu_prices = {
+    "nasi goreng": 15000,
+    "mie ayam": 12000,
+    "es teh": 4000,
+}
+
+student = {"name": "Ani", "grade": 10, "active": True}
+empty = {}
+
+print(menu_prices)
+print(student)
+print(empty)
+print("Number of dishes:", len(menu_prices))`} />
+
+Keys are usually strings, and every key in a dictionary must be **unique**. Values can be
+anything: numbers, strings, booleans, even lists.
+
+## Reading a value by key
+
+To get a value, put its key inside square brackets, much like an index on a list:
+
+<Playground initialCode={`menu_prices = {"nasi goreng": 15000, "mie ayam": 12000, "es teh": 4000}
+
+print(menu_prices["mie ayam"])
+total = menu_prices["nasi goreng"] + menu_prices["es teh"]
+print(f"Nasi goreng + es teh = Rp{total}")`} />
+
+## Adding, changing, and deleting
+
+- Writing `dict[key] = value` with a **new** key adds a new pair.
+- If the key **already exists**, its value is replaced.
+- `del dict[key]` removes that pair.
+
+<Playground initialCode={`menu_prices = {"nasi goreng": 15000, "mie ayam": 12000, "es teh": 4000}
+
+menu_prices["soto"] = 13000        # new key: added
+menu_prices["es teh"] = 5000       # existing key: changed
+del menu_prices["mie ayam"]        # deleted
+
+print(menu_prices)`} />
+
+## KeyError and checking for a key
+
+If you read a key that doesn't exist, Python stops with a `KeyError`:
+
+<Playground expectError initialCode={`menu_prices = {"nasi goreng": 15000, "es teh": 4000}
+print(menu_prices["bakso"])`} />
+
+Check first with `in`. On a dictionary, `in` looks at the **keys**, not the values:
+
+<Playground initialCode={`menu_prices = {"nasi goreng": 15000, "es teh": 4000}
+order = "bakso"
+
+if order in menu_prices:
+    print("Price:", menu_prices[order])
+else:
+    print(f"Sorry, {order} is not on the menu")
+
+print(15000 in menu_prices)  # False, because 15000 is a value, not a key`} />
+
+## Reading safely with `get()`
+
+`get(key)` returns the value, or `None` if the key isn't there. You can also give a default:
+`get(key, default)`.
+
+<Playground initialCode={`stock = {"rice": 10, "eggs": 30}
+
+print(stock.get("eggs"))
+print(stock.get("sugar"))
+print(stock.get("sugar", 0))
+
+item = "cooking oil"
+print(f"Stock of {item}: {stock.get(item, 0)}")`} />
+
+<Callout type="tip">
+  Use `dict[key]` when the key is sure to exist, and `get()` when it might not. With `get()`
+  your program won't stop with a `KeyError`.
+</Callout>
+
+## Exercise
+
+Build the data for Budi's kos room. Add a `"wifi"` key, raise the rent, then print the room
+number with `get()` (with a default in case it's missing).
+
+<Playground initialCode={`kos = {"name": "Budi", "room": "A3", "rent": 800000}
+
+# 1. Add the key "wifi" with the value True
+
+# 2. Raise the rent to 850000
+
+# 3. Print the room number with get(), default "not set"
+
+print(kos)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "If d = {'a': 1, 'b': 2}, what happens when you run d['c']?",
+      options: ["You get None", "You get 0", "A KeyError is raised"],
+      answer: 2,
+      explanation: "Reading a missing key with square brackets raises a KeyError. Use get() to stay safe.",
+    },
+    {
+      question: "If d = {'a': 1}, what is d after d['a'] = 5?",
+      options: ["{'a': 5}", "{'a': 1, 'a': 5}", "An error"],
+      answer: 0,
+      explanation: "The key 'a' already exists, so its value is replaced. Keys in a dictionary are always unique.",
+    },
+    {
+      question: "What is the result of 'teh' in {'kopi': 5000, 'teh': 4000}?",
+      options: ["False", "True", "4000"],
+      answer: 1,
+      explanation: "in on a dictionary checks the keys, and 'teh' is one of them.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A dictionary stores key and value pairs, for example `{"es teh": 4000}`.
+- Read with `d[key]`; add or change with `d[key] = value`; delete with `del d[key]`.
+- A missing key raises a `KeyError`.
+- `key in d` checks for a key, and `d.get(key, default)` reads safely.

@@ -1,0 +1,162 @@
+---
+title: Mengenal Iterator
+slug: iterators
+stage: 3
+module: Generator
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Pahami perbedaan iterable dan iterator, serta cara kerja loop for di balik layar.
+---
+
+# Mengenal Iterator
+
+Kamu sudah sering memakai `for` untuk list, string, dict, `range()`, bahkan file. Tapi
+bagaimana satu perintah `for` bisa bekerja untuk semua jenis data itu? Jawabannya adalah
+**iterator**.
+
+## Iterable dan iterator
+
+Dua istilah ini mirip, tapi berbeda:
+
+- **Iterable** adalah sesuatu yang **bisa** dijalani satu per satu: list, tuple, string,
+  dict, set, `range`, file.
+- **Iterator** adalah "penunjuk" yang sedang berjalan di atas iterable dan tahu isi
+  **berikutnya**.
+
+Fungsi `iter()` membuat iterator dari iterable, dan `next()` mengambil isi berikutnya:
+
+<Playground initialCode={`antrean = ["Budi", "Ani", "Citra"]
+
+penunjuk = iter(antrean)
+print(type(antrean))
+print(type(penunjuk))
+
+print(next(penunjuk))
+print(next(penunjuk))
+print(next(penunjuk))`} />
+
+Bayangkan list sebagai buku, dan iterator sebagai pembatas buku yang menandai halaman
+terakhir yang kamu baca.
+
+## Saat isinya habis: `StopIteration`
+
+Iterator hanya bisa berjalan maju. Kalau isinya sudah habis dan kamu memanggil `next()`
+lagi, Python memberi `StopIteration`:
+
+<Playground expectError initialCode={`antrean = ["Budi", "Ani"]
+penunjuk = iter(antrean)
+
+print(next(penunjuk))
+print(next(penunjuk))
+print(next(penunjuk))`} />
+
+Iterator yang sudah habis tidak bisa diulang. Kalau ingin mulai dari awal, buat iterator
+baru dengan `iter()` lagi. Kamu juga bisa memberi nilai cadangan ke `next()` supaya tidak
+error:
+
+<Playground initialCode={`penunjuk = iter([10, 20])
+print(next(penunjuk, "habis"))
+print(next(penunjuk, "habis"))
+print(next(penunjuk, "habis"))`} />
+
+## Cara kerja `for` di balik layar
+
+Setiap kali kamu menulis `for`, Python sebenarnya melakukan ini: memanggil `iter()` sekali,
+lalu `next()` berulang kali sampai bertemu `StopIteration`, lalu berhenti dengan tenang.
+Kita bisa menirunya dengan `while` dan `try`/`except`:
+
+<Playground initialCode={`menu = ["soto", "bakso", "gado-gado"]
+
+# Versi biasa
+for makanan in menu:
+    print(makanan)
+
+print()
+
+# Yang sebenarnya dilakukan Python
+penunjuk = iter(menu)
+while True:
+    try:
+        makanan = next(penunjuk)
+    except StopIteration:
+        break
+    print(makanan)`} />
+
+<Callout type="info">
+  Itulah sebabnya `for` bisa dipakai untuk apa saja yang iterable. Asalkan suatu objek bisa
+  diberikan ke `iter()`, `for` bisa menjalaninya.
+</Callout>
+
+## Iterator di dict, range, dan file
+
+Setiap jenis iterable menentukan sendiri apa yang dihasilkan iteratornya:
+
+<Playground initialCode={`harga = {"teh": 3000, "kopi": 5000}
+it = iter(harga)
+print(next(it))          # dict menghasilkan kunci
+
+it_item = iter(harga.items())
+print(next(it_item))     # .items() menghasilkan pasangan (kunci, nilai)
+
+it_range = iter(range(0, 10, 3))
+print(next(it_range), next(it_range))
+
+with open("absen.txt", "w") as f:
+    f.write("Budi")
+    f.write(chr(10))
+    f.write("Ani")
+    f.write(chr(10))
+
+with open("absen.txt") as f:
+    print(next(f).strip())  # file menghasilkan satu baris setiap kali
+    for baris in f:
+        print("Lanjut:", baris.strip())`} />
+
+Perhatikan di contoh file: setelah `next(f)` mengambil baris pertama, loop `for` melanjutkan
+dari baris kedua, karena keduanya memakai iterator yang sama. `chr(10)` adalah karakter
+baris baru.
+
+## Latihan
+
+Tanpa memakai `for`, cetak tiga nama pertama dari `daftar_hadir` dengan `iter()` dan
+`next()`. Lalu cetak sisa namanya memakai `for` dengan iterator yang sama.
+
+<Playground initialCode={`daftar_hadir = ["Ani", "Budi", "Citra", "Dodi", "Eka"]
+
+# TODO: buat iterator dengan iter()
+# TODO: cetak 3 nama pertama dengan next()
+# TODO: cetak sisanya dengan for
+pass`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Fungsi apa yang membuat iterator dari sebuah list?",
+      options: ["next()", "list()", "iter()"],
+      answer: 2,
+      explanation: "iter() membuat iterator, sedangkan next() mengambil isi berikutnya dari iterator.",
+    },
+    {
+      question: "Apa yang terjadi jika next() dipanggil pada iterator yang sudah habis (tanpa nilai cadangan)?",
+      options: ["Mengembalikan None", "Muncul StopIteration", "Mulai lagi dari awal"],
+      answer: 1,
+      explanation: "Iterator yang habis memunculkan StopIteration. Loop for menangkapnya untuk berhenti.",
+    },
+    {
+      question: "Jika it = iter({'a': 1, 'b': 2}), apa hasil next(it)?",
+      options: ["'a'", "1", "('a', 1)"],
+      answer: 0,
+      explanation: "Iterasi pada dict menghasilkan kuncinya. Untuk pasangan, pakai .items().",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Iterable bisa dijalani satu per satu; iterator adalah penunjuk yang tahu isi berikutnya.
+- `iter()` membuat iterator, `next()` mengambil isi berikutnya.
+- Iterator yang habis memunculkan `StopIteration` dan tidak bisa diulang.
+- `for` di balik layar memanggil `iter()` sekali lalu `next()` sampai `StopIteration`.

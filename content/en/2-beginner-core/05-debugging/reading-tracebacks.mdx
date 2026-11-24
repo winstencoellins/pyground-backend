@@ -1,0 +1,144 @@
+---
+title: Reading Tracebacks
+slug: reading-tracebacks
+stage: 2
+module: Debugging
+order: 1
+isFree: false
+estimatedMinutes: 15
+description: Understand Python error messages by reading tracebacks from the bottom up, including when the error happens inside a function.
+---
+
+# Reading Tracebacks
+
+Every programmer runs into errors, even those with years of experience. The difference is that
+experienced programmers don't panic: they **read** the error message. That message is called a
+**traceback**, and it almost always tells you what went wrong and where.
+
+## Your first traceback
+
+Run the code below. It is wrong on purpose:
+
+<Playground expectError initialCode={`price = 15000
+quantity = 3
+print("Total:", price * quantty)`} />
+
+Python stops and shows something like this:
+
+```text
+Traceback (most recent call last):
+  File "main.py", line 3, in <module>
+    print("Total:", price * quantty)
+NameError: name 'quantty' is not defined
+```
+
+The file name on your screen may differ (for example `<exec>`), but the layout is always the same.
+
+## Read from the bottom up
+
+The most important line is at the **very bottom**. Read in this order:
+
+1. **Error type**: `NameError`. This tells you the category of the problem.
+2. **Message**: `name 'quantty' is not defined`. Python doesn't know the name `quantty`.
+3. **Location**: `line 3`, together with the contents of that line.
+
+From those three things the fix is clear: `quantty` is a typo for `quantity`.
+
+<Callout type="tip">
+  Don't close or delete a traceback right away. Read its last line first, out loud if you need
+  to. Very often the answer is already written there.
+</Callout>
+
+## A traceback through a function
+
+When an error happens inside a function, the traceback gets longer. Python shows the **call
+path**: from the line that called the function down to the line inside the function that failed.
+
+<Playground expectError initialCode={`def price_per_person(total, people):
+    return total / people
+
+def split_bill(total):
+    guests = 0
+    return price_per_person(total, guests)
+
+print(split_bill(120000))`} />
+
+The result looks roughly like this:
+
+```text
+Traceback (most recent call last):
+  File "main.py", line 8, in <module>
+    print(split_bill(120000))
+  File "main.py", line 6, in split_bill
+    return price_per_person(total, guests)
+  File "main.py", line 2, in price_per_person
+    return total / people
+ZeroDivisionError: division by zero
+```
+
+Still read from the bottom. The error happened in `price_per_person` on line 2 because it divided
+by zero. Go up one level: that function was called from `split_bill` on line 6. Up again: the line
+that called `split_bill` is line 8. Each `File ... line ...` block is one step along that path, and
+the top one is the earliest call.
+
+## The line shown isn't always the cause
+
+A traceback points to where Python **noticed** the problem. The cause is sometimes somewhere else.
+In the example above, the division is on line 2, but the zero came from `guests = 0` on line 5.
+
+<Playground expectError initialCode={`def get_top_score(scores):
+    return scores[0]
+
+class_scores = []
+# Forgot to fill class_scores here
+print("Top score:", get_top_score(class_scores))`} />
+
+The traceback points to `scores[0]` inside the function, yet the function is fine. What's wrong is
+the empty list passed into it. So after reading the line shown, also ask: **where did this value
+come from?**
+
+## Exercise
+
+The code below runs normally. Remove the `#` on the last line, run it, then read the traceback
+from the bottom up. Fix the cause until the fare per km is shown.
+
+<Playground initialCode={`def fare_per_km(fare, distance):
+    return fare / distance
+
+trips = {"Budi": 4, "Ani": 0}
+
+print("Budi's fare per km:", fare_per_km(20000, trips["Budi"]))
+# TODO: remove the # on the next line, read the traceback, then fix the data
+# print("Ani's fare per km:", fare_per_km(15000, trips["Ani"]))`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which part of a traceback should you read first?",
+      options: ["The top line", "The bottom line", "A line in the middle"],
+      answer: 1,
+      explanation: "The bottom line holds the error type and message, the most important clue.",
+    },
+    {
+      question: "In a traceback through several functions, what does the top File block show?",
+      options: ["The earliest call, usually from the main code", "Where the error happened", "The last function you wrote"],
+      answer: 0,
+      explanation: "A traceback runs from the earliest call at the top to the failing line at the bottom.",
+    },
+    {
+      question: "The traceback points to items[0] inside a function, but the function is fine. What's next?",
+      options: ["Delete the function", "Ignore the error", "Find where the value of items came from"],
+      answer: 2,
+      explanation: "The line shown is where the problem was noticed; the cause may be the data passed into the function.",
+    },
+  ]}
+/>
+
+## Summary
+
+- A traceback is Python's error message; read it from the **bottom up**.
+- The last line gives the error type and message; above it are the line number and its contents.
+- An error inside a function shows the call path, one block per step.
+- The line shown isn't always the cause; trace where the value came from.

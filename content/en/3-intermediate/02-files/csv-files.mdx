@@ -1,0 +1,185 @@
+---
+title: Working with CSV Files
+slug: csv-files
+stage: 3
+module: Files
+order: 2
+isFree: false
+estimatedMinutes: 20
+description: Write and read table data in CSV format with the csv module, then build a simple sales report.
+---
+
+# Working with CSV Files
+
+**CSV** (comma-separated values) is a text file that holds a table: each line is one table
+row, and the columns are separated by commas. Files like this open in Excel or Google Sheets,
+so they are often used to exchange data.
+
+```
+name,class,score
+Budi,10A,85
+Ani,10B,92
+```
+
+Python has a built-in `csv` module that handles the details of this format for you.
+
+## Writing CSV with `csv.writer`
+
+`csv.writer` wraps a file you have opened. `writerow()` writes one row from a list, and
+`writerows()` writes many rows at once:
+
+<Playground initialCode={`import csv
+
+with open("scores.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["name", "class", "score"])
+    writer.writerows([
+        ["Budi", "10A", 85],
+        ["Ani", "10B", 92],
+        ["Citra", "10A", 78],
+    ])
+
+with open("scores.csv", encoding="utf-8") as f:
+    print(f.read())`} />
+
+<Callout type="info">
+  When you open a file for `csv.writer`, add `newline=""`. The `csv` module manages its own
+  line endings, and without `newline=""` a file on Windows can get blank lines in between.
+</Callout>
+
+## Reading with `csv.reader`
+
+`csv.reader` gives you each row as a **list of strings**. The first row is usually the column
+headers, so take it first with `next()`:
+
+<Playground initialCode={`import csv
+
+with open("scores.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["name", "class", "score"])
+    writer.writerows([["Budi", "10A", 85], ["Ani", "10B", 92], ["Citra", "10A", 78]])
+
+with open("scores.csv", encoding="utf-8") as f:
+    reader = csv.reader(f)
+    header = next(reader)
+    print("Columns:", header)
+    for row in reader:
+        print(row)`} />
+
+<Callout type="warning">
+  Everything in a CSV is read as a **string**, numbers included. `"85"` cannot be added up yet;
+  convert it first with `int()` or `float()`.
+</Callout>
+
+## Reading with `csv.DictReader`
+
+Remembering which column `row[2]` is gets tiring. `csv.DictReader` uses the header row as
+keys, so every row becomes a **dict**:
+
+<Playground initialCode={`import csv
+
+with open("scores.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["name", "class", "score"])
+    writer.writerows([["Budi", "10A", 85], ["Ani", "10B", 92], ["Citra", "10A", 78]])
+
+with open("scores.csv", encoding="utf-8") as f:
+    for student in csv.DictReader(f):
+        score = int(student["score"])
+        status = "pass" if score >= 80 else "remedial"
+        print(f"{student['name']} ({student['class']}): {score}, {status}")`} />
+
+The code is easier to read: `student["score"]` says exactly what it means, and it stays
+correct even if the column order in the file changes.
+
+## A warung sales report
+
+Now let's put it all together. Pak Dodi's warung records daily sales in a CSV. We compute the
+total revenue and the revenue per product with a dict:
+
+<Playground initialCode={`import csv
+
+sales = [
+    ["date", "product", "quantity", "price"],
+    ["2024-07-01", "coffee", 12, 5000],
+    ["2024-07-01", "instant noodles", 8, 3500],
+    ["2024-07-02", "coffee", 15, 5000],
+    ["2024-07-02", "iced tea", 20, 4000],
+    ["2024-07-03", "instant noodles", 10, 3500],
+]
+with open("sales.csv", "w", newline="", encoding="utf-8") as f:
+    csv.writer(f).writerows(sales)
+
+per_product = {}
+total = 0
+with open("sales.csv", encoding="utf-8") as f:
+    for row in csv.DictReader(f):
+        revenue = int(row["quantity"]) * int(row["price"])
+        product = row["product"]
+        per_product[product] = per_product.get(product, 0) + revenue
+        total += revenue
+
+print("SALES REPORT")
+for product, revenue in per_product.items():
+    print(f"{product:<16} Rp{revenue:>8,}")
+print(f"{'TOTAL':<16} Rp{total:>8,}")`} />
+
+`per_product.get(product, 0)` gives 0 when the product is not in the dict yet, the same trick
+you used for counting in the Dictionaries and Sets module.
+
+## Exercise
+
+Kos expense data has been written to `expenses.csv`. Read it with `csv.DictReader`, then add
+up the total spending for the `"food"` category only.
+
+<Playground initialCode={`import csv
+
+data = [
+    ["description", "category", "cost"],
+    ["fried rice", "food", 15000],
+    ["ojek to campus", "transport", 12000],
+    ["bakso", "food", 18000],
+    ["water gallon", "supplies", 20000],
+]
+with open("expenses.csv", "w", newline="", encoding="utf-8") as f:
+    csv.writer(f).writerows(data)
+
+total_food = 0
+with open("expenses.csv", encoding="utf-8") as f:
+    for row in csv.DictReader(f):
+        # TODO: if the category is "food", add its cost (remember int())
+        pass
+
+print("Total food: Rp", total_food)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "If a file has the line Budi,10A,85, what does csv.reader give for that row?",
+      options: ["['Budi', '10A', 85]", "{'name': 'Budi'}", "['Budi', '10A', '85']"],
+      answer: 2,
+      explanation: "csv.reader gives a list of strings. Even the number 85 is read as '85'.",
+    },
+    {
+      question: "What is the advantage of csv.DictReader over csv.reader?",
+      options: ["Each row becomes a dict with the column headers as keys", "Numbers automatically become int", "It can read files that do not exist yet"],
+      answer: 0,
+      explanation: "DictReader uses the header row as keys, so you write row['score'] instead of row[2].",
+    },
+    {
+      question: "Why do we add newline=\"\" when opening a file for csv.writer?",
+      options: ["To make the file smaller", "So no extra blank lines appear between rows", "So columns are separated by semicolons"],
+      answer: 1,
+      explanation: "The csv module manages its own line endings; newline=\"\" prevents doubled line breaks, especially on Windows.",
+    },
+  ]}
+/>
+
+## Summary
+
+- CSV is a table in a text file: one line per record, columns separated by commas.
+- Write with `csv.writer(f)` and `writerow()` / `writerows()`; open the file with `newline=""`.
+- `csv.reader` gives lists of strings; `csv.DictReader` gives a dict per row.
+- CSV values are always strings, so convert numbers with `int()` or `float()` before using them.

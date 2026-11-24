@@ -1,0 +1,403 @@
+---
+title: Proyek Pencatat Pengeluaran
+slug: expense-tracker-project
+stage: 3
+module: Proyek
+order: 1
+isFree: false
+estimatedMinutes: 30
+description: Bangun pencatat pengeluaran langkah demi langkah dengan dataclass, exception sendiri, generator, datetime, dan file JSON.
+---
+
+# Proyek Pencatat Pengeluaran
+
+Uang jajan, bayar kos, bensin ojek, pulsa... tiba-tiba akhir bulan dompet kosong dan kamu
+tidak tahu ke mana uangnya pergi. Di proyek penutup Tahap 3 ini, kamu membangun **pencatat
+pengeluaran** yang menggabungkan hampir semua yang sudah kamu pelajari:
+
+- `@dataclass` dan type hint untuk data pengeluaran,
+- `date` dari modul `datetime` untuk tanggalnya,
+- exception buatan sendiri untuk jumlah yang tidak valid,
+- class dengan method dan dict comprehension untuk ringkasan per kategori,
+- generator untuk mencari pengeluaran besar,
+- file JSON untuk menyimpan dan memuat data.
+
+Kita membangunnya selangkah demi selangkah. Setiap playground berdiri sendiri, jadi kode dari
+langkah sebelumnya ikut ditulis ulang.
+
+## Langkah 1: data satu pengeluaran
+
+Satu pengeluaran punya tanggal, keterangan, kategori, dan jumlah dalam Rupiah. `@dataclass`
+membuatkan `__init__` dan tampilan yang rapi untuk kita:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+@dataclass
+class Pengeluaran:
+    tanggal: date
+    keterangan: str
+    kategori: str
+    jumlah: int
+
+makan = Pengeluaran(date(2026, 11, 2), "Nasi padang", "makan", 25000)
+kos = Pengeluaran(date(2026, 11, 1), "Bayar kos", "tempat tinggal", 900000)
+
+print(makan)
+print(f"{kos.keterangan}: Rp{kos.jumlah:,} pada {kos.tanggal.strftime('%d/%m/%Y')}")`} />
+
+## Langkah 2: tolak jumlah yang tidak valid
+
+Pengeluaran dengan jumlah nol atau negatif jelas salah ketik. Kita buat exception sendiri,
+lalu periksa di `__post_init__`, method yang dijalankan dataclass tepat setelah `__init__`:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+class JumlahTidakValid(Exception):
+    pass
+
+@dataclass
+class Pengeluaran:
+    tanggal: date
+    keterangan: str
+    kategori: str
+    jumlah: int
+
+    def __post_init__(self) -> None:
+        if self.jumlah <= 0:
+            raise JumlahTidakValid(f"Jumlah harus lebih dari 0, bukan {self.jumlah}")
+
+print(Pengeluaran(date(2026, 11, 2), "Pulsa", "lainnya", 50000))
+
+try:
+    Pengeluaran(date(2026, 11, 2), "Salah ketik", "makan", -15000)
+except JumlahTidakValid as e:
+    print("Ditolak:", e)`} />
+
+Dengan exception sendiri, kode yang memakai class ini bisa menangkap tepat kesalahan
+tersebut tanpa ikut menangkap error lain.
+
+## Langkah 3: class pencatat
+
+Sekarang buat `PencatatPengeluaran` yang menyimpan banyak pengeluaran. Ia punya tiga method
+utama: `tambah()`, `total()`, dan `per_kategori()`. Yang terakhir memakai dict comprehension
+untuk menjumlahkan setiap kategori:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+class JumlahTidakValid(Exception):
+    pass
+
+@dataclass
+class Pengeluaran:
+    tanggal: date
+    keterangan: str
+    kategori: str
+    jumlah: int
+
+    def __post_init__(self) -> None:
+        if self.jumlah <= 0:
+            raise JumlahTidakValid(f"Jumlah harus lebih dari 0, bukan {self.jumlah}")
+
+class PencatatPengeluaran:
+    def __init__(self) -> None:
+        self.daftar: list[Pengeluaran] = []
+
+    def tambah(self, pengeluaran: Pengeluaran) -> None:
+        self.daftar.append(pengeluaran)
+
+    def total(self) -> int:
+        return sum(p.jumlah for p in self.daftar)
+
+    def per_kategori(self) -> dict[str, int]:
+        kategori = sorted({p.kategori for p in self.daftar})
+        return {k: sum(p.jumlah for p in self.daftar if p.kategori == k) for k in kategori}
+
+pencatat = PencatatPengeluaran()
+pencatat.tambah(Pengeluaran(date(2026, 11, 1), "Bayar kos", "tempat tinggal", 900000))
+pencatat.tambah(Pengeluaran(date(2026, 11, 2), "Nasi padang", "makan", 25000))
+pencatat.tambah(Pengeluaran(date(2026, 11, 3), "Ojek ke kampus", "transportasi", 12000))
+pencatat.tambah(Pengeluaran(date(2026, 11, 3), "Bakso", "makan", 15000))
+
+print(f"Total: Rp{pencatat.total():,}")
+for kategori, jumlah in pencatat.per_kategori().items():
+    print(f"- {kategori}: Rp{jumlah:,}")`} />
+
+`sorted()` pada set kategori membuat urutannya selalu sama, jadi laporannya rapi.
+
+## Langkah 4: generator untuk pengeluaran besar
+
+Ingin tahu pengeluaran mana yang lebih dari batas tertentu? Generator cocok di sini: ia
+memberikan hasil satu per satu dengan `yield`, tanpa membuat list baru:
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+from typing import Iterator
+
+@dataclass
+class Pengeluaran:
+    tanggal: date
+    keterangan: str
+    kategori: str
+    jumlah: int
+
+class PencatatPengeluaran:
+    def __init__(self) -> None:
+        self.daftar: list[Pengeluaran] = []
+
+    def tambah(self, pengeluaran: Pengeluaran) -> None:
+        self.daftar.append(pengeluaran)
+
+    def di_atas(self, batas: int) -> Iterator[Pengeluaran]:
+        for p in self.daftar:
+            if p.jumlah > batas:
+                yield p
+
+pencatat = PencatatPengeluaran()
+pencatat.tambah(Pengeluaran(date(2026, 11, 1), "Bayar kos", "tempat tinggal", 900000))
+pencatat.tambah(Pengeluaran(date(2026, 11, 2), "Nasi padang", "makan", 25000))
+pencatat.tambah(Pengeluaran(date(2026, 11, 5), "Sepatu", "belanja", 350000))
+
+print("Pengeluaran di atas Rp100.000:")
+for p in pencatat.di_atas(100000):
+    print(f"- {p.keterangan}: Rp{p.jumlah:,}")`} />
+
+`Iterator[Pengeluaran]` adalah type hint untuk "sesuatu yang bisa di-loop dan menghasilkan
+`Pengeluaran`", cocok untuk generator.
+
+## Langkah 5: simpan dan muat dari JSON
+
+Supaya data tidak hilang saat program ditutup, simpan ke file JSON. Masalahnya, JSON tidak
+mengenal `date`. Solusinya: ubah tanggal menjadi string dengan `isoformat()` saat menyimpan,
+dan kembalikan dengan `date.fromisoformat()` saat memuat. `asdict()` dari `dataclasses`
+mengubah dataclass menjadi dict:
+
+<Playground initialCode={`import json
+from dataclasses import dataclass, asdict
+from datetime import date
+
+@dataclass
+class Pengeluaran:
+    tanggal: date
+    keterangan: str
+    kategori: str
+    jumlah: int
+
+def ke_dict(p: Pengeluaran) -> dict:
+    data = asdict(p)
+    data["tanggal"] = p.tanggal.isoformat()  # date menjadi "2026-11-02"
+    return data
+
+def dari_dict(data: dict) -> Pengeluaran:
+    data["tanggal"] = date.fromisoformat(data["tanggal"])
+    return Pengeluaran(**data)
+
+daftar = [
+    Pengeluaran(date(2026, 11, 2), "Nasi padang", "makan", 25000),
+    Pengeluaran(date(2026, 11, 3), "Ojek ke kampus", "transportasi", 12000),
+]
+
+with open("pengeluaran.json", "w") as f:
+    json.dump([ke_dict(p) for p in daftar], f, indent=2)
+
+with open("pengeluaran.json") as f:
+    print(f.read())
+
+with open("pengeluaran.json") as f:
+    dimuat = [dari_dict(d) for d in json.load(f)]
+
+print(dimuat[0])
+print("Sama dengan aslinya?", dimuat == daftar)`} />
+
+`Pengeluaran(**data)` membongkar dict menjadi argumen bernama, persis seperti `**kwargs` yang
+sudah kamu pelajari.
+
+<Callout type="info">
+  Saat memuat file, data dari JSON juga melewati `__post_init__`. Jadi kalau seseorang mengedit
+  file dan menulis jumlah negatif, `JumlahTidakValid` tetap akan muncul.
+</Callout>
+
+## Program lengkap
+
+Ini semua langkah yang digabung menjadi satu program. Bacalah dari atas ke bawah, lalu
+jalankan:
+
+<Playground initialCode={`import json
+from dataclasses import dataclass, asdict
+from datetime import date
+from typing import Iterator
+
+class JumlahTidakValid(Exception):
+    pass
+
+@dataclass
+class Pengeluaran:
+    tanggal: date
+    keterangan: str
+    kategori: str
+    jumlah: int
+
+    def __post_init__(self) -> None:
+        if self.jumlah <= 0:
+            raise JumlahTidakValid(f"Jumlah harus lebih dari 0, bukan {self.jumlah}")
+
+class PencatatPengeluaran:
+    def __init__(self) -> None:
+        self.daftar: list[Pengeluaran] = []
+
+    def tambah(self, pengeluaran: Pengeluaran) -> None:
+        self.daftar.append(pengeluaran)
+
+    def total(self) -> int:
+        return sum(p.jumlah for p in self.daftar)
+
+    def per_kategori(self) -> dict[str, int]:
+        kategori = sorted({p.kategori for p in self.daftar})
+        return {k: sum(p.jumlah for p in self.daftar if p.kategori == k) for k in kategori}
+
+    def di_atas(self, batas: int) -> Iterator[Pengeluaran]:
+        for p in self.daftar:
+            if p.jumlah > batas:
+                yield p
+
+    def simpan(self, nama_file: str) -> None:
+        data = []
+        for p in self.daftar:
+            baris = asdict(p)
+            baris["tanggal"] = p.tanggal.isoformat()
+            data.append(baris)
+        with open(nama_file, "w") as f:
+            json.dump(data, f, indent=2)
+
+    def muat(self, nama_file: str) -> None:
+        with open(nama_file) as f:
+            data = json.load(f)
+        self.daftar = []
+        for baris in data:
+            baris["tanggal"] = date.fromisoformat(baris["tanggal"])
+            self.tambah(Pengeluaran(**baris))
+
+# Mencatat pengeluaran bulan November
+pencatat = PencatatPengeluaran()
+catatan = [
+    (date(2026, 11, 1), "Bayar kos", "tempat tinggal", 900000),
+    (date(2026, 11, 2), "Nasi padang", "makan", 25000),
+    (date(2026, 11, 3), "Ojek ke kampus", "transportasi", 12000),
+    (date(2026, 11, 3), "Bakso", "makan", 15000),
+    (date(2026, 11, 4), "Salah ketik", "makan", 0),
+    (date(2026, 11, 5), "Sepatu", "belanja", 350000),
+]
+for tanggal, keterangan, kategori, jumlah in catatan:
+    try:
+        pencatat.tambah(Pengeluaran(tanggal, keterangan, kategori, jumlah))
+    except JumlahTidakValid as e:
+        print(f"Dilewati ({keterangan}): {e}")
+
+# Simpan, lalu muat ke pencatat baru seolah-olah program dibuka ulang
+pencatat.simpan("pengeluaran.json")
+pencatat_baru = PencatatPengeluaran()
+pencatat_baru.muat("pengeluaran.json")
+
+print()
+print("=== Laporan Pengeluaran ===")
+print(f"Jumlah catatan: {len(pencatat_baru.daftar)}")
+print(f"Total: Rp{pencatat_baru.total():,}")
+print()
+print("Per kategori:")
+for kategori, jumlah in pencatat_baru.per_kategori().items():
+    print(f"- {kategori}: Rp{jumlah:,}")
+print()
+print("Di atas Rp100.000:")
+for p in pencatat_baru.di_atas(100000):
+    print(f"- {p.tanggal.strftime('%d/%m/%Y')} {p.keterangan}: Rp{p.jumlah:,}")`} />
+
+## Ide pengembangan
+
+Programmu sudah berjalan. Kalau ingin melangkah lebih jauh, coba salah satu ide ini di
+komputermu sendiri:
+
+- **Ekspor ke CSV**: tambahkan method `ekspor_csv(nama_file)` yang memakai `csv.writer`
+  supaya datanya bisa dibuka di spreadsheet.
+- **Tes dengan pytest**: buat `test_pencatat.py` yang mengecek `total()`, `per_kategori()`,
+  dan bahwa `JumlahTidakValid` muncul dengan `pytest.raises`.
+- **Filter per bulan**: tambahkan method yang hanya menghitung pengeluaran di bulan tertentu
+  memakai `p.tanggal.month`.
+- **Menu interaktif**: pakai `input()` dan `while` supaya pengguna bisa menambah pengeluaran
+  sendiri, dengan `strptime` untuk membaca tanggal yang diketik.
+
+## Latihan
+
+Tambahkan method `terbesar()` yang mengembalikan pengeluaran dengan jumlah paling besar, dan
+method `rata_rata()` yang mengembalikan rata-rata jumlah pengeluaran. Kalau daftarnya kosong,
+`terbesar()` mengembalikan `None` dan `rata_rata()` mengembalikan `0`.
+
+<Playground initialCode={`from dataclasses import dataclass
+from datetime import date
+
+@dataclass
+class Pengeluaran:
+    tanggal: date
+    keterangan: str
+    kategori: str
+    jumlah: int
+
+class PencatatPengeluaran:
+    def __init__(self) -> None:
+        self.daftar: list[Pengeluaran] = []
+
+    def tambah(self, pengeluaran: Pengeluaran) -> None:
+        self.daftar.append(pengeluaran)
+
+    def terbesar(self) -> Pengeluaran | None:
+        # TODO: petunjuk: max() dengan key=lambda p: p.jumlah
+        pass
+
+    def rata_rata(self) -> float:
+        # TODO: total dibagi banyaknya pengeluaran
+        return 0
+
+pencatat = PencatatPengeluaran()
+pencatat.tambah(Pengeluaran(date(2026, 11, 2), "Nasi padang", "makan", 25000))
+pencatat.tambah(Pengeluaran(date(2026, 11, 5), "Sepatu", "belanja", 350000))
+pencatat.tambah(Pengeluaran(date(2026, 11, 6), "Pulsa", "lainnya", 50000))
+
+print("Terbesar:", pencatat.terbesar())
+print("Rata-rata:", pencatat.rata_rata())`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Kenapa tanggal diubah dengan isoformat() sebelum disimpan ke JSON?",
+      options: ["Supaya file JSON lebih kecil", "Supaya tanggalnya otomatis memakai WIB", "Karena JSON tidak bisa menyimpan objek date secara langsung"],
+      answer: 2,
+      explanation: "JSON hanya mengenal string, angka, boolean, null, list, dan objek. Tanggal disimpan sebagai string lalu dikembalikan dengan date.fromisoformat().",
+    },
+    {
+      question: "Kapan __post_init__ pada dataclass dijalankan?",
+      options: ["Tepat setelah __init__ buatan dataclass selesai", "Saat objek dihapus", "Hanya saat objek dicetak dengan print()"],
+      answer: 0,
+      explanation: "__post_init__ dijalankan otomatis setelah __init__, sehingga cocok untuk memeriksa data seperti jumlah yang tidak valid.",
+    },
+    {
+      question: "Apa keuntungan di_atas() ditulis sebagai generator dengan yield?",
+      options: ["Hasilnya otomatis diurutkan", "Pengeluaran diberikan satu per satu tanpa membuat list baru", "Generator bisa dipakai berkali-kali tanpa batas"],
+      answer: 1,
+      explanation: "Generator menghasilkan nilai satu per satu saat di-loop, jadi tidak perlu menyimpan semua hasil di list baru.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- `@dataclass` dengan type hint membuat class data yang rapi, dan `__post_init__` bisa
+  memvalidasi isinya.
+- Exception buatan sendiri seperti `JumlahTidakValid` membuat error lebih jelas dan mudah
+  ditangkap.
+- Dict comprehension dan generator meringkas serta menyaring data dengan sedikit kode.
+- Tanggal disimpan ke JSON sebagai string `isoformat()` dan dibaca kembali dengan
+  `date.fromisoformat()`.
+- Selamat, kamu sudah menyelesaikan Tahap 3!

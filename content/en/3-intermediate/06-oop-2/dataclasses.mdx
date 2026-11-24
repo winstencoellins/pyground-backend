@@ -1,0 +1,225 @@
+---
+title: Dataclasses
+slug: dataclasses
+stage: 3
+module: OOP Part 2
+order: 3
+isFree: false
+estimatedMinutes: 15
+description: Use @dataclass to build data-holding classes without writing __init__, __repr__, and __eq__ yourself.
+---
+
+# Dataclasses
+
+Many classes exist mainly to hold data: products, students, orders. For classes like that, you
+keep writing `__init__`, `__repr__`, and `__eq__` that look almost the same every time. The
+`dataclasses` module can write them for you.
+
+## Plain class vs `@dataclass`
+
+Compare these two versions of a `Product` class.
+
+<Playground initialCode={`class PlainProduct:
+    def __init__(self, name, price, stock):
+        self.name = name
+        self.price = price
+        self.stock = stock
+
+    def __repr__(self):
+        return f"PlainProduct(name={self.name!r}, price={self.price}, stock={self.stock})"
+
+    def __eq__(self, other):
+        return (self.name, self.price, self.stock) == (other.name, other.price, other.stock)
+
+print(PlainProduct("Indomie", 3500, 40))`} />
+
+<Playground initialCode={`from dataclasses import dataclass
+
+@dataclass
+class Product:
+    name: str
+    price: int
+    stock: int
+
+noodles = Product("Indomie", 3500, 40)
+print(noodles)
+print(noodles.price)
+print(noodles == Product("Indomie", 3500, 40))`} />
+
+Just write each field's name and type (`name: str`). `@dataclass` automatically creates
+`__init__`, `__repr__`, and `__eq__` for you.
+
+<Callout type="info">
+  The `: str` and `: int` parts are called **type hints**. In a dataclass they're required
+  because they mark the fields. But Python doesn't check the types: `Product("Tea", "pricey", 1)`
+  still runs.
+</Callout>
+
+## Fields with default values
+
+Fields can have defaults. The rule is the same as for function parameters: fields with a
+default must come **after** fields without one.
+
+<Playground initialCode={`from dataclasses import dataclass
+
+@dataclass
+class KosRoom:
+    number: str
+    price: int
+    has_ac: bool = False
+    city: str = "Bandung"
+
+a1 = KosRoom("A1", 900000)
+b2 = KosRoom("B2", 1300000, has_ac=True)
+print(a1)
+print(b2)`} />
+
+## `field(default_factory=list)` for lists
+
+If the default is a list, you can't write `= []`. The dataclass rejects it with a `ValueError`,
+precisely to protect you from the shared list trap.
+
+<Playground expectError initialCode={`from dataclasses import dataclass
+
+@dataclass
+class Student:
+    name: str
+    scores: list = []`} />
+
+Use `field(default_factory=list)`. It means: "every time an object is created, call `list()` to
+make a fresh list".
+
+<Playground initialCode={`from dataclasses import dataclass, field
+
+@dataclass
+class Student:
+    name: str
+    scores: list = field(default_factory=list)
+
+    def average(self):
+        if not self.scores:
+            return 0
+        return sum(self.scores) / len(self.scores)
+
+budi = Student("Budi")
+ani = Student("Ani")
+budi.scores.append(85)
+budi.scores.append(95)
+
+print(budi, budi.average())
+print(ani, ani.average())`} />
+
+A dataclass is still a normal class, so you can add methods like `average`, properties, and
+even inheritance.
+
+## `frozen=True`: data that can't change
+
+With `@dataclass(frozen=True)`, fields can't be changed after the object is created. That's a
+good fit for data that really is fixed, like coordinates or region codes.
+
+<Playground expectError initialCode={`from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Location:
+    city: str
+    lat: float
+    lon: float
+
+jogja = Location("Yogyakarta", -7.80, 110.36)
+print(jogja)
+jogja.city = "Solo"`} />
+
+Bonus: frozen objects can be used as dict keys or set members.
+
+<Playground initialCode={`from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Location:
+    city: str
+    lat: float
+    lon: float
+
+shipping = {
+    Location("Yogyakarta", -7.80, 110.36): 10000,
+    Location("Jakarta", -6.20, 106.82): 25000,
+}
+print(shipping[Location("Jakarta", -6.20, 106.82)])`} />
+
+## When to use a dataclass, a plain class, or a dict?
+
+| Choice | Good for |
+| --- | --- |
+| dict | Temporary data or data whose shape changes, like freshly loaded JSON |
+| `@dataclass` | Data with clear, fixed fields, plus a few methods |
+| plain class | Objects with lots of rules and behaviour, like a `BankAccount` that guards its balance |
+
+For example: order data from a form can start as a dict. Once it's used in many places, turn it
+into a dataclass so a misspelled field name gets caught right away.
+
+<Playground initialCode={`from dataclasses import dataclass
+
+data = {"customer": "Citra", "dish": "Bakso", "quantity": 2}
+
+@dataclass
+class Order:
+    customer: str
+    dish: str
+    quantity: int = 1
+
+o = Order(**data)
+print(o)
+print(o.dish, "x", o.quantity)`} />
+
+`Order(**data)` unpacks the dict into keyword arguments. You'll learn more about `**` in the
+next module.
+
+## Exercise
+
+Create a `MenuItem` dataclass for a warung with `name`, `price`, and `spicy` (default `False`)
+fields. Then create a `Receipt` dataclass with `customer` and `items` (a list of `MenuItem`,
+using `default_factory`) fields, plus a `total()` method.
+
+<Playground initialCode={`from dataclasses import dataclass, field
+
+@dataclass
+class MenuItem:
+    name: str
+    # TODO: add price and spicy (default False)
+
+# TODO: create a Receipt dataclass with customer, items, and a total() method
+
+soto = MenuItem("Soto ayam")
+print(soto)`} />
+
+## Quiz
+
+<Quiz
+  questions={[
+    {
+      question: "Which methods does @dataclass create automatically?",
+      options: ["Only __init__", "__str__ and __len__", "__init__, __repr__, and __eq__"],
+      answer: 2,
+      explanation: "By default @dataclass builds __init__, __repr__, and __eq__ from the list of fields.",
+    },
+    {
+      question: "What's the correct way to give a dataclass field an empty list default?",
+      options: ["scores: list = field(default_factory=list)", "scores: list = []", "scores: list = list"],
+      answer: 0,
+      explanation: "default_factory=list makes a new list for each object. Writing = [] is rejected with a ValueError.",
+    },
+    {
+      question: "What does @dataclass(frozen=True) do?",
+      options: ["Objects can't be created", "Fields can't be changed after the object is created", "Every field must have a default"],
+      answer: 1,
+      explanation: "Changing a field on a frozen object raises FrozenInstanceError, and the object can be a dict key.",
+    },
+  ]}
+/>
+
+## Summary
+
+- `@dataclass` creates `__init__`, `__repr__`, and `__eq__` from the fields you write with type hints.
+- Fields with defaults come after fields without them.
+- For list or dict defaults, use `field(default_factory=list)`.
+- `frozen=True` makes objects unchangeable and usable as dict keys.
+- A dict for loose data, a dataclass for fixed-shape data, a plain class for objects with lots of rules.

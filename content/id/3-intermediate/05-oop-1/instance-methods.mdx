@@ -1,0 +1,222 @@
+---
+title: Method pada Object
+slug: instance-methods
+stage: 3
+module: OOP Bagian 1
+order: 2
+isFree: false
+estimatedMinutes: 15
+description: Tulis method yang membaca dan mengubah data object, mengembalikan nilai, dan menolak input yang salah dengan ValueError.
+---
+
+# Method pada Object
+
+Object bukan cuma tempat menyimpan data. Lewat **method**, object juga bisa *melakukan*
+sesuatu dengan datanya sendiri. Di pelajaran ini kita membangun class `RekeningBank` yang bisa
+menerima setoran dan penarikan.
+
+## Method membaca data object
+
+Method adalah fungsi di dalam class. Parameter pertamanya selalu `self`, sehingga method bisa
+membaca atribut object yang memanggilnya.
+
+<Playground initialCode={`class RekeningBank:
+    def __init__(self, pemilik, saldo):
+        self.pemilik = pemilik
+        self.saldo = saldo
+
+    def info(self):
+        print("Rekening", self.pemilik, "saldo Rp", self.saldo)
+
+rek_budi = RekeningBank("Budi", 50000)
+rek_ani = RekeningBank("Ani", 120000)
+
+rek_budi.info()
+rek_ani.info()`} />
+
+Saat kamu menulis `rek_budi.info()`, Python sebenarnya menjalankan `RekeningBank.info(rek_budi)`.
+Itulah sebabnya `self` di dalam method berisi `rek_budi`.
+
+## Method mengubah data object
+
+Method juga boleh mengubah atribut. Perubahan itu tersimpan di object, jadi terlihat oleh
+method lain.
+
+<Playground initialCode={`class RekeningBank:
+    def __init__(self, pemilik, saldo=0):
+        self.pemilik = pemilik
+        self.saldo = saldo
+
+    def setor(self, jumlah):
+        self.saldo += jumlah
+
+    def tarik(self, jumlah):
+        self.saldo -= jumlah
+
+rek = RekeningBank("Citra")
+rek.setor(100000)
+rek.tarik(25000)
+rek.setor(10000)
+print("Saldo Citra:", rek.saldo)`} />
+
+## Mengembalikan nilai
+
+Seperti fungsi biasa, method bisa memakai `return`. Ini berguna kalau kamu butuh hasil
+hitungan, bukan sekadar cetakan.
+
+<Playground initialCode={`class RekeningBank:
+    def __init__(self, pemilik, saldo=0):
+        self.pemilik = pemilik
+        self.saldo = saldo
+
+    def setor(self, jumlah):
+        self.saldo += jumlah
+        return self.saldo
+
+    def bisa_tarik(self, jumlah):
+        return jumlah <= self.saldo
+
+rek = RekeningBank("Dodi", 30000)
+saldo_baru = rek.setor(20000)
+print("Saldo baru:", saldo_baru)
+print("Bisa tarik 40000?", rek.bisa_tarik(40000))
+print("Bisa tarik 90000?", rek.bisa_tarik(90000))`} />
+
+## Menolak input yang salah dengan `ValueError`
+
+Setoran negatif atau penarikan melebihi saldo tidak masuk akal. Method sebaiknya menjaga data
+object tetap benar dengan melempar error memakai `raise`.
+
+<Playground initialCode={`class RekeningBank:
+    def __init__(self, pemilik, saldo=0):
+        self.pemilik = pemilik
+        self.saldo = saldo
+
+    def setor(self, jumlah):
+        if jumlah <= 0:
+            raise ValueError("Jumlah setoran harus lebih dari 0")
+        self.saldo += jumlah
+
+    def tarik(self, jumlah):
+        if jumlah > self.saldo:
+            raise ValueError("Saldo tidak cukup")
+        self.saldo -= jumlah
+
+rek = RekeningBank("Ani", 50000)
+
+try:
+    rek.tarik(80000)
+except ValueError as e:
+    print("Gagal:", e)
+
+rek.tarik(20000)
+print("Saldo Ani:", rek.saldo)`} />
+
+Kalau error tidak ditangkap dengan `try`/`except`, program berhenti. Ini lebih baik daripada
+diam-diam menyimpan saldo minus.
+
+<Playground expectError initialCode={`class RekeningBank:
+    def __init__(self, pemilik, saldo=0):
+        self.pemilik = pemilik
+        self.saldo = saldo
+
+    def setor(self, jumlah):
+        if jumlah <= 0:
+            raise ValueError("Jumlah setoran harus lebih dari 0")
+        self.saldo += jumlah
+
+rek = RekeningBank("Budi")
+rek.setor(-5000)`} />
+
+<Callout type="warning">
+  Jangan lupa `self.` saat mengubah atribut. Kalau kamu menulis `saldo += jumlah`, Python
+  menganggap `saldo` variabel lokal di method dan memberi error, sementara saldo object tidak
+  berubah.
+</Callout>
+
+## Object di dalam list
+
+Object bisa disimpan di list seperti nilai lainnya. Ini cara umum mengelola banyak data
+sekaligus.
+
+<Playground initialCode={`class RekeningBank:
+    def __init__(self, pemilik, saldo=0):
+        self.pemilik = pemilik
+        self.saldo = saldo
+
+    def setor(self, jumlah):
+        self.saldo += jumlah
+
+nasabah = [
+    RekeningBank("Budi", 50000),
+    RekeningBank("Ani", 120000),
+    RekeningBank("Citra", 75000),
+]
+
+for rek in nasabah:
+    rek.setor(10000)
+
+total = sum(rek.saldo for rek in nasabah)
+print("Total saldo semua nasabah:", total)
+
+terkaya = nasabah[0]
+for rek in nasabah:
+    if rek.saldo > terkaya.saldo:
+        terkaya = rek
+print("Saldo terbesar milik", terkaya.pemilik)`} />
+
+## Latihan
+
+Lengkapi class `KartuEMoney` untuk naik KRL. Method `isi_ulang` menambah saldo (tolak jumlah
+`<= 0`), dan method `bayar` mengurangi saldo sesuai tarif (tolak kalau saldo kurang).
+
+<Playground initialCode={`class KartuEMoney:
+    def __init__(self, pemilik, saldo=0):
+        self.pemilik = pemilik
+        self.saldo = saldo
+
+    def isi_ulang(self, jumlah):
+        # TODO: raise ValueError kalau jumlah <= 0, lalu tambah saldo
+        pass
+
+    def bayar(self, tarif):
+        # TODO: raise ValueError kalau saldo kurang, lalu kurangi saldo
+        pass
+
+kartu = KartuEMoney("Dodi")
+kartu.isi_ulang(20000)
+kartu.bayar(5000)
+print("Sisa saldo:", kartu.saldo)`} />
+
+## Kuis
+
+<Quiz
+  questions={[
+    {
+      question: "Apa yang terjadi saat kamu memanggil rek.setor(10000)?",
+      options: ["Python menjalankan RekeningBank.setor(rek, 10000)", "Python membuat object RekeningBank baru", "Python mengirim 10000 ke parameter self"],
+      answer: 0,
+      explanation: "Object di depan titik otomatis dikirim sebagai self, lalu 10000 masuk ke jumlah.",
+    },
+    {
+      question: "Di dalam method, baris mana yang benar-benar mengubah saldo object?",
+      options: ["saldo += jumlah", "jumlah += self.saldo", "self.saldo += jumlah"],
+      answer: 2,
+      explanation: "Atribut object selalu diakses lewat self. Tanpa self., saldo dianggap variabel lokal.",
+    },
+    {
+      question: "Kenapa method tarik sebaiknya melempar ValueError saat saldo tidak cukup?",
+      options: ["Supaya program lebih cepat", "Supaya data object tidak menjadi salah, dan pemanggil tahu ada masalah", "Karena Python mewajibkan setiap method punya raise"],
+      answer: 1,
+      explanation: "Error menghentikan perubahan yang tidak masuk akal, dan pemanggil bisa menanganinya dengan try/except.",
+    },
+  ]}
+/>
+
+## Ringkasan
+
+- Method adalah fungsi di dalam class; parameter pertamanya `self`.
+- `obj.method(x)` sama dengan `Class.method(obj, x)`.
+- Method bisa membaca dan mengubah atribut lewat `self`, dan bisa mengembalikan nilai dengan `return`.
+- Pakai `raise ValueError(...)` untuk menolak input yang membuat data object salah.
+- Object bisa disimpan di list dan diolah dengan loop atau `sum()`.
