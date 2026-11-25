@@ -83,6 +83,77 @@ Python allows chained comparisons, just like in maths:
 <Playground initialCode={`score = 85
 print(80 <= score <= 100)`} />
 
+## Practice
+
+<Exercise
+  type="guided"
+  title="Fix the ride rule"
+  steps={[
+    "The rule: you can ride if your height is **at least** 120 cm **and** your age is **at least** 7. Read the `can_ride` line slowly.",
+    "Run it with height `125` and age `6`. That child shouldn't be allowed on. What do you get?",
+    "Fix the operator that joins the two conditions.",
+    "At least means the limit itself is allowed too. Run it with height `120` and age `7`, then fix the comparison operators.",
+    "Click Check answer.",
+  ]}
+  starter={`height = int(input("Height (cm): "))
+age = int(input("Age: "))
+
+can_ride = height > 120 or age > 7
+print("Can ride:", can_ride)
+`}
+  tests={[
+    { input: ["125", "6"], output: "Can ride: False" },
+    { input: ["120", "7"], output: "Can ride: True" },
+    { input: ["119", "10"], output: "Can ride: False" },
+    { input: ["150", "12"], output: "Can ride: True" },
+  ]}
+  hints={[
+    "`or` is already `True` when just one condition holds. Here both have to hold.",
+    "`>` doesn't accept the limit itself: `120 > 120` is `False`.",
+    "`can_ride = height >= 120 and age >= 7`",
+  ]}
+  solution={`height = int(input("Height (cm): "))
+age = int(input("Age: "))
+
+can_ride = height >= 120 and age >= 7
+print("Can ride:", can_ride)`}
+  reflect="The original program never crashed, yet its answers were wrong. Why are mistakes like this more dangerous than errors, and how can you catch them?"
+>
+
+This ride attendant program has two logic mistakes. It runs without any error, but it lets on a
+child who shouldn't ride. Find them and fix them.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Weekend discount"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["saturday"], output: "Weekend discount: True" },
+    { input: ["Monday"], output: "Weekend discount: False" },
+    { input: [" Sunday "], output: "Weekend discount: True" },
+    { input: ["SATURDAY"], output: "Weekend discount: True" },
+  ]}
+  hints={[
+    "Two days get the discount. Which operator is `True` when either condition holds?",
+    "Users might type `Sunday`, `SUNDAY` or ` sunday ` with spaces. Tidy the input first.",
+    "`day = input('Day: ').strip().lower()` then `day == 'saturday' or day == 'sunday'`.",
+  ]}
+  solution={`day = input("Day: ").strip().lower()
+
+discount = day == "saturday" or day == "sunday"
+print("Weekend discount:", discount)`}
+  reflect="Try writing `day == 'saturday' or 'sunday'` (without the second `day ==`) and run it with `monday`. What gets printed, and why?"
+>
+
+A cafe gives a discount every **Saturday and Sunday**. Write a program that asks for the day,
+then prints `Weekend discount: True` or `Weekend discount: False`. The cashier doesn't always type
+neatly.
+
+</Exercise>
+
 ## Quiz
 
 <Quiz

@@ -82,16 +82,92 @@ print("Final balance:", balance)`} />
 
 ## Practice
 
-Calculate the area and perimeter of a rectangle with a length of 8 and a width of 5.
-
-<Playground initialCode={`length = 8
+<Exercise
+  type="guided"
+  title="Area and perimeter"
+  steps={[
+    "Replace the `0` for `area` with the area formula using `length` and `width`.",
+    "Replace the `0` for `perimeter` with the perimeter formula. Remember brackets for the order of operations.",
+    "Run it, then click Check answer.",
+  ]}
+  starter={`length = 8
 width = 5
 
 area = 0       # replace with the right formula
 perimeter = 0  # replace with the right formula
 
 print("Area:", area)
-print("Perimeter:", perimeter)`} />
+print("Perimeter:", perimeter)
+`}
+  tests={[
+    { output: `Area: 40
+Perimeter: 26` },
+  ]}
+  hints={[
+    "A rectangle's area is length times width: `length * width`.",
+    "The perimeter is twice the sum of length and width. Mind the order of operations: use brackets.",
+  ]}
+  solution={`length = 8
+width = 5
+
+area = length * width
+perimeter = 2 * (length + width)
+
+print("Area:", area)
+print("Perimeter:", perimeter)`}
+  reflect="What do you get if you write `2 * length + width` without brackets? Why is it different?"
+>
+
+Calculate the area and perimeter of a rectangle with a length of 8 and a width of 5. Use the
+variables, don't type the results directly.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Counting out change"
+  starter={`change = 78000
+
+# Print how many of each note here
+`}
+  tests={[
+    { output: `50000 x 1
+20000 x 1
+10000 x 0
+5000 x 1
+2000 x 1
+1000 x 1` },
+  ]}
+  hints={[
+    "Start with the largest note. What is `change // 50000`?",
+    "After handing out the 50000 notes, the money left is `change % 50000`. Keep it in a variable, for example `left`.",
+    "Repeat the same pattern for every note: `//` for the count, then `%` for what's left.",
+  ]}
+  solution={`change = 78000
+
+left = change
+print(50000, "x", left // 50000)
+left = left % 50000
+print(20000, "x", left // 20000)
+left = left % 20000
+print(10000, "x", left // 10000)
+left = left % 10000
+print(5000, "x", left // 5000)
+left = left % 5000
+print(2000, "x", left // 2000)
+left = left % 2000
+print(1000, "x", left // 1000)`}
+  reflect="Change `change` to 3000 or 99000 and check whether the result makes sense. Why does it have to start from the largest note?"
+>
+
+A cashier has to give Rp78000 in change using as few notes as possible. The notes available are
+50000, 20000, 10000, 5000, 2000 and 1000. Print how many of each note, starting from the largest,
+exactly like the example (including notes used 0 times): `50000 x 1` means one 50000 note.
+
+Your program must still be right if the value of `change` is changed, so don't type the counts
+directly.
+
+</Exercise>
 
 ## Quiz
 

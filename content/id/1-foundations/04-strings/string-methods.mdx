@@ -77,12 +77,70 @@ print("yahoo" in email)`} />
 
 ## Latihan
 
-Rapikan nama ini supaya menjadi `Rina Wulandari`, lalu ganti `Rina` dengan `Rani`.
+<Exercise
+  type="guided"
+  title="Perbaiki perapi nama"
+  steps={[
+    "Klik Jalankan dan ketik `   rina WULANDARI  `. Perhatikan hasilnya: spasinya masih ada dan semua huruf besar.",
+    "Baris `nama.strip()` tidak berpengaruh apa-apa. Ingat: method menghasilkan string baru. Simpan hasilnya kembali ke `nama`.",
+    "Ganti `upper()` dengan method yang membuat setiap kata diawali huruf besar.",
+    "Jalankan lagi dengan input yang sama, lalu klik Cek jawaban.",
+  ]}
+  starter={`nama = input("Nama lengkap: ")
 
-<Playground initialCode={`nama = "   rina WULANDARI  "
+nama.strip()
+nama = nama.upper()
+print("Nama: " + nama)
+`}
+  tests={[
+    { input: ["   rina WULANDARI  "], output: "Nama: Rina Wulandari" },
+    { input: ["budi"], output: "Nama: Budi" },
+    { input: ["  ANDI pratama"], output: "Nama: Andi Pratama" },
+  ]}
+  hints={[
+    "`nama.strip()` membuat string baru yang langsung dibuang karena tidak disimpan.",
+    "Tulis `nama = nama.strip()`. Method untuk Huruf Besar Di Setiap Kata adalah `title()`.",
+  ]}
+  solution={`nama = input("Nama lengkap: ")
 
-# Rapikan dulu, lalu ganti
-`} />
+nama = nama.strip()
+nama = nama.title()
+print("Nama: " + nama)`}
+  reflect="Kedua baris itu bisa digabung menjadi `nama = nama.strip().title()`. Apakah urutannya penting? Coba `nama.title().strip()` dan pikirkan kenapa hasilnya sama atau berbeda."
+>
+
+Program di bawah seharusnya merapikan nama pendaftar: membuang spasi di awal dan akhir, lalu
+membuat setiap kata diawali huruf besar. Tapi hasilnya salah. Temukan dan perbaiki kesalahannya.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Hitung kata enak"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["Nasinya enak, sambalnya enak banget"], output: "Kata enak muncul 2 kali" },
+    { input: ["ENAK! Enak sekali. enak"], output: "Kata enak muncul 3 kali" },
+    { input: ["Biasa saja"], output: "Kata enak muncul 0 kali" },
+  ]}
+  hints={[
+    "Ada method yang menghitung berapa kali sebuah teks muncul.",
+    "`count()` membedakan huruf besar dan kecil, jadi `Enak` dan `enak` dihitung berbeda. Samakan dulu hurufnya.",
+    "`jumlah = ulasan.lower().count('enak')` lalu `print('Kata enak muncul', jumlah, 'kali')`.",
+  ]}
+  solution={`ulasan = input("Ulasan: ")
+
+jumlah = ulasan.lower().count("enak")
+print("Kata enak muncul", jumlah, "kali")`}
+  reflect="Ulasan `Tidak enak` juga ikut terhitung, begitu juga kata `kenakan`. Apa artinya ini untuk program yang ingin tahu apakah sebuah ulasan positif?"
+>
+
+Pemilik warung ingin tahu seberapa sering pelanggan menulis kata **enak** di ulasannya. Buat
+program yang meminta satu ulasan, lalu mencetak berapa kali kata `enak` muncul, dengan format
+`Kata enak muncul 2 kali`. Pelanggan menulis dengan gaya yang macam-macam.
+
+</Exercise>
 
 ## Kuis
 

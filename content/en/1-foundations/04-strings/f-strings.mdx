@@ -69,15 +69,85 @@ print(f"Total: Rp{rupiah}")`} />
 
 ## Practice
 
-Make a simple receipt with an f-string: item name, quantity, and total price with a thousands
-separator.
+<Exercise
+  type="guided"
+  title="A receipt line"
+  steps={[
+    "`input()` always gives you text. Turn `price` and `qty` into whole numbers with `int()`.",
+    "Work out `total` as price times quantity.",
+    "Print one line with an f-string, exactly like `12 x Notebook = Rp54,000`.",
+    "Use the `:,` format on the total so it has thousands separators.",
+  ]}
+  starter={`item = input("Item name: ")
+price = input("Unit price: ")
+qty = input("Quantity: ")
 
-<Playground initialCode={`item = "Notebook"
-price = 4500
-quantity = 12
+# Example result: 12 x Notebook = Rp54,000
+`}
+  tests={[
+    { input: ["Notebook", "4500", "12"], output: "12 x Notebook = Rp54,000" },
+    { input: ["Pencil", "2000", "3"], output: "3 x Pencil = Rp6,000" },
+    { input: ["Bag", "150000", "1"], output: "1 x Bag = Rp150,000" },
+  ]}
+  hints={[
+    "Without `int()`, `price * qty` tries to multiply two pieces of text and fails.",
+    "The thousands format goes after a colon inside the curly braces: `{total:,}`.",
+    "`print(f'{qty} x {item} = Rp{total:,}')`",
+  ]}
+  solution={`item = input("Item name: ")
+price = int(input("Unit price: "))
+qty = int(input("Quantity: "))
 
-# Example output: 12 x Notebook = Rp54,000
-`} />
+total = price * qty
+print(f"{qty} x {item} = Rp{total:,}")`}
+  reflect="The result is `Rp54,000`, but in Indonesia we write `Rp54.000`. How would you change it? Look at the callout above again, then try it."
+>
+
+Build one receipt line: the program asks for the **item name**, the **unit price**, then the
+**quantity**, and prints the quantity, the item and the total price with thousands separators.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Splitting the bill"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["250000", "3"], output: `Per person: Rp83.333
+Leftover: Rp1` },
+    { input: ["1000000", "4"], output: `Per person: Rp250.000
+Leftover: Rp0` },
+    { input: ["900", "2"], output: `Per person: Rp450
+Leftover: Rp0` },
+    { input: ["100000", "7"], output: `Per person: Rp14.285
+Leftover: Rp5` },
+  ]}
+  hints={[
+    "Rupiah has no cents. Which operator divides without decimals, and which one gives the remainder?",
+    "`//` gives the whole-number result, `%` gives what's left over.",
+    "For the Indonesian format: `f'{per_person:,}'.replace(',', '.')`, then put that into the next f-string.",
+  ]}
+  solution={`total = int(input("Bill total: "))
+people = int(input("Number of people: "))
+
+per_person = total // people
+leftover = total % people
+per_person_rp = f"{per_person:,}".replace(",", ".")
+print(f"Per person: Rp{per_person_rp}")
+print(f"Leftover: Rp{leftover}")`}
+  reflect="What if the number of people is `0`? Try it and read the error. How would you prevent it once you've learned `if` in the next module?"
+>
+
+You and your friends ate together and want to split the bill evenly. The program asks for the
+**bill total**, then the **number of people**, and prints two lines:
+
+- how much each person pays, in whole rupiah with the Indonesian format (dots for thousands);
+- the rupiah left over that can't be split evenly.
+
+Example: a 250000 bill for 3 people gives `Per person: Rp83.333` and `Leftover: Rp1`.
+
+</Exercise>
 
 ## Quiz
 

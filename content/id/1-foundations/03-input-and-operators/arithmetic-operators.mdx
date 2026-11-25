@@ -82,16 +82,92 @@ print("Saldo akhir:", saldo)`} />
 
 ## Latihan
 
-Hitung luas dan keliling persegi panjang dengan panjang 8 dan lebar 5.
-
-<Playground initialCode={`panjang = 8
+<Exercise
+  type="guided"
+  title="Luas dan keliling"
+  steps={[
+    "Ganti `0` pada `luas` dengan rumus luas memakai `panjang` dan `lebar`.",
+    "Ganti `0` pada `keliling` dengan rumus keliling. Ingat kurung untuk urutan pengerjaan.",
+    "Jalankan, lalu klik Cek jawaban.",
+  ]}
+  starter={`panjang = 8
 lebar = 5
 
 luas = 0       # ganti dengan rumus yang benar
 keliling = 0   # ganti dengan rumus yang benar
 
 print("Luas:", luas)
-print("Keliling:", keliling)`} />
+print("Keliling:", keliling)
+`}
+  tests={[
+    { output: `Luas: 40
+Keliling: 26` },
+  ]}
+  hints={[
+    "Luas persegi panjang adalah panjang kali lebar: `panjang * lebar`.",
+    "Keliling adalah dua kali jumlah panjang dan lebar. Perhatikan urutan pengerjaan: pakai kurung.",
+  ]}
+  solution={`panjang = 8
+lebar = 5
+
+luas = panjang * lebar
+keliling = 2 * (panjang + lebar)
+
+print("Luas:", luas)
+print("Keliling:", keliling)`}
+  reflect="Apa hasilnya kalau kamu menulis `2 * panjang + lebar` tanpa kurung? Kenapa berbeda?"
+>
+
+Hitung luas dan keliling persegi panjang dengan panjang 8 dan lebar 5. Gunakan variabelnya,
+jangan menulis hasilnya langsung.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Pecahan uang kembalian"
+  starter={`kembalian = 78000
+
+# Cetak jumlah lembar tiap pecahan di sini
+`}
+  tests={[
+    { output: `50000: 1 lembar
+20000: 1 lembar
+10000: 0 lembar
+5000: 1 lembar
+2000: 1 lembar
+1000: 1 lembar` },
+  ]}
+  hints={[
+    "Mulai dari pecahan terbesar. Berapa hasil `kembalian // 50000`?",
+    "Setelah memberi lembar 50000, sisa uangnya adalah `kembalian % 50000`. Simpan di variabel, misalnya `sisa`.",
+    "Ulangi pola yang sama untuk setiap pecahan: `//` untuk jumlah lembar, lalu `%` untuk sisanya.",
+  ]}
+  solution={`kembalian = 78000
+
+sisa = kembalian
+print("50000:", sisa // 50000, "lembar")
+sisa = sisa % 50000
+print("20000:", sisa // 20000, "lembar")
+sisa = sisa % 20000
+print("10000:", sisa // 10000, "lembar")
+sisa = sisa % 10000
+print("5000:", sisa // 5000, "lembar")
+sisa = sisa % 5000
+print("2000:", sisa // 2000, "lembar")
+sisa = sisa % 2000
+print("1000:", sisa // 1000, "lembar")`}
+  reflect="Ganti `kembalian` menjadi 3000 atau 99000 dan cek apakah hasilnya masuk akal. Kenapa urutannya harus dimulai dari pecahan terbesar?"
+>
+
+Kasir harus memberi kembalian Rp78000 dengan lembar uang sesedikit mungkin. Pecahan yang ada:
+50000, 20000, 10000, 5000, 2000, dan 1000. Cetak berapa lembar tiap pecahan, mulai dari yang
+terbesar, persis seperti contoh (termasuk pecahan yang 0 lembar).
+
+Programmu harus tetap benar kalau nilai `kembalian` diganti, jadi jangan menulis jumlah lembarnya
+langsung.
+
+</Exercise>
 
 ## Kuis
 

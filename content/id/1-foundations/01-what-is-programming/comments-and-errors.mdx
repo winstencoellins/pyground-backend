@@ -78,6 +78,82 @@ pritn("Seru sekali!")`} />
   error pertama yang ia temukan, jadi perbaiki satu per satu.
 </Callout>
 
+## Latihan
+
+<Exercise
+  type="guided"
+  title="Pengumuman yang salah"
+  steps={[
+    "Jalankan dulu dan lihat ketiga baris pengumuman.",
+    "Tambahkan `#` di depan `print(“Besok libur!”)` supaya baris itu tidak dijalankan.",
+    "Tambahkan satu baris komentar di atasnya yang menjelaskan alasannya, misalnya `# Info libur salah`.",
+    "Jalankan lagi, lalu klik Cek jawaban.",
+  ]}
+  starter={`# Pengumuman kelas 10A
+print("Besok upacara jam 7")
+print("Besok libur!")
+print("Jangan lupa bawa topi")
+`}
+  tests={[
+    { output: `Besok upacara jam 7
+Jangan lupa bawa topi` },
+  ]}
+  hints={[
+    "Komentar diawali tanda `#`. Semua tulisan setelahnya di baris itu diabaikan Python.",
+    'Baris yang dimatikan menjadi: `# print("Besok libur!")`',
+  ]}
+  solution={`# Pengumuman kelas 10A
+print("Besok upacara jam 7")
+# Info libur salah, dibatalkan
+# print("Besok libur!")
+print("Jangan lupa bawa topi")`}
+  reflect="Kenapa mematikan baris dengan komentar kadang lebih baik daripada menghapusnya? Kapan sebaiknya baris itu benar-benar dihapus?"
+>
+
+Pengumuman sekolah ini punya satu baris yang ternyata salah info. Bu guru minta barisnya
+**dimatikan dengan komentar**, bukan dihapus, supaya masih bisa dilihat nanti.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Struk belanja rusak"
+  starter={`# Struk belanja
+print("Struk Belanja")
+pritn("Beras 5 kg")
+# print("Minyak 2 liter")
+print("Gula 1 kg"
+print("Telur 1 kg")
+print("Terima kasih!")
+`}
+  tests={[
+    { output: `Struk Belanja
+Beras 5 kg
+Minyak 2 liter
+Gula 1 kg
+Telur 1 kg
+Terima kasih!` },
+  ]}
+  hints={[
+    "Baca pesan error dari bawah ke atas, lalu perbaiki satu per satu. Jalankan lagi setelah setiap perbaikan.",
+    "Setelah tidak ada error, bandingkan outputmu dengan contoh baris per baris. Ada yang hilang?",
+    "Satu baris tidak pernah jalan karena diawali `#`.",
+  ]}
+  solution={`# Struk belanja
+print("Struk Belanja")
+print("Beras 5 kg")
+print("Minyak 2 liter")
+print("Gula 1 kg")
+print("Telur 1 kg")
+print("Terima kasih!")`}
+  reflect="Dua kesalahan dilaporkan Python, tapi satu tidak. Bug mana yang paling sulit ditemukan, dan bagaimana kamu akhirnya menemukannya?"
+>
+
+Program struk belanja ini harus menampilkan judul, empat barang, dan ucapan terima kasih, persis
+seperti contoh. Ada beberapa kesalahan, dan tidak semuanya membuat Python error.
+
+</Exercise>
+
 ## Kuis
 
 <Quiz

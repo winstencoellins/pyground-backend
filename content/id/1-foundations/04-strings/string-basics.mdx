@@ -89,13 +89,77 @@ Kalau `awal` dikosongkan, mulai dari awal. Kalau `akhir` dikosongkan, sampai hab
 
 ## Latihan
 
-Dari `email = "siti@pyground.id"`, tampilkan huruf pertama dan jumlah karakternya.
+<Exercise
+  type="guided"
+  title="Inisial dan panjang nama"
+  steps={[
+    "Ambil huruf pertama `depan` dengan indeks `[0]`, begitu juga untuk `belakang`.",
+    "Sambung keduanya dengan titik memakai `+`, lalu cetak dengan awalan `Inisial: `.",
+    "Gabungkan nama lengkap: `depan`, satu spasi, lalu `belakang`.",
+    "Cetak `Panjang nama lengkap:` diikuti hasil `len()` nama lengkap tadi.",
+  ]}
+  starter={`depan = input("Nama depan: ")
+belakang = input("Nama belakang: ")
 
-<Playground initialCode={`email = "siti@pyground.id"
+# 1. Buat inisial dari huruf pertama setiap nama
+# 2. Gabungkan nama lengkap dengan spasi di tengah
+# 3. Cetak inisial dan panjang nama lengkap
+`}
+  tests={[
+    { input: ["Budi", "Santoso"], output: `Inisial: B.S.
+Panjang nama lengkap: 12` },
+    { input: ["Siti", "Aminah"], output: `Inisial: S.A.
+Panjang nama lengkap: 11` },
+    { input: ["Ani", "Wu"], output: `Inisial: A.W.
+Panjang nama lengkap: 6` },
+  ]}
+  hints={[
+    "Indeks dimulai dari 0, jadi huruf pertama adalah `depan[0]`.",
+    "Spasi di tengah juga dihitung oleh `len()`. `Budi Santoso` panjangnya 12, bukan 11.",
+    "`print('Inisial: ' + depan[0] + '.' + belakang[0] + '.')` lalu `print('Panjang nama lengkap:', len(depan + ' ' + belakang))`",
+  ]}
+  solution={`depan = input("Nama depan: ")
+belakang = input("Nama belakang: ")
 
-# Tampilkan huruf pertama
-# Tampilkan jumlah karakter
-`} />
+lengkap = depan + " " + belakang
+print("Inisial: " + depan[0] + "." + belakang[0] + ".")
+print("Panjang nama lengkap:", len(lengkap))`}
+  reflect="Apa yang terjadi kalau pengguna langsung menekan Enter tanpa mengetik nama depan? Coba jalankan. Kenapa `depan[0]` error, padahal `len(depan)` tidak?"
+>
+
+Buat program yang meminta **nama depan** lalu **nama belakang**, kemudian mencetak inisialnya
+dan panjang nama lengkap (nama depan, spasi, nama belakang).
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Sensor nomor HP"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["081234567890"], output: "********7890" },
+    { input: ["0812345678"], output: "******5678" },
+    { input: ["6281234567890"], output: "*********7890" },
+    { input: ["1234"], output: "1234" },
+  ]}
+  hints={[
+    "Empat digit terakhir bisa diambil dengan slicing indeks negatif.",
+    "Panjang nomor HP tidak selalu sama. Jumlah bintangnya bergantung pada `len()` nomor itu.",
+    "`'*' * (len(nomor) - 4)` lalu sambung dengan `nomor[-4:]`.",
+  ]}
+  solution={`nomor = input("Nomor HP: ")
+
+bintang = "*" * (len(nomor) - 4)
+print(bintang + nomor[-4:])`}
+  reflect="Bagaimana kalau nomornya lebih pendek dari 4 digit, misalnya `123`? Coba jalankan. Kenapa Python tidak error, dan apakah hasilnya masuk akal?"
+>
+
+Aplikasi belanja sering menyembunyikan nomor HP pembeli, misalnya `081234567890` ditampilkan
+sebagai `********7890`. Buat program yang meminta nomor HP, lalu mencetaknya dengan **semua digit
+kecuali 4 digit terakhir** diganti `*`. Ingat, panjang nomor HP bisa berbeda-beda.
+
+</Exercise>
 
 ## Kuis
 

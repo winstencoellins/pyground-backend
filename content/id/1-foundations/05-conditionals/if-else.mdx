@@ -80,14 +80,77 @@ else:
 
 ## Latihan
 
-Buat program pengecek kata sandi. Kalau yang diketik sama dengan `"python123"`, tampilkan
-`Login berhasil`. Kalau tidak, tampilkan `Kata sandi salah`.
-
-<Playground initialCode={`kata_sandi_benar = "python123"
+<Exercise
+  type="guided"
+  title="Pengecek kata sandi"
+  steps={[
+    "Tulis `if` yang membandingkan `ketikan` dengan `kata_sandi_benar` memakai `==`. Jangan lupa titik dua.",
+    "Di dalam blok `if` (menjorok 4 spasi), cetak `Login berhasil`.",
+    "Tambahkan `else:` dan di dalamnya cetak `Kata sandi salah`.",
+    "Klik Jalankan untuk mencoba sendiri, lalu klik Cek jawaban.",
+  ]}
+  starter={`kata_sandi_benar = "python123"
 ketikan = input("Kata sandi: ")
 
 # Tulis if dan else di sini
-`} />
+`}
+  tests={[
+    { input: ["python123"], output: "Login berhasil" },
+    { input: ["Python123"], output: "Kata sandi salah" },
+    { input: ["python"], output: "Kata sandi salah" },
+  ]}
+  hints={[
+    "Baris pertamanya: `if ketikan == kata_sandi_benar:`",
+    "`else` sejajar dengan `if` (tidak menjorok), dan juga diakhiri titik dua.",
+  ]}
+  solution={`kata_sandi_benar = "python123"
+ketikan = input("Kata sandi: ")
+
+if ketikan == kata_sandi_benar:
+    print("Login berhasil")
+else:
+    print("Kata sandi salah")`}
+  reflect="Tes 2 mengetik `Python123` dengan P besar, dan hasilnya salah. Menurutmu, apakah itu perilaku yang benar untuk kata sandi? Bagaimana dengan pengguna yang tidak sengaja menyalakan Caps Lock?"
+>
+
+Buat program pengecek kata sandi. Kalau yang diketik sama persis dengan `"python123"`, cetak
+`Login berhasil`. Kalau tidak, cetak `Kata sandi salah`.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Gratis ongkir"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["75000"], output: "Tambah Rp25000 lagi untuk gratis ongkir" },
+    { input: ["150000"], output: "Gratis ongkir!" },
+    { input: ["100000"], output: "Gratis ongkir!" },
+    { input: ["99999"], output: "Tambah Rp1 lagi untuk gratis ongkir" },
+  ]}
+  hints={[
+    "`input()` selalu menghasilkan teks. Ubah dulu jadi angka dengan `int()` sebelum dibandingkan.",
+    "Belanja tepat Rp100000 sudah dapat gratis ongkir. Apa bedanya `>` dan `>=` di sini?",
+    "Kekurangannya adalah `100000 - total`. Masukkan ke f-string.",
+  ]}
+  solution={`total = int(input("Total belanja: "))
+
+if total >= 100000:
+    print("Gratis ongkir!")
+else:
+    kurang = 100000 - total
+    print(f"Tambah Rp{kurang} lagi untuk gratis ongkir")`}
+  reflect="Bagaimana kalau pembeli mengetik `seratus ribu` atau `100.000`? Coba jalankan. Program yang baik harus siap menghadapi input yang tidak terduga; kamu akan belajar caranya di Tahap 3 (try/except)."
+>
+
+Sebuah toko online memberi **gratis ongkir** untuk belanja minimal Rp100000. Buat program yang
+meminta total belanja, lalu:
+
+- kalau sudah cukup, cetak `Gratis ongkir!`
+- kalau belum, cetak berapa yang kurang, persis dengan format `Tambah Rp25000 lagi untuk gratis ongkir`
+
+</Exercise>
 
 ## Kuis
 

@@ -115,6 +115,127 @@ for name, code in json.load(sys.stdin):
   });
 });
 
+type Exercise = {
+  type: "guided" | "challenge";
+  title: string;
+  steps?: string[];
+  starter?: string;
+  tests: { input?: string[]; output: string }[];
+  hints?: string[];
+  solution: string;
+  reflect?: string;
+};
+
+/** Reads the props of every <Exercise …> in an MDX source. Prop values are JS (our own content), so eval is fine. */
+function exercises(source: string): Exercise[] {
+  const found: Exercise[] = [];
+  for (const m of source.matchAll(/<Exercise\b/g)) {
+    const props: Record<string, unknown> = {};
+    let i = m.index! + m[0].length;
+    for (;;) {
+      while (/\s/.test(source[i]!)) i++;
+      if (source[i] === ">" || source.startsWith("/>", i)) break;
+      const name = /^[A-Za-z]+/.exec(source.slice(i))![0];
+      i += name.length + 1; // skip `name=`
+      const start = i;
+      if (source[i] === '"') i = source.indexOf('"', i + 1) + 1;
+      else {
+        // Balanced { … }, skipping over strings and template literals.
+        let depth = 0;
+        do {
+          const c = source[i]!;
+          if (c === '"' || c === "'" || c === "`") {
+            i++;
+            while (source[i] !== c) i += source[i] === "\\" ? 2 : 1;
+          } else if ("{[(".includes(c)) depth++;
+          else if ("}])".includes(c)) depth--;
+          i++;
+        } while (depth > 0);
+      }
+      const raw = source.slice(start, i);
+      props[name] = raw.startsWith('"')
+        ? JSON.parse(raw)
+        : new Function(`return (${raw.slice(1, -1)})`)();
+    }
+    found.push(props as Exercise);
+  }
+  return found;
+}
+
+describe("hands-on exercises", () => {
+  const all: [string, Exercise][] = [];
+  for (const locale of ["id", "en"] as const)
+    for (const lesson of getCatalog().byLocale[locale].values())
+      for (const ex of exercises(lesson.source))
+        all.push([`${locale}/${lesson.slug}: ${ex.title}`, ex]);
+
+  it("every free lesson has a guided exercise and a solo challenge, in both locales", () => {
+    for (const locale of ["id", "en"] as const) {
+      for (const lesson of getCatalog().byLocale[locale].values()) {
+        if (lesson.stage !== 1) continue;
+        const types = exercises(lesson.source).map((e) => e.type);
+        expect(`${locale}/${lesson.slug}: ${types.sort().join(",")}`).toMatch(/challenge.*guided/);
+      }
+    }
+  });
+
+  it("exercises are well-formed", () => {
+    for (const [name, ex] of all) {
+      expect([name, ex.type]).toEqual([name, expect.stringMatching(/^(guided|challenge)$/)]);
+      expect([
+        name,
+        ex.title.length > 0,
+        ex.solution.trim().length > 0,
+        ex.tests.length > 0,
+      ]).toEqual([name, true, true, true]);
+      if (ex.type === "guided") expect([name, (ex.steps?.length ?? 0) > 0]).toEqual([name, true]);
+      // A challenge shows one example and hides the rest. Before input() is taught a program has nothing to
+      // vary, so those (fix-the-bug) challenges have a single test.
+      else
+        expect([name, ex.tests.length >= 2 || !ex.solution.includes("input(")]).toEqual([
+          name,
+          true,
+        ]);
+    }
+  });
+
+  it("every sample answer passes its tests, and no starter code passes already", () => {
+    // Same rules as the browser checker: input() prints nothing, trailing spaces and blank lines don't count.
+    const harness = `import builtins, contextlib, io, json, sys
+def run(code, inputs):
+    queue, out = list(inputs), io.StringIO()
+    def fake_input(prompt=""):
+        if not queue:
+            raise RuntimeError("asked for more input than the test gives")
+        return queue.pop(0)
+    saved, builtins.input = builtins.input, fake_input
+    try:
+        with contextlib.redirect_stdout(out):
+            exec(compile(code, "main.py", "exec"), {"__name__": "__main__"})
+        return out.getvalue(), None
+    except BaseException as e:
+        return out.getvalue(), repr(e)
+    finally:
+        builtins.input = saved
+norm = lambda t: "\\n".join(l.rstrip() for l in t.replace("\\r", "").split("\\n")).rstrip()
+for name, ex in json.load(sys.stdin):
+    for i, t in enumerate(ex["tests"], 1):
+        got, err = run(ex["solution"], t.get("input", []))
+        if err or norm(got) != norm(t["output"]):
+            print(f"{name}, test {i}: sample answer gives {err or repr(norm(got))}, expected {norm(t['output'])!r}")
+    starter = [run(ex.get("starter", ""), t.get("input", [])) for t in ex["tests"]]
+    if all(e is None and norm(g) == norm(t["output"]) for (g, e), t in zip(starter, ex["tests"])):
+        print(f"{name}: the starter code already passes")
+`;
+    expect(all.length).toBeGreaterThan(0);
+    const py = Bun.spawnSync(["python3", "-c", harness], {
+      stdin: new TextEncoder().encode(JSON.stringify(all)),
+    });
+    expect(py.stderr.toString()).toBe("");
+    expect(py.stdout.toString()).toBe("");
+  });
+});
+
 describe("loader validation + locale fallback", () => {
   let root: string;
   const write = (path: string, fm: Record<string, unknown>) => {

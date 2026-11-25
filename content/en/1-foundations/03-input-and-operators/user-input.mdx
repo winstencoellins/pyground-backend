@@ -64,13 +64,76 @@ print("Each person pays Rp", round(per_person))`} />
 
 ## Practice
 
+<Exercise
+  type="guided"
+  title="Temperature converter"
+  steps={[
+    "Ask for the temperature with `input()` and turn it into a decimal with `float()`. Keep it in a variable `celsius`.",
+    "Calculate `fahrenheit` with the formula above.",
+    "Print `Fahrenheit:` followed by the result, separated by a comma.",
+    "Run it and try a few temperatures, then click Check answer.",
+  ]}
+  starter={`# 1. Ask for the temperature in Celsius (it can be a decimal, so use float)
+# 2. Calculate Fahrenheit
+# 3. Show the result
+`}
+  tests={[
+    { input: ["30"], output: "Fahrenheit: 86.0" },
+    { input: ["0"], output: "Fahrenheit: 32.0" },
+    { input: ["100"], output: "Fahrenheit: 212.0" },
+    { input: ["-40"], output: "Fahrenheit: -40.0" },
+  ]}
+  hints={[
+    "What `input()` gives you is always text. Wrap it in `float()` so you can calculate with it.",
+    'The first line: `celsius = float(input("Temperature (Celsius): "))`',
+    'Print with a comma: `print("Fahrenheit:", fahrenheit)`.',
+  ]}
+  solution={`celsius = float(input("Temperature (Celsius): "))
+fahrenheit = celsius * 9 / 5 + 32
+print("Fahrenheit:", fahrenheit)`}
+  reflect="-40 comes out the same on both scales! Why does the result always end in `.0`, even though you typed 30? What changes if you use `int()` instead of `float()` and then type 36.6?"
+>
+
 Build a temperature converter. Ask for a temperature in Celsius, then show it in Fahrenheit.
 The formula: `fahrenheit = celsius * 9 / 5 + 32`.
 
-<Playground initialCode={`# 1. Ask for the temperature in Celsius (it can be a decimal, so use float)
-# 2. Calculate Fahrenheit
-# 3. Show the result
-`} />
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Class gift fund"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["100000", "3"], output: `Per student: Rp33333
+Treasurer covers: Rp1` },
+    { input: ["90000", "3"], output: `Per student: Rp30000
+Treasurer covers: Rp0` },
+    { input: ["50000", "1"], output: `Per student: Rp50000
+Treasurer covers: Rp0` },
+    { input: ["100000", "7"], output: `Per student: Rp14285
+Treasurer covers: Rp5` },
+  ]}
+  hints={[
+    "You need two `input()` calls, and both must be converted with `int()`.",
+    "`//` gives the part that divides evenly, and `%` gives what's left over.",
+    'A comma in `print()` adds a space. To stick `Rp` to the number, use `+` and `str()`: `"Per student: Rp" + str(per_student)`.',
+  ]}
+  solution={`total = int(input("Gift total price: "))
+students = int(input("Number of students: "))
+per_student = total // students
+left = total % students
+print("Per student: Rp" + str(per_student))
+print("Treasurer covers: Rp" + str(left))`}
+  reflect="Try running it with `0` students. What happens, and why? Once you learn branching (`if`), you can prevent it. What message should it show instead?"
+>
+
+Your class is chipping in for a gift for your homeroom teacher. Write a program that asks for the
+**gift's total price**, then the **number of students**. Every student pays the same whole number of
+rupiah, and the treasurer covers whatever is left. Print exactly in the example's format, with no
+space between `Rp` and the number.
+
+</Exercise>
 
 ## Quiz
 

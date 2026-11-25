@@ -89,13 +89,77 @@ Leave out `start` to begin at the start. Leave out `end` to go to the end.
 
 ## Practice
 
-From `email = "siti@pyground.id"`, print the first letter and the number of characters.
+<Exercise
+  type="guided"
+  title="Initials and name length"
+  steps={[
+    "Take the first letter of `first` with index `[0]`, and the same for `last`.",
+    "Join them with dots using `+`, then print it after `Initials: `.",
+    "Build the full name: `first`, one space, then `last`.",
+    "Print `Full name length:` followed by the `len()` of that full name.",
+  ]}
+  starter={`first = input("First name: ")
+last = input("Last name: ")
 
-<Playground initialCode={`email = "siti@pyground.id"
+# 1. Build the initials from the first letter of each name
+# 2. Join the full name with a space in the middle
+# 3. Print the initials and the length of the full name
+`}
+  tests={[
+    { input: ["Budi", "Santoso"], output: `Initials: B.S.
+Full name length: 12` },
+    { input: ["Siti", "Aminah"], output: `Initials: S.A.
+Full name length: 11` },
+    { input: ["Ani", "Wu"], output: `Initials: A.W.
+Full name length: 6` },
+  ]}
+  hints={[
+    "Indexes start at 0, so the first letter is `first[0]`.",
+    "The space in the middle also counts for `len()`. `Budi Santoso` is 12 characters, not 11.",
+    "`print('Initials: ' + first[0] + '.' + last[0] + '.')` then `print('Full name length:', len(first + ' ' + last))`",
+  ]}
+  solution={`first = input("First name: ")
+last = input("Last name: ")
 
-# Print the first letter
-# Print the number of characters
-`} />
+full = first + " " + last
+print("Initials: " + first[0] + "." + last[0] + ".")
+print("Full name length:", len(full))`}
+  reflect="What happens if the user just presses Enter without typing a first name? Try it. Why does `first[0]` fail when `len(first)` doesn't?"
+>
+
+Write a program that asks for a **first name** and then a **last name**, then prints the
+initials and the length of the full name (first name, a space, last name).
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Mask a phone number"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["081234567890"], output: "********7890" },
+    { input: ["0812345678"], output: "******5678" },
+    { input: ["6281234567890"], output: "*********7890" },
+    { input: ["1234"], output: "1234" },
+  ]}
+  hints={[
+    "The last four digits can be taken with a negative-index slice.",
+    "Phone numbers aren't all the same length. The number of stars depends on the `len()` of the number.",
+    "`'*' * (len(number) - 4)` then join it with `number[-4:]`.",
+  ]}
+  solution={`number = input("Phone number: ")
+
+stars = "*" * (len(number) - 4)
+print(stars + number[-4:])`}
+  reflect="What if the number is shorter than 4 digits, like `123`? Try it. Why doesn't Python fail, and does the result make sense?"
+>
+
+Shopping apps often hide a buyer's phone number: `081234567890` shows as `********7890`. Write a
+program that asks for a phone number and prints it with **every digit except the last 4** replaced
+by `*`. Remember, phone numbers can have different lengths.
+
+</Exercise>
 
 ## Quiz
 

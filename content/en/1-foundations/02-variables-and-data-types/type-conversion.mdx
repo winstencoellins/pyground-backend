@@ -58,18 +58,69 @@ The result is a `ValueError`: the value can't be read as a number.
 
 ## Practice
 
+<Exercise
+  type="guided"
+  title="The strange total"
+  steps={[
+    "Run it and look at the strange output.",
+    "Turn `price` into a number with `int()` before multiplying by `quantity`.",
+    "Turn the product back into text with `str()` so it can be joined with `Total: `.",
+    "Run it, then click Check answer.",
+  ]}
+  starter={`price = "25000"
+quantity = 3
+print("Total: " + price * quantity)
+`}
+  tests={[
+    { output: "Total: 75000" },
+  ]}
+  hints={[
+    "Turn `price` into a number with `int(price)` before multiplying.",
+    'The product is a number, so wrap it in `str()` before joining: `"Total: " + str(...)`.',
+  ]}
+  solution={`price = "25000"
+quantity = 3
+print("Total: " + str(int(price) * quantity))`}
+  reflect="There's another way without `str()`: remember the comma in `print()`. Why is a bug like the original, which causes no error, more dangerous?"
+>
+
 Run this code. There's no error, but the result is `Total: 250002500025000`! Text multiplied by a
 number gets **repeated**, not calculated. Fix it so it shows `Total: 75000`.
 
-<Playground initialCode={`price = "25000"
-quantity = 3
-print("Total: " + price * quantity)`} />
+</Exercise>
 
-<Callout type="tip">
-  You need two conversions: `price` to a number before multiplying, then the result to text
-  before joining. Bugs like this are more dangerous than errors, because the program keeps
-  running.
-</Callout>
+<Exercise
+  type="challenge"
+  title="Courier parcel weights"
+  starter={`weight_1 = "2.5"
+weight_2 = "1.25"
+weight_3 = "3"
+
+# Calculate the total weight and the billed weight
+`}
+  tests={[
+    { output: `Total weight: 6.75 kg
+Billed: 6 kg` },
+  ]}
+  hints={[
+    "Try `int(weight_1)`. Why does it fail? Text with a decimal needs a different function.",
+    "Add all three after converting them with `float()`, and keep the result in a variable `total`.",
+    "Which function drops the decimal part without rounding? Remember the difference between `int()` and `round()`.",
+  ]}
+  solution={`weight_1 = "2.5"
+weight_2 = "1.25"
+weight_3 = "3"
+
+total = float(weight_1) + float(weight_2) + float(weight_3)
+print("Total weight:", total, "kg")
+print("Billed:", int(total), "kg")`}
+  reflect="Real couriers usually round up: 6.75 kg is billed as 7 kg, and so is 6.2 kg. `round()` can't do that for 6.2. How might you do it?"
+>
+
+A courier picks up three parcels. Each weight was recorded as **text** from a form. Print the
+total weight, then the billed weight: this courier **drops** the decimal part.
+
+</Exercise>
 
 ## Quiz
 

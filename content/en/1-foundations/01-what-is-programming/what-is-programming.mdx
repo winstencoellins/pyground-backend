@@ -67,6 +67,73 @@ And your project will have a file structure like this:
 └── hello.py`}
 </FileTree>
 
+## Practice
+
+<Exercise
+  type="guided"
+  title="Warung menu board"
+  steps={[
+    "Look at the first line: `print()` with text inside quotes.",
+    "Below it, add a `print()` for `Fried rice`.",
+    "Continue with `Chicken noodles` and then `Sweet iced tea`, in the same order as the example.",
+    "Click Run, compare with the example, then click Check answer.",
+  ]}
+  starter={`print("=== Warung Bu Sri ===")
+# Write 3 more prints below
+`}
+  tests={[
+    { output: `=== Warung Bu Sri ===
+Fried rice
+Chicken noodles
+Sweet iced tea` },
+  ]}
+  hints={[
+    "Every line of output needs its own `print()`.",
+    'The second line: `print("Fried rice")`. Capital and small letters must match exactly.',
+  ]}
+  solution={`print("=== Warung Bu Sri ===")
+print("Fried rice")
+print("Chicken noodles")
+print("Sweet iced tea")`}
+  reflect="Try swapping two print lines, then run it. What changes in the output? Why does the order of instructions matter?"
+>
+
+Bu Sri wants a menu board. Complete the program so it shows the title and three dishes, exactly
+like the example, one line per dish.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="The messy recipe"
+  starter={`print("3. Add the rice, stir")
+print("1. Heat the oil")
+Print("2. Fry the shallots until fragrant")
+print("4. Add soy sauce and salt)
+`}
+  tests={[
+    { output: `1. Heat the oil
+2. Fry the shallots until fragrant
+3. Add the rice, stir
+4. Add soy sauce and salt` },
+  ]}
+  hints={[
+    "Run it first and read the error message. Which line does it point to?",
+    "There are two typing mistakes: a missing quote, and a letter that should be lowercase.",
+    "Once there are no errors, reorder the print lines to match steps 1 to 4.",
+  ]}
+  solution={`print("1. Heat the oil")
+print("2. Fry the shallots until fragrant")
+print("3. Add the rice, stir")
+print("4. Add soy sauce and salt")`}
+  reflect="Python only reports one error per run. Could you find every mistake just by reading the code, before running it?"
+>
+
+Your friend wrote a fried rice recipe program, but it has errors **and** the steps are out of
+order. Fix it until the output matches the example exactly.
+
+</Exercise>
+
 ## Quiz
 
 <Quiz

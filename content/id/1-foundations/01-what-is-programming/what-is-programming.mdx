@@ -68,6 +68,73 @@ Dan proyekmu akan punya struktur file seperti ini:
 └── halo.py`}
 </FileTree>
 
+## Latihan
+
+<Exercise
+  type="guided"
+  title="Papan menu warung"
+  steps={[
+    "Lihat baris pertama: `print()` dengan teks di dalam tanda kutip.",
+    "Di bawahnya, tambahkan `print()` untuk `Nasi goreng`.",
+    "Lanjutkan untuk `Mie ayam` lalu `Es teh manis`, dengan urutan yang sama seperti contoh.",
+    "Klik Jalankan, bandingkan dengan contoh, lalu klik Cek jawaban.",
+  ]}
+  starter={`print("=== Warung Bu Sri ===")
+# Tulis 3 print lagi di bawah ini
+`}
+  tests={[
+    { output: `=== Warung Bu Sri ===
+Nasi goreng
+Mie ayam
+Es teh manis` },
+  ]}
+  hints={[
+    "Setiap baris output butuh satu `print()` sendiri.",
+    'Baris kedua: `print("Nasi goreng")`. Huruf besar-kecilnya harus sama persis.',
+  ]}
+  solution={`print("=== Warung Bu Sri ===")
+print("Nasi goreng")
+print("Mie ayam")
+print("Es teh manis")`}
+  reflect="Coba tukar urutan dua baris print, lalu jalankan. Apa yang berubah di output? Kenapa urutan instruksi itu penting?"
+>
+
+Bu Sri minta dibuatkan papan menu. Lengkapi programnya supaya menampilkan judul dan tiga menu,
+persis seperti contoh, satu baris per menu.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Resep yang berantakan"
+  starter={`print("3. Masukkan nasi, aduk")
+print("1. Panaskan minyak")
+Print("2. Tumis bawang sampai harum")
+print("4. Tambahkan kecap dan garam)
+`}
+  tests={[
+    { output: `1. Panaskan minyak
+2. Tumis bawang sampai harum
+3. Masukkan nasi, aduk
+4. Tambahkan kecap dan garam` },
+  ]}
+  hints={[
+    "Jalankan dulu dan baca pesan error-nya. Baris berapa yang disebut?",
+    "Ada dua kesalahan penulisan: satu tanda kutip yang hilang, dan satu huruf yang seharusnya kecil.",
+    "Setelah tidak error, atur urutan baris print supaya sama dengan langkah 1 sampai 4.",
+  ]}
+  solution={`print("1. Panaskan minyak")
+print("2. Tumis bawang sampai harum")
+print("3. Masukkan nasi, aduk")
+print("4. Tambahkan kecap dan garam")`}
+  reflect="Python hanya melaporkan satu error setiap kali dijalankan. Bisakah kamu menemukan semua kesalahannya hanya dengan membaca kode, sebelum menjalankannya?"
+>
+
+Temanmu menulis program resep nasi goreng, tapi programnya error **dan** langkahnya tertukar.
+Perbaiki sampai outputnya persis seperti contoh.
+
+</Exercise>
+
 ## Kuis
 
 <Quiz

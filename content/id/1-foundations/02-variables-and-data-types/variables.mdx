@@ -66,14 +66,82 @@ print(harga_kopii)`} />
 
 ## Latihan
 
-Buat variabel `makanan_favorit` dan `jumlah_porsi`, lalu tampilkan kalimat seperti
-"Aku mau 2 porsi sate".
-
-<Playground initialCode={`makanan_favorit = "sate"
+<Exercise
+  type="guided"
+  title="Pesan sate"
+  steps={[
+    "Cetak kalimat `Aku mau 2 porsi sate` memakai kedua variabel, jangan menulis angka 2 atau kata sate langsung.",
+    "Di bawahnya, tambah isi `jumlah_porsi` dengan 1.",
+    "Cetak kalimat yang sama sekali lagi.",
+    "Jalankan, lalu klik Cek jawaban.",
+  ]}
+  starter={`makanan_favorit = "sate"
 jumlah_porsi = 2
 
 # Tulis print() di sini
-`} />
+`}
+  tests={[
+    { output: `Aku mau 2 porsi sate
+Aku mau 3 porsi sate` },
+  ]}
+  hints={[
+    "`print()` bisa menerima beberapa nilai yang dipisah koma, dan Python memberi spasi di antaranya.",
+    'Kalimat pertama: `print("Aku mau", jumlah_porsi, "porsi", makanan_favorit)`',
+    "Untuk menambah satu porsi: `jumlah_porsi = jumlah_porsi + 1`, lalu tulis print yang sama lagi.",
+  ]}
+  solution={`makanan_favorit = "sate"
+jumlah_porsi = 2
+
+print("Aku mau", jumlah_porsi, "porsi", makanan_favorit)
+jumlah_porsi = jumlah_porsi + 1
+print("Aku mau", jumlah_porsi, "porsi", makanan_favorit)`}
+  reflect="Kedua print-mu ditulis sama persis, tapi hasilnya berbeda. Kenapa? Apa yang terjadi kalau baris penambahan porsi kamu pindahkan ke paling bawah?"
+>
+
+Pakai variabel `makanan_favorit` dan `jumlah_porsi` untuk mencetak pesanan. Lalu ternyata kamu
+lapar sekali: tambah satu porsi, dan cetak pesanannya lagi.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Tukar isi gelas"
+  starter={`gelas_a = "kopi"
+gelas_b = "teh"
+
+# Tukar isinya di sini
+
+print("Gelas A:", gelas_a)
+print("Gelas B:", gelas_b)
+`}
+  tests={[
+    { output: `Gelas A: teh
+Gelas B: kopi` },
+  ]}
+  hints={[
+    "Coba dulu `gelas_a = gelas_b` lalu `gelas_b = gelas_a`. Jalankan. Kenapa isinya jadi teh dua-duanya?",
+    "Di dunia nyata, untuk menukar isi dua gelas kamu butuh gelas ketiga yang kosong.",
+    "Simpan dulu isi gelas A ke variabel baru: `sementara = gelas_a`.",
+  ]}
+  solution={`gelas_a = "kopi"
+gelas_b = "teh"
+
+sementara = gelas_a
+gelas_a = gelas_b
+gelas_b = sementara
+
+print("Gelas A:", gelas_a)
+print("Gelas B:", gelas_b)`}
+  reflect="Kenapa `gelas_a = gelas_b` lalu `gelas_b = gelas_a` tidak berhasil? Apa yang terjadi pada isi lama gelas A setelah baris pertama dijalankan?"
+>
+
+Ada dua gelas: `gelas_a` berisi kopi dan `gelas_b` berisi teh. Tukar isinya, sehingga gelas A
+berisi teh dan gelas B berisi kopi.
+
+Aturannya: jangan menulis teks `"kopi"` atau `"teh"` lagi, dan jangan ubah dua baris pertama
+maupun dua baris print. Tulis kodemu di antaranya.
+
+</Exercise>
 
 ## Kuis
 

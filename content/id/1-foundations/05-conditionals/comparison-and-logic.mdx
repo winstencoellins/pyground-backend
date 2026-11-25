@@ -83,6 +83,77 @@ Python mengizinkan perbandingan berantai, persis seperti di matematika:
 <Playground initialCode={`nilai = 85
 print(80 <= nilai <= 100)`} />
 
+## Latihan
+
+<Exercise
+  type="guided"
+  title="Perbaiki syarat wahana"
+  steps={[
+    "Aturannya: boleh naik kalau tinggi **minimal** 120 cm **dan** umur **minimal** 7 tahun. Baca baris `boleh_naik` pelan-pelan.",
+    "Jalankan dengan tinggi `125` dan umur `6`. Anak itu seharusnya tidak boleh naik. Apa hasilnya?",
+    "Perbaiki operator yang menggabungkan kedua syarat.",
+    "Kata minimal berarti angka batasnya juga boleh. Jalankan dengan tinggi `120` dan umur `7`, lalu perbaiki operator perbandingannya.",
+    "Klik Cek jawaban.",
+  ]}
+  starter={`tinggi = int(input("Tinggi (cm): "))
+umur = int(input("Umur: "))
+
+boleh_naik = tinggi > 120 or umur > 7
+print("Boleh naik:", boleh_naik)
+`}
+  tests={[
+    { input: ["125", "6"], output: "Boleh naik: False" },
+    { input: ["120", "7"], output: "Boleh naik: True" },
+    { input: ["119", "10"], output: "Boleh naik: False" },
+    { input: ["150", "12"], output: "Boleh naik: True" },
+  ]}
+  hints={[
+    "`or` sudah `True` kalau salah satu syarat terpenuhi. Di sini kedua syarat harus terpenuhi.",
+    "`>` tidak menerima angka batasnya sendiri: `120 > 120` hasilnya `False`.",
+    "`boleh_naik = tinggi >= 120 and umur >= 7`",
+  ]}
+  solution={`tinggi = int(input("Tinggi (cm): "))
+umur = int(input("Umur: "))
+
+boleh_naik = tinggi >= 120 and umur >= 7
+print("Boleh naik:", boleh_naik)`}
+  reflect="Program awal tidak error sama sekali, tapi jawabannya salah. Kenapa kesalahan seperti ini lebih berbahaya daripada error, dan bagaimana kamu bisa menemukannya?"
+>
+
+Program penjaga wahana ini punya dua kesalahan logika. Programnya tetap berjalan tanpa error,
+tapi ada anak yang seharusnya tidak boleh naik justru diizinkan. Temukan dan perbaiki.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Diskon akhir pekan"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["sabtu"], output: "Diskon akhir pekan: True" },
+    { input: ["Senin"], output: "Diskon akhir pekan: False" },
+    { input: [" Minggu "], output: "Diskon akhir pekan: True" },
+    { input: ["SABTU"], output: "Diskon akhir pekan: True" },
+  ]}
+  hints={[
+    "Ada dua hari yang mendapat diskon. Operator mana yang `True` kalau salah satu syarat terpenuhi?",
+    "Pengguna bisa mengetik `Minggu`, `MINGGU`, atau ` minggu ` dengan spasi. Rapikan inputnya dulu.",
+    "`hari = input('Hari: ').strip().lower()` lalu `hari == 'sabtu' or hari == 'minggu'`.",
+  ]}
+  solution={`hari = input("Hari: ").strip().lower()
+
+diskon = hari == "sabtu" or hari == "minggu"
+print("Diskon akhir pekan:", diskon)`}
+  reflect="Coba tulis `hari == 'sabtu' or 'minggu'` (tanpa `hari ==` yang kedua) lalu jalankan dengan `senin`. Apa yang tercetak, dan kenapa?"
+>
+
+Sebuah kafe memberi diskon setiap **Sabtu dan Minggu**. Buat program yang meminta nama hari,
+lalu mencetak `Diskon akhir pekan: True` atau `Diskon akhir pekan: False`. Kasirnya tidak selalu
+mengetik dengan rapi.
+
+</Exercise>
+
 ## Kuis
 
 <Quiz

@@ -78,6 +78,82 @@ pritn("This is fun!")`} />
   finds, so fix them one at a time.
 </Callout>
 
+## Practice
+
+<Exercise
+  type="guided"
+  title="The wrong announcement"
+  steps={[
+    "Run it first and look at all three announcement lines.",
+    "Put `#` in front of `print(“No school tomorrow!”)` so that line doesn't run.",
+    "Add a comment line above it that explains why, for example `# Wrong info`.",
+    "Run it again, then click Check answer.",
+  ]}
+  starter={`# Class 10A announcement
+print("Flag ceremony tomorrow at 7")
+print("No school tomorrow!")
+print("Don't forget your hat")
+`}
+  tests={[
+    { output: `Flag ceremony tomorrow at 7
+Don't forget your hat` },
+  ]}
+  hints={[
+    "A comment starts with `#`. Everything after it on that line is ignored by Python.",
+    'The turned-off line becomes: `# print("No school tomorrow!")`',
+  ]}
+  solution={`# Class 10A announcement
+print("Flag ceremony tomorrow at 7")
+# Wrong info, cancelled
+# print("No school tomorrow!")
+print("Don't forget your hat")`}
+  reflect="Why is turning a line off with a comment sometimes better than deleting it? When should the line really be deleted?"
+>
+
+This school announcement has one line with the wrong information. The teacher wants that line
+**turned off with a comment**, not deleted, so it can still be seen later.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="The broken receipt"
+  starter={`# Shopping receipt
+print("Shopping Receipt")
+pritn("Rice 5 kg")
+# print("Cooking oil 2 liters")
+print("Sugar 1 kg"
+print("Eggs 1 kg")
+print("Thank you!")
+`}
+  tests={[
+    { output: `Shopping Receipt
+Rice 5 kg
+Cooking oil 2 liters
+Sugar 1 kg
+Eggs 1 kg
+Thank you!` },
+  ]}
+  hints={[
+    "Read the error message from the bottom up, then fix one thing at a time. Run again after each fix.",
+    "Once there are no errors, compare your output with the example line by line. Is anything missing?",
+    "One line never runs because it starts with `#`.",
+  ]}
+  solution={`# Shopping receipt
+print("Shopping Receipt")
+print("Rice 5 kg")
+print("Cooking oil 2 liters")
+print("Sugar 1 kg")
+print("Eggs 1 kg")
+print("Thank you!")`}
+  reflect="Python reported two of the mistakes, but not the third. Which bug was hardest to find, and how did you find it?"
+>
+
+This shopping receipt program should show a title, four items and a thank-you, exactly like the
+example. There are several mistakes, and not all of them make Python show an error.
+
+</Exercise>
+
 ## Quiz
 
 <Quiz

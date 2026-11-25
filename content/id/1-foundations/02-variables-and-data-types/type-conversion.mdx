@@ -58,18 +58,69 @@ Hasilnya `ValueError`: nilainya tidak bisa dibaca sebagai angka.
 
 ## Latihan
 
+<Exercise
+  type="guided"
+  title="Total yang aneh"
+  steps={[
+    "Jalankan dan perhatikan outputnya yang aneh.",
+    "Ubah `harga` menjadi angka dengan `int()` sebelum dikali `jumlah`.",
+    "Ubah hasil kalinya kembali menjadi teks dengan `str()` supaya bisa disambung dengan `Total: `.",
+    "Jalankan, lalu klik Cek jawaban.",
+  ]}
+  starter={`harga = "25000"
+jumlah = 3
+print("Total: " + harga * jumlah)
+`}
+  tests={[
+    { output: "Total: 75000" },
+  ]}
+  hints={[
+    "Ubah `harga` menjadi angka dengan `int(harga)` sebelum dikali.",
+    'Hasil kalinya angka, jadi bungkus dengan `str()` sebelum disambung: `"Total: " + str(...)`.',
+  ]}
+  solution={`harga = "25000"
+jumlah = 3
+print("Total: " + str(int(harga) * jumlah))`}
+  reflect="Ada cara lain tanpa `str()`: ingat koma di `print()`. Kenapa bug seperti tadi, yang tidak menimbulkan error, lebih berbahaya?"
+>
+
 Jalankan kode ini. Tidak ada error, tapi hasilnya `Total: 250002500025000`! Teks yang dikali
 angka akan **diulang**, bukan dihitung. Perbaiki supaya menampilkan `Total: 75000`.
 
-<Playground initialCode={`harga = "25000"
-jumlah = 3
-print("Total: " + harga * jumlah)`} />
+</Exercise>
 
-<Callout type="tip">
-  Kamu perlu dua konversi: `harga` menjadi angka sebelum dikali, lalu hasilnya menjadi teks
-  sebelum disambung. Bug seperti ini lebih berbahaya daripada error, karena programnya tetap
-  berjalan.
-</Callout>
+<Exercise
+  type="challenge"
+  title="Berat paket kurir"
+  starter={`berat_1 = "2.5"
+berat_2 = "1.25"
+berat_3 = "3"
+
+# Hitung total berat dan berat yang ditagih
+`}
+  tests={[
+    { output: `Total berat: 6.75 kg
+Ditagih: 6 kg` },
+  ]}
+  hints={[
+    "Coba `int(berat_1)`. Kenapa error? Teks berisi desimal harus diubah dengan fungsi lain.",
+    "Jumlahkan ketiganya setelah diubah dengan `float()`, dan simpan di variabel `total`.",
+    "Fungsi apa yang membuang bagian desimal tanpa membulatkan? Ingat bedanya `int()` dan `round()`.",
+  ]}
+  solution={`berat_1 = "2.5"
+berat_2 = "1.25"
+berat_3 = "3"
+
+total = float(berat_1) + float(berat_2) + float(berat_3)
+print("Total berat:", total, "kg")
+print("Ditagih:", int(total), "kg")`}
+  reflect="Kurir sungguhan biasanya membulatkan ke atas: 6.75 kg ditagih 7 kg, dan 6.2 kg juga 7 kg. `round()` tidak bisa melakukannya untuk 6.2. Bagaimana kira-kira caranya?"
+>
+
+Seorang kurir menerima tiga paket. Berat setiap paket tercatat sebagai **teks** dari formulir.
+Cetak total beratnya, lalu berat yang ditagih: kurir ini **membuang** bagian desimal.
+
+</Exercise>
 
 ## Kuis
 

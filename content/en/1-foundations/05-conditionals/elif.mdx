@@ -75,17 +75,95 @@ needs a different message.
 
 ## Practice
 
+<Exercise
+  type="guided"
+  title="Shipping cost by weight"
+  steps={[
+    "Up to 1 kg means a weight of exactly 1 counts too. Write `if weight <= 1:` and store `cost = 10000`.",
+    "Add an `elif` for weights up to 5 kg with a cost of `25000`. Why don't you need to write `weight > 1` again?",
+    "Everything else (over 5 kg) goes into `else` with a cost of `50000`.",
+    "After the if block (not indented), print `Shipping: Rp...` with an f-string and the `:,` format.",
+  ]}
+  starter={`weight = float(input("Parcel weight (kg): "))
+
+# Work out the shipping cost with if, elif, else
+# then show the result with an f-string
+`}
+  tests={[
+    { input: ["0.5"], output: "Shipping: Rp10,000" },
+    { input: ["1"], output: "Shipping: Rp10,000" },
+    { input: ["3"], output: "Shipping: Rp25,000" },
+    { input: ["5"], output: "Shipping: Rp25,000" },
+    { input: ["7.5"], output: "Shipping: Rp50,000" },
+  ]}
+  hints={[
+    "Store the cost in a variable in each branch, then print it once at the end.",
+    "`elif` is only checked when the `if` above it is `False`, so in that branch the weight is already over 1.",
+    "`print(f'Shipping: Rp{cost:,}')`",
+  ]}
+  solution={`weight = float(input("Parcel weight (kg): "))
+
+if weight <= 1:
+    cost = 10000
+elif weight <= 5:
+    cost = 25000
+else:
+    cost = 50000
+
+print(f"Shipping: Rp{cost:,}")`}
+  reflect="Tests 2 and 4 use weights exactly on the limits (1 kg and 5 kg). Why do tests right on a boundary catch mistakes most often?"
+>
+
 Build a shipping cost program based on parcel weight:
 
 - up to 1 kg: Rp10,000
 - more than 1 kg, up to 5 kg: Rp25,000
 - more than 5 kg: Rp50,000
 
-<Playground initialCode={`weight = float(input("Parcel weight (kg): "))
+</Exercise>
 
-# Work out the shipping cost with if, elif, else
-# then show the result with an f-string
-`} />
+<Exercise
+  type="challenge"
+  title="Ride-hailing fare"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["7"], output: "Fare: Rp17,500" },
+    { input: ["4"], output: "Fare: Rp10,000" },
+    { input: ["25"], output: "Fare: Rp62,500" },
+    { input: ["26"], output: "Too far, maximum 25 km" },
+    { input: ["0"], output: "Invalid distance" },
+  ]}
+  hints={[
+    "There are four possibilities. Write all four in plain words before writing any code.",
+    "Check the distances that make no sense first (`<= 0` and `> 25`), then work out the fare.",
+    "For more than 4 km: `fare = 10000 + (distance - 4) * 2500`.",
+  ]}
+  solution={`distance = int(input("Distance (km): "))
+
+if distance <= 0:
+    print("Invalid distance")
+elif distance > 25:
+    print("Too far, maximum 25 km")
+elif distance <= 4:
+    print(f"Fare: Rp{10000:,}")
+else:
+    fare = 10000 + (distance - 4) * 2500
+    print(f"Fare: Rp{fare:,}")`}
+  reflect="Try moving the `distance > 25` check to the bottom, just before `else`. Which test fails, and why does the order of the conditions decide the result?"
+>
+
+Build a motorbike ride-hailing (ojek) fare calculator. The program asks for the **distance** in km
+(a whole number), then:
+
+- up to 4 km: the minimum fare of Rp10,000;
+- more than 4 km: Rp10,000 plus Rp2,500 for every km after the first 4;
+- more than 25 km: print `Too far, maximum 25 km`;
+- 0 km or less: print `Invalid distance`.
+
+Print the fare in the format `Fare: Rp17,500`.
+
+</Exercise>
 
 ## Quiz
 

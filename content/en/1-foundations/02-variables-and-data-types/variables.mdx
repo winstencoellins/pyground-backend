@@ -66,14 +66,82 @@ print(coffee_pricee)`} />
 
 ## Practice
 
-Create the variables `favorite_food` and `portions`, then print a sentence like
-"I want 2 portions of satay".
-
-<Playground initialCode={`favorite_food = "satay"
+<Exercise
+  type="guided"
+  title="Ordering satay"
+  steps={[
+    "Print the sentence `I want 2 portions of satay` using both variables, without typing the 2 or the word satay directly.",
+    "Below it, increase `portions` by 1.",
+    "Print the same sentence once more.",
+    "Run it, then click Check answer.",
+  ]}
+  starter={`favorite_food = "satay"
 portions = 2
 
 # Write your print() here
-`} />
+`}
+  tests={[
+    { output: `I want 2 portions of satay
+I want 3 portions of satay` },
+  ]}
+  hints={[
+    "`print()` can take several values separated by commas, and Python puts a space between them.",
+    'The first sentence: `print("I want", portions, "portions of", favorite_food)`',
+    "To add a portion: `portions = portions + 1`, then write the same print again.",
+  ]}
+  solution={`favorite_food = "satay"
+portions = 2
+
+print("I want", portions, "portions of", favorite_food)
+portions = portions + 1
+print("I want", portions, "portions of", favorite_food)`}
+  reflect="Your two prints are written exactly the same, but they print different things. Why? What happens if you move the line that adds a portion to the very bottom?"
+>
+
+Use the variables `favorite_food` and `portions` to print an order. Then it turns out you're
+really hungry: add one more portion, and print the order again.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Swap the glasses"
+  starter={`glass_a = "coffee"
+glass_b = "tea"
+
+# Swap them here
+
+print("Glass A:", glass_a)
+print("Glass B:", glass_b)
+`}
+  tests={[
+    { output: `Glass A: tea
+Glass B: coffee` },
+  ]}
+  hints={[
+    "First try `glass_a = glass_b` and then `glass_b = glass_a`. Run it. Why do both end up as tea?",
+    "In real life, to swap two glasses you need a third, empty glass.",
+    "Keep glass A's contents in a new variable first: `temp = glass_a`.",
+  ]}
+  solution={`glass_a = "coffee"
+glass_b = "tea"
+
+temp = glass_a
+glass_a = glass_b
+glass_b = temp
+
+print("Glass A:", glass_a)
+print("Glass B:", glass_b)`}
+  reflect="Why doesn't `glass_a = glass_b` followed by `glass_b = glass_a` work? What happens to glass A's old contents after the first line runs?"
+>
+
+There are two glasses: `glass_a` holds coffee and `glass_b` holds tea. Swap them, so glass A
+holds tea and glass B holds coffee.
+
+The rules: don't type the text `"coffee"` or `"tea"` again, and don't change the first two lines
+or the two print lines. Write your code between them.
+
+</Exercise>
 
 ## Quiz
 

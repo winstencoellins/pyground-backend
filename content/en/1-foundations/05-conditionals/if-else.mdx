@@ -78,14 +78,77 @@ else:
 
 ## Practice
 
-Build a password checker. If what's typed equals `"python123"`, show `Login successful`.
-Otherwise, show `Wrong password`.
-
-<Playground initialCode={`correct_password = "python123"
+<Exercise
+  type="guided"
+  title="Password checker"
+  steps={[
+    "Write an `if` that compares `typed` with `correct_password` using `==`. Don't forget the colon.",
+    "Inside the `if` block (indented 4 spaces), print `Login successful`.",
+    "Add `else:` and print `Wrong password` inside it.",
+    "Click Run to try it yourself, then click Check answer.",
+  ]}
+  starter={`correct_password = "python123"
 typed = input("Password: ")
 
 # Write your if and else here
-`} />
+`}
+  tests={[
+    { input: ["python123"], output: "Login successful" },
+    { input: ["Python123"], output: "Wrong password" },
+    { input: ["python"], output: "Wrong password" },
+  ]}
+  hints={[
+    "The first line is: `if typed == correct_password:`",
+    "`else` lines up with `if` (not indented), and also ends with a colon.",
+  ]}
+  solution={`correct_password = "python123"
+typed = input("Password: ")
+
+if typed == correct_password:
+    print("Login successful")
+else:
+    print("Wrong password")`}
+  reflect="Test 2 types `Python123` with a capital P, and it's rejected. Is that the right behaviour for a password? What about a user who accidentally has Caps Lock on?"
+>
+
+Build a password checker. If what's typed is exactly `"python123"`, print `Login successful`.
+Otherwise, print `Wrong password`.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Free shipping"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["75000"], output: "Add Rp25000 more for free shipping" },
+    { input: ["150000"], output: "Free shipping!" },
+    { input: ["100000"], output: "Free shipping!" },
+    { input: ["99999"], output: "Add Rp1 more for free shipping" },
+  ]}
+  hints={[
+    "`input()` always gives you text. Turn it into a number with `int()` before comparing.",
+    "Spending exactly Rp100000 already gets free shipping. What's the difference between `>` and `>=` here?",
+    "The amount missing is `100000 - total`. Put it in an f-string.",
+  ]}
+  solution={`total = int(input("Order total: "))
+
+if total >= 100000:
+    print("Free shipping!")
+else:
+    missing = 100000 - total
+    print(f"Add Rp{missing} more for free shipping")`}
+  reflect="What if the shopper types `one hundred thousand` or `100.000`? Try it. A good program is ready for unexpected input; you'll learn how in Stage 3 (try/except)."
+>
+
+An online shop gives **free shipping** on orders of at least Rp100000. Write a program that asks
+for the order total, then:
+
+- if it's enough, print `Free shipping!`
+- if not, print how much is missing, exactly in the format `Add Rp25000 more for free shipping`
+
+</Exercise>
 
 ## Quiz
 

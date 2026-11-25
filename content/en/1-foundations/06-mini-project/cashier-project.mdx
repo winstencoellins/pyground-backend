@@ -173,16 +173,98 @@ else:
 
 ## Challenges
 
-Got it working? Try extending your program:
+<Exercise
+  type="guided"
+  title="Work out the change"
+  steps={[
+    "Turn the order total and the money paid into whole numbers.",
+    "If there's enough money (`paid >= total`), work out the change and print `Change: Rp...`.",
+    "Otherwise, work out how much is missing and print `Not enough, short by Rp...`.",
+    "Use the `:,` format for both numbers.",
+  ]}
+  starter={`total = input("Order total: ")
+paid = input("Money paid: ")
 
-1. Add a fourth menu item, for example `crackers` at Rp2,000.
-2. Add 11% tax, calculated **after** the discount.
-3. Ask how much money the customer pays, then calculate the change. If it's not enough, show how
-   much is still missing.
-4. Make sure the total is never negative, for example with a tiny order and a member card.
+# Work out the change, or how much is still missing
+`}
+  tests={[
+    { input: ["65550", "100000"], output: "Change: Rp34,450" },
+    { input: ["65550", "50000"], output: "Not enough, short by Rp15,550" },
+    { input: ["20000", "20000"], output: "Change: Rp0" },
+  ]}
+  hints={[
+    "The change is `paid - total`. What's missing is the other way round, `total - paid`.",
+    "Exact money (test 3) still counts as enough. Use `>=`, not `>`.",
+    "`if paid >= total:` then `print(f'Change: Rp{paid - total:,}')`, and in `else`: `print(f'Not enough, short by Rp{total - paid:,}')`",
+  ]}
+  solution={`total = int(input("Order total: "))
+paid = int(input("Money paid: "))
 
-<Playground initialCode={`# Copy the complete program above here, then extend it!
-`} />
+if paid >= total:
+    change = paid - total
+    print(f"Change: Rp{change:,}")
+else:
+    short = total - paid
+    print(f"Not enough, short by Rp{short:,}")`}
+  reflect="Now add this to the complete cashier program above. Where does it belong, and which variable plays the part of `total`?"
+>
+
+The cashier needs to know the customer's change. The program asks for the **order total**, then
+the **money paid**. If there's enough, print the change. If not, print how much is still missing.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Cashier with discount, member card and tax"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["80000", "no"], output: "Total to pay: Rp84,360" },
+    { input: ["100000", "yes"], output: "Total to pay: Rp94,350" },
+    { input: ["3000", " YES "], output: "Total to pay: Rp0" },
+    { input: ["50000", "Yes"], output: "Total to pay: Rp47,175" },
+    { input: ["49999", "no"], output: "Total to pay: Rp55,498" },
+  ]}
+  hints={[
+    "Work in order, like a receipt: discount, member deduction, then tax. Store each result in a variable.",
+    "The member answer could be ` YES ` or `Yes`, so tidy it with `.strip().lower()`. If the total goes negative, set it to 0 with `if`.",
+    "Tax: `tax = total * 11 // 100`, then `to_pay = total + tax`.",
+  ]}
+  solution={`subtotal = int(input("Subtotal: "))
+member = input("Member card? (yes/no): ").strip().lower()
+
+if subtotal >= 100000:
+    discount = subtotal * 10 // 100
+elif subtotal >= 50000:
+    discount = subtotal * 5 // 100
+else:
+    discount = 0
+total = subtotal - discount
+
+if member == "yes":
+    total = total - 5000
+if total < 0:
+    total = 0
+
+tax = total * 11 // 100
+to_pay = total + tax
+print(f"Total to pay: Rp{to_pay:,}")`}
+  reflect="If the tax were calculated before the discount, would the customer pay more or less? Swap the order and compare with test 2. Which do you think is fair?"
+>
+
+Extend the cashier calculation. The program asks for the **subtotal**, then the answer to **member
+card?** (`yes`/`no`), and prints `Total to pay: Rp...` with thousands separators. The rules, in order:
+
+1. 10% discount if the subtotal is at least Rp100,000, or 5% if it's at least Rp50,000.
+2. Members get an extra Rp5,000 off. The total can never be negative.
+3. 11% tax is calculated **after** the discount and the member deduction, rounded down (use `//`).
+
+Think about customers who type their answer in different ways, and about very small orders.
+
+Want more? Add a fourth menu item, for example `crackers` at Rp2,000, to the complete program above.
+
+</Exercise>
 
 <Callout type="tip">
   The program you've built can't yet repeat questions or hold a long menu list. That's what you'll

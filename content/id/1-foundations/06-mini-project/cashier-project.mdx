@@ -172,16 +172,98 @@ else:
 
 ## Tantangan
 
-Sudah berhasil? Coba kembangkan programmu:
+<Exercise
+  type="guided"
+  title="Hitung kembalian"
+  steps={[
+    "Ubah total belanja dan uang yang dibayar menjadi bilangan bulat.",
+    "Kalau uangnya cukup (`bayar >= total`), hitung kembalian dan cetak `Kembalian: Rp...`.",
+    "Kalau tidak, hitung berapa yang kurang dan cetak `Uang kurang Rp...`.",
+    "Pakai format `:,` untuk kedua angka.",
+  ]}
+  starter={`total = input("Total belanja: ")
+bayar = input("Uang dibayar: ")
 
-1. Tambahkan menu keempat, misalnya `kerupuk` seharga Rp2.000.
-2. Tambahkan pajak 11% yang dihitung **setelah** diskon.
-3. Minta uang yang dibayarkan, lalu hitung kembaliannya. Kalau uangnya kurang, tampilkan
-   berapa yang masih kurang.
-4. Pastikan total tidak pernah negatif, misalnya saat pesanan kecil tapi memakai kartu member.
+# Hitung kembalian, atau berapa yang masih kurang
+`}
+  tests={[
+    { input: ["65550", "100000"], output: "Kembalian: Rp34,450" },
+    { input: ["65550", "50000"], output: "Uang kurang Rp15,550" },
+    { input: ["20000", "20000"], output: "Kembalian: Rp0" },
+  ]}
+  hints={[
+    "Kembalian adalah `bayar - total`. Yang kurang adalah kebalikannya, `total - bayar`.",
+    "Uang pas (tes 3) masih termasuk cukup. Pakai `>=`, bukan `>`.",
+    "`if bayar >= total:` lalu `print(f'Kembalian: Rp{bayar - total:,}')`, dan di `else`: `print(f'Uang kurang Rp{total - bayar:,}')`",
+  ]}
+  solution={`total = int(input("Total belanja: "))
+bayar = int(input("Uang dibayar: "))
 
-<Playground initialCode={`# Salin program lengkap di atas ke sini, lalu kembangkan!
-`} />
+if bayar >= total:
+    kembalian = bayar - total
+    print(f"Kembalian: Rp{kembalian:,}")
+else:
+    kurang = total - bayar
+    print(f"Uang kurang Rp{kurang:,}")`}
+  reflect="Sekarang tambahkan kode ini ke program kasir lengkap di atas. Di mana tempat yang tepat, dan variabel mana yang menjadi `total`?"
+>
+
+Kasir perlu tahu kembalian pembeli. Program meminta **total belanja**, lalu **uang yang dibayar**.
+Kalau uangnya cukup, cetak kembaliannya. Kalau tidak, cetak berapa yang masih kurang.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Kasir dengan diskon, member, dan pajak"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["80000", "tidak"], output: "Total bayar: Rp84,360" },
+    { input: ["100000", "ya"], output: "Total bayar: Rp94,350" },
+    { input: ["3000", " YA "], output: "Total bayar: Rp0" },
+    { input: ["50000", "Ya"], output: "Total bayar: Rp47,175" },
+    { input: ["49999", "tidak"], output: "Total bayar: Rp55,498" },
+  ]}
+  hints={[
+    "Kerjakan berurutan seperti struk: diskon, potongan member, lalu pajak. Simpan setiap hasil di variabel.",
+    "Jawaban member bisa ` YA ` atau `Ya`, jadi rapikan dengan `.strip().lower()`. Kalau total jadi negatif, ubah menjadi 0 dengan `if`.",
+    "Pajak: `pajak = total * 11 // 100`, lalu `total_bayar = total + pajak`.",
+  ]}
+  solution={`subtotal = int(input("Subtotal: "))
+member = input("Punya kartu member? (ya/tidak): ").strip().lower()
+
+if subtotal >= 100000:
+    diskon = subtotal * 10 // 100
+elif subtotal >= 50000:
+    diskon = subtotal * 5 // 100
+else:
+    diskon = 0
+total = subtotal - diskon
+
+if member == "ya":
+    total = total - 5000
+if total < 0:
+    total = 0
+
+pajak = total * 11 // 100
+total_bayar = total + pajak
+print(f"Total bayar: Rp{total_bayar:,}")`}
+  reflect="Kalau pajak dihitung sebelum diskon, apakah pembeli membayar lebih mahal atau lebih murah? Ubah urutannya dan bandingkan dengan tes 2. Menurutmu, mana yang adil?"
+>
+
+Kembangkan perhitungan kasir. Program meminta **subtotal**, lalu jawaban **punya kartu member?**
+(`ya`/`tidak`), dan mencetak `Total bayar: Rp...` dengan pemisah ribuan. Aturannya, berurutan:
+
+1. Diskon 10% kalau subtotal minimal Rp100,000, atau 5% kalau minimal Rp50,000.
+2. Member mendapat potongan tambahan Rp5,000. Total tidak boleh negatif.
+3. Pajak 11% dihitung **setelah** diskon dan potongan, dibulatkan ke bawah (pakai `//`).
+
+Pikirkan pembeli yang mengetik jawabannya dengan cara berbeda, dan pesanan yang sangat kecil.
+
+Mau lebih? Tambahkan menu keempat, misalnya `kerupuk` seharga Rp2.000, ke program lengkap di atas.
+
+</Exercise>
 
 <Callout type="tip">
   Program yang kamu buat sekarang belum bisa mengulang pertanyaan atau menyimpan daftar menu yang

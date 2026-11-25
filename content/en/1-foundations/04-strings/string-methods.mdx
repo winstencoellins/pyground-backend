@@ -77,12 +77,70 @@ print("yahoo" in email)`} />
 
 ## Practice
 
-Tidy this name so it becomes `Rina Wulandari`, then replace `Rina` with `Rani`.
+<Exercise
+  type="guided"
+  title="Fix the name tidier"
+  steps={[
+    "Click Run and type `   rina WULANDARI  `. Look at the result: the spaces are still there and everything is in capitals.",
+    "The line `name.strip()` does nothing. Remember: methods return a new string. Store the result back in `name`.",
+    "Replace `upper()` with the method that starts every word with a capital letter.",
+    "Run it again with the same input, then click Check answer.",
+  ]}
+  starter={`name = input("Full name: ")
 
-<Playground initialCode={`name = "   rina WULANDARI  "
+name.strip()
+name = name.upper()
+print("Name: " + name)
+`}
+  tests={[
+    { input: ["   rina WULANDARI  "], output: "Name: Rina Wulandari" },
+    { input: ["budi"], output: "Name: Budi" },
+    { input: ["  ANDI pratama"], output: "Name: Andi Pratama" },
+  ]}
+  hints={[
+    "`name.strip()` makes a new string that is thrown away because it isn't stored.",
+    "Write `name = name.strip()`. The method for Capitalising Every Word is `title()`.",
+  ]}
+  solution={`name = input("Full name: ")
 
-# Tidy it first, then replace
-`} />
+name = name.strip()
+name = name.title()
+print("Name: " + name)`}
+  reflect="Those two lines can become `name = name.strip().title()`. Does the order matter? Try `name.title().strip()` and think about why the result is the same or different."
+>
+
+The program below should tidy up a sign-up name: remove spaces at the start and end, then
+start every word with a capital letter. But the result is wrong. Find the mistakes and fix them.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Count the word good"
+  starter={`# Write your program here
+`}
+  tests={[
+    { input: ["The rice is good, the sambal is good too"], output: "The word good appears 2 times" },
+    { input: ["GOOD! Good food. good"], output: "The word good appears 3 times" },
+    { input: ["It was okay"], output: "The word good appears 0 times" },
+  ]}
+  hints={[
+    "There's a method that counts how many times a piece of text appears.",
+    "`count()` is case-sensitive, so `Good` and `good` count differently. Make the letters the same first.",
+    "`total = review.lower().count('good')` then `print('The word good appears', total, 'times')`.",
+  ]}
+  solution={`review = input("Review: ")
+
+total = review.lower().count("good")
+print("The word good appears", total, "times")`}
+  reflect="The review `Not good` is counted too, and so is the word `goodbye`. What does that mean for a program that wants to know whether a review is positive?"
+>
+
+A warung owner wants to know how often customers write the word **good** in their reviews.
+Write a program that asks for one review and prints how many times `good` appears, in the format
+`The word good appears 2 times`. Customers write in all sorts of styles.
+
+</Exercise>
 
 ## Quiz
 

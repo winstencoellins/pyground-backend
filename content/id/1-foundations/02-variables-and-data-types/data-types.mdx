@@ -70,6 +70,90 @@ punya_payung = False
 print("Hujan?", hujan)
 print("Bawa payung?", punya_payung)`} />
 
+## Latihan
+
+<Exercise
+  type="guided"
+  title="Disambung atau dijumlah?"
+  steps={[
+    "Sebelum menjalankan, tebak dulu: apa hasil `angka_teks + angka_teks`?",
+    "Cetak `angka_teks + angka_teks`, lalu `angka + angka`.",
+    "Cetak tipe `angka_teks` dengan `type()`.",
+    "Jalankan, cocokkan dengan tebakanmu, lalu klik Cek jawaban.",
+  ]}
+  starter={`angka_teks = "50"
+angka = 50
+
+# 1. Cetak angka_teks + angka_teks
+# 2. Cetak angka + angka
+# 3. Cetak tipe dari angka_teks
+`}
+  tests={[
+    { output: `5050
+100
+<class 'str'>` },
+  ]}
+  hints={[
+    "Tulis langsung di dalam print: `print(angka_teks + angka_teks)`.",
+    "Untuk tipe, bungkus variabelnya dengan `type()` di dalam `print()`.",
+  ]}
+  solution={`angka_teks = "50"
+angka = 50
+
+print(angka_teks + angka_teks)
+print(angka + angka)
+print(type(angka_teks))`}
+  reflect="Hasil `5050` bukan error, tapi salah kalau maksudmu menjumlahkan. Kenapa bug seperti ini lebih berbahaya daripada error?"
+>
+
+Dua variabel ini kelihatannya sama-sama berisi 50, tapi tipenya berbeda. Buktikan dengan tiga
+baris print.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Kartu siswa"
+  starter={`nama = "Rina"
+umur = 17
+tinggi = 158.5
+lulus = True
+
+print("Nama: " + nama)
+print("Umur: " + umur)
+print("Tinggi: " + tinggi + " cm")
+print("Lulus: " + lulus)
+`}
+  tests={[
+    { output: `Nama: Rina
+Umur: 17
+Tinggi: 158.5 cm
+Lulus: True` },
+  ]}
+  hints={[
+    "Jalankan dan baca baris terakhir pesan error-nya. Tipe apa yang dicampur?",
+    "Ingat pelajaran Variabel: `print()` bisa menerima beberapa nilai yang dipisah koma.",
+    'Contohnya `print("Umur:", umur)`. Perhatikan spasinya: koma sudah otomatis memberi spasi.',
+  ]}
+  solution={`nama = "Rina"
+umur = 17
+tinggi = 158.5
+lulus = True
+
+print("Nama:", nama)
+print("Umur:", umur)
+print("Tinggi:", tinggi, "cm")
+print("Lulus:", lulus)`}
+  reflect="Baris `Nama` sebenarnya tidak error. Kenapa yang itu boleh memakai `+`, sedangkan yang lain tidak?"
+>
+
+Program kartu siswa ini error. Perbaiki sampai outputnya persis seperti contoh.
+
+Aturannya: jangan ubah empat baris variabel di atas. Kamu belum belajar cara mengubah tipe data,
+jadi cari cara lain dari pelajaran sebelumnya.
+
+</Exercise>
+
 ## Kuis
 
 <Quiz

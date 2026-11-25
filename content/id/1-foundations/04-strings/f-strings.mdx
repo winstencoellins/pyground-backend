@@ -69,14 +69,85 @@ print(f"Total: Rp{rupiah}")`} />
 
 ## Latihan
 
-Buat struk sederhana dengan f-string: nama barang, jumlah, dan total harga dengan pemisah ribuan.
-
-<Playground initialCode={`barang = "Buku tulis"
-harga = 4500
-jumlah = 12
+<Exercise
+  type="guided"
+  title="Baris struk belanja"
+  steps={[
+    "`input()` selalu menghasilkan teks. Ubah `harga` dan `jumlah` menjadi bilangan bulat dengan `int()`.",
+    "Hitung `total` dari harga dikali jumlah.",
+    "Cetak satu baris dengan f-string, persis seperti `12 x Buku tulis = Rp54,000`.",
+    "Pakai format `:,` pada total supaya ada pemisah ribuan.",
+  ]}
+  starter={`barang = input("Nama barang: ")
+harga = input("Harga satuan: ")
+jumlah = input("Jumlah: ")
 
 # Contoh hasil: 12 x Buku tulis = Rp54,000
-`} />
+`}
+  tests={[
+    { input: ["Buku tulis", "4500", "12"], output: "12 x Buku tulis = Rp54,000" },
+    { input: ["Pensil", "2000", "3"], output: "3 x Pensil = Rp6,000" },
+    { input: ["Tas", "150000", "1"], output: "1 x Tas = Rp150,000" },
+  ]}
+  hints={[
+    "Tanpa `int()`, `harga * jumlah` mencoba mengalikan dua teks dan menghasilkan error.",
+    "Format ribuan ditulis setelah titik dua di dalam kurung kurawal: `{total:,}`.",
+    "`print(f'{jumlah} x {barang} = Rp{total:,}')`",
+  ]}
+  solution={`barang = input("Nama barang: ")
+harga = int(input("Harga satuan: "))
+jumlah = int(input("Jumlah: "))
+
+total = harga * jumlah
+print(f"{jumlah} x {barang} = Rp{total:,}")`}
+  reflect="Hasilnya `Rp54,000`, padahal di Indonesia kita menulis `Rp54.000`. Bagaimana cara mengubahnya? Lihat lagi Callout di atas, lalu coba."
+>
+
+Buat satu baris struk: program meminta **nama barang**, **harga satuan**, lalu **jumlah**, dan
+mencetak jumlah, nama barang, dan total harganya dengan pemisah ribuan.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Patungan makan"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["250000", "3"], output: `Per orang: Rp83.333
+Sisa: Rp1` },
+    { input: ["1000000", "4"], output: `Per orang: Rp250.000
+Sisa: Rp0` },
+    { input: ["900", "2"], output: `Per orang: Rp450
+Sisa: Rp0` },
+    { input: ["100000", "7"], output: `Per orang: Rp14.285
+Sisa: Rp5` },
+  ]}
+  hints={[
+    "Rupiah tidak punya sen. Operator mana yang membagi tanpa desimal, dan operator mana yang memberi sisanya?",
+    "`//` memberi hasil bagi bulat, `%` memberi sisanya.",
+    "Untuk format Indonesia: `f'{per_orang:,}'.replace(',', '.')`, lalu masukkan hasilnya ke f-string berikutnya.",
+  ]}
+  solution={`total = int(input("Total tagihan: "))
+orang = int(input("Jumlah orang: "))
+
+per_orang = total // orang
+sisa = total % orang
+per_orang_rp = f"{per_orang:,}".replace(",", ".")
+print(f"Per orang: Rp{per_orang_rp}")
+print(f"Sisa: Rp{sisa}")`}
+  reflect="Bagaimana kalau jumlah orangnya `0`? Coba jalankan dan baca pesan error-nya. Bagaimana kamu akan mencegahnya setelah belajar `if` di modul berikutnya?"
+>
+
+Kamu dan teman-teman makan bersama dan ingin membagi tagihan sama rata. Program meminta **total
+tagihan**, lalu **jumlah orang**, dan mencetak dua baris:
+
+- berapa yang dibayar setiap orang, dalam rupiah bulat dengan format Indonesia (titik untuk ribuan);
+- sisa rupiah yang tidak bisa dibagi rata.
+
+Contoh: tagihan 250000 untuk 3 orang menghasilkan `Per orang: Rp83.333` dan `Sisa: Rp1`.
+
+</Exercise>
 
 ## Kuis
 

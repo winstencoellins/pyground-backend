@@ -75,17 +75,94 @@ setiap kasus butuh pesan yang berbeda.
 
 ## Latihan
 
-Buat program ongkos kirim berdasarkan berat paket:
-
-- sampai 1 kg: Rp10.000
-- lebih dari 1 kg sampai 5 kg: Rp25.000
-- lebih dari 5 kg: Rp50.000
-
-<Playground initialCode={`berat = float(input("Berat paket (kg): "))
+<Exercise
+  type="guided"
+  title="Ongkos kirim berdasarkan berat"
+  steps={[
+    "Sampai 1 kg berarti beratnya 1 juga termasuk. Tulis `if berat <= 1:` dan simpan `ongkir = 10000`.",
+    "Tambahkan `elif` untuk berat sampai 5 kg dengan ongkir `25000`. Kenapa tidak perlu menulis `berat > 1` lagi?",
+    "Sisanya (lebih dari 5 kg) masuk ke `else` dengan ongkir `50000`.",
+    "Setelah blok if selesai (tidak menjorok), cetak `Ongkir: Rp...` dengan f-string dan format `:,`.",
+  ]}
+  starter={`berat = float(input("Berat paket (kg): "))
 
 # Tentukan ongkir dengan if, elif, else
 # lalu tampilkan hasilnya dengan f-string
-`} />
+`}
+  tests={[
+    { input: ["0.5"], output: "Ongkir: Rp10,000" },
+    { input: ["1"], output: "Ongkir: Rp10,000" },
+    { input: ["3"], output: "Ongkir: Rp25,000" },
+    { input: ["5"], output: "Ongkir: Rp25,000" },
+    { input: ["7.5"], output: "Ongkir: Rp50,000" },
+  ]}
+  hints={[
+    "Simpan angka ongkir di variabel di setiap cabang, lalu cetak sekali saja di akhir.",
+    "`elif` hanya dicek kalau `if` di atasnya `False`, jadi di cabang itu berat pasti sudah lebih dari 1.",
+    "`print(f'Ongkir: Rp{ongkir:,}')`",
+  ]}
+  solution={`berat = float(input("Berat paket (kg): "))
+
+if berat <= 1:
+    ongkir = 10000
+elif berat <= 5:
+    ongkir = 25000
+else:
+    ongkir = 50000
+
+print(f"Ongkir: Rp{ongkir:,}")`}
+  reflect="Tes 2 dan 4 memakai berat tepat di batas (1 kg dan 5 kg). Kenapa tes di angka batas seperti ini paling sering menemukan kesalahan?"
+>
+
+Buat program ongkos kirim berdasarkan berat paket:
+
+- sampai 1 kg: Rp10,000
+- lebih dari 1 kg sampai 5 kg: Rp25,000
+- lebih dari 5 kg: Rp50,000
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Tarif ojek online"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["7"], output: "Tarif: Rp17,500" },
+    { input: ["4"], output: "Tarif: Rp10,000" },
+    { input: ["25"], output: "Tarif: Rp62,500" },
+    { input: ["26"], output: "Jarak terlalu jauh, maksimal 25 km" },
+    { input: ["0"], output: "Jarak tidak valid" },
+  ]}
+  hints={[
+    "Ada empat kemungkinan. Tulis dulu keempatnya dalam bahasa sehari-hari sebelum menulis kode.",
+    "Periksa jarak yang tidak masuk akal lebih dulu (`<= 0` dan `> 25`), baru hitung tarif.",
+    "Untuk lebih dari 4 km: `tarif = 10000 + (jarak - 4) * 2500`.",
+  ]}
+  solution={`jarak = int(input("Jarak (km): "))
+
+if jarak <= 0:
+    print("Jarak tidak valid")
+elif jarak > 25:
+    print("Jarak terlalu jauh, maksimal 25 km")
+elif jarak <= 4:
+    print(f"Tarif: Rp{10000:,}")
+else:
+    tarif = 10000 + (jarak - 4) * 2500
+    print(f"Tarif: Rp{tarif:,}")`}
+  reflect="Coba pindahkan pengecekan `jarak > 25` ke paling bawah, sebelum `else`. Tes mana yang gagal, dan kenapa urutan syarat menentukan hasilnya?"
+>
+
+Buat kalkulator tarif ojek online. Program meminta **jarak** dalam km (bilangan bulat), lalu:
+
+- sampai 4 km: tarif minimal Rp10,000;
+- lebih dari 4 km: Rp10,000 ditambah Rp2,500 untuk setiap km setelah 4 km pertama;
+- lebih dari 25 km: cetak `Jarak terlalu jauh, maksimal 25 km`;
+- 0 km atau kurang: cetak `Jarak tidak valid`.
+
+Tarif dicetak dengan format `Tarif: Rp17,500`.
+
+</Exercise>
 
 ## Kuis
 

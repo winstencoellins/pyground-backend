@@ -70,6 +70,90 @@ has_umbrella = False
 print("Raining?", raining)
 print("Bringing an umbrella?", has_umbrella)`} />
 
+## Practice
+
+<Exercise
+  type="guided"
+  title="Joined or added?"
+  steps={[
+    "Before running, guess: what does `number_text + number_text` give?",
+    "Print `number_text + number_text`, then `number + number`.",
+    "Print the type of `number_text` with `type()`.",
+    "Run it, compare with your guess, then click Check answer.",
+  ]}
+  starter={`number_text = "50"
+number = 50
+
+# 1. Print number_text + number_text
+# 2. Print number + number
+# 3. Print the type of number_text
+`}
+  tests={[
+    { output: `5050
+100
+<class 'str'>` },
+  ]}
+  hints={[
+    "Write it straight inside print: `print(number_text + number_text)`.",
+    "For the type, wrap the variable in `type()` inside `print()`.",
+  ]}
+  solution={`number_text = "50"
+number = 50
+
+print(number_text + number_text)
+print(number + number)
+print(type(number_text))`}
+  reflect="`5050` isn't an error, but it's wrong if you meant to add. Why is a bug like this more dangerous than an error?"
+>
+
+These two variables both seem to hold 50, but their types differ. Prove it with three print
+lines.
+
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Student card"
+  starter={`name = "Rina"
+age = 17
+height = 158.5
+passed = True
+
+print("Name: " + name)
+print("Age: " + age)
+print("Height: " + height + " cm")
+print("Passed: " + passed)
+`}
+  tests={[
+    { output: `Name: Rina
+Age: 17
+Height: 158.5 cm
+Passed: True` },
+  ]}
+  hints={[
+    "Run it and read the last line of the error message. Which types are being mixed?",
+    "Remember the Variables lesson: `print()` can take several values separated by commas.",
+    'For example `print("Age:", age)`. Watch the spaces: the comma already adds one.',
+  ]}
+  solution={`name = "Rina"
+age = 17
+height = 158.5
+passed = True
+
+print("Name:", name)
+print("Age:", age)
+print("Height:", height, "cm")
+print("Passed:", passed)`}
+  reflect="The `Name` line doesn't actually cause an error. Why is `+` fine there but not on the other lines?"
+>
+
+This student card program has errors. Fix it until the output matches the example exactly.
+
+The rules: don't change the four variable lines at the top. You haven't learned how to convert
+types yet, so find another way from an earlier lesson.
+
+</Exercise>
+
 ## Quiz
 
 <Quiz

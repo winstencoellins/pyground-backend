@@ -64,13 +64,76 @@ print("Setiap orang bayar Rp", round(per_orang))`} />
 
 ## Latihan
 
+<Exercise
+  type="guided"
+  title="Konversi suhu"
+  steps={[
+    "Minta suhu dengan `input()` dan ubah menjadi desimal dengan `float()`. Simpan di variabel `celsius`.",
+    "Hitung `fahrenheit` memakai rumus di atas.",
+    "Cetak `Fahrenheit:` diikuti hasilnya, dipisah koma.",
+    "Jalankan dan coba beberapa suhu, lalu klik Cek jawaban.",
+  ]}
+  starter={`# 1. Minta suhu dalam Celsius (bisa desimal, jadi pakai float)
+# 2. Hitung Fahrenheit
+# 3. Tampilkan hasilnya
+`}
+  tests={[
+    { input: ["30"], output: "Fahrenheit: 86.0" },
+    { input: ["0"], output: "Fahrenheit: 32.0" },
+    { input: ["100"], output: "Fahrenheit: 212.0" },
+    { input: ["-40"], output: "Fahrenheit: -40.0" },
+  ]}
+  hints={[
+    "Hasil `input()` selalu teks. Bungkus dengan `float()` supaya bisa dihitung.",
+    'Baris pertama: `celsius = float(input("Suhu (Celsius): "))`',
+    'Cetak dengan koma: `print("Fahrenheit:", fahrenheit)`.',
+  ]}
+  solution={`celsius = float(input("Suhu (Celsius): "))
+fahrenheit = celsius * 9 / 5 + 32
+print("Fahrenheit:", fahrenheit)`}
+  reflect="Suhu -40 hasilnya sama di kedua skala! Kenapa hasilnya selalu berakhiran `.0`, padahal kamu mengetik 30? Apa yang berubah kalau kamu memakai `int()` alih-alih `float()`, lalu mengetik 36.6?"
+>
+
 Buat program konversi suhu. Minta suhu dalam Celsius, lalu tampilkan dalam Fahrenheit.
 Rumusnya: `fahrenheit = celsius * 9 / 5 + 32`.
 
-<Playground initialCode={`# 1. Minta suhu dalam Celsius (bisa desimal, jadi pakai float)
-# 2. Hitung Fahrenheit
-# 3. Tampilkan hasilnya
-`} />
+</Exercise>
+
+<Exercise
+  type="challenge"
+  title="Patungan kas kelas"
+  starter={`# Tulis programmu di sini
+`}
+  tests={[
+    { input: ["100000", "3"], output: `Per siswa: Rp33333
+Ditanggung bendahara: Rp1` },
+    { input: ["90000", "3"], output: `Per siswa: Rp30000
+Ditanggung bendahara: Rp0` },
+    { input: ["50000", "1"], output: `Per siswa: Rp50000
+Ditanggung bendahara: Rp0` },
+    { input: ["100000", "7"], output: `Per siswa: Rp14285
+Ditanggung bendahara: Rp5` },
+  ]}
+  hints={[
+    "Kamu butuh dua `input()`, dan keduanya harus diubah dengan `int()`.",
+    "`//` memberi bagian yang bisa dibagi rata, dan `%` memberi sisanya.",
+    'Koma di `print()` menambah spasi. Untuk menempelkan `Rp` dengan angka, pakai `+` dan `str()`: `"Per siswa: Rp" + str(per_siswa)`.',
+  ]}
+  solution={`total = int(input("Total harga hadiah: "))
+siswa = int(input("Jumlah siswa: "))
+per_siswa = total // siswa
+sisa = total % siswa
+print("Per siswa: Rp" + str(per_siswa))
+print("Ditanggung bendahara: Rp" + str(sisa))`}
+  reflect="Coba jalankan dengan jumlah siswa `0`. Apa yang terjadi, dan kenapa? Setelah belajar percabangan (`if`), kamu bisa mencegahnya. Apa pesan yang sebaiknya ditampilkan?"
+>
+
+Kelasmu mau patungan membeli hadiah untuk wali kelas. Buat program yang meminta **total harga
+hadiah**, lalu **jumlah siswa**. Setiap siswa membayar jumlah yang sama dalam rupiah bulat, dan
+kekurangannya ditanggung bendahara. Cetak persis dengan format contoh, tanpa spasi antara `Rp`
+dan angkanya.
+
+</Exercise>
 
 ## Kuis
 
