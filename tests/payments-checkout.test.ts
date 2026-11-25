@@ -37,6 +37,16 @@ afterAll(async () => {
   await cleanupUsers();
 });
 
+describe("GET /api/payments/pass", () => {
+  it("is public and returns the configured price", async () => {
+    process.env.ACCESS_PASS_PRICE_IDR = "59000";
+    const res = await call("/api/payments/pass");
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ id: "access-pass-30d", days: 30, price: 59000, currency: "IDR" });
+    process.env.ACCESS_PASS_PRICE_IDR = "49000";
+  });
+});
+
 const checkout = (cookie?: string) =>
   call("/api/payments/checkout", { method: "POST", headers: cookie ? { cookie } : {} });
 

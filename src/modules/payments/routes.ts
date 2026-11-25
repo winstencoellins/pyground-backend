@@ -29,6 +29,11 @@ const newOrderId = () =>
 
 export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
   .use(sessionPlugin)
+  // Public: the landing page shows the real price from the same config checkout charges.
+  .get("/pass", () => {
+    const { id, days, price } = accessPass();
+    return { id, days, price, currency: "IDR" as const };
+  })
   .post(
     "/checkout",
     async ({ user }) => {
