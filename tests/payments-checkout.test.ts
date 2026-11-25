@@ -42,7 +42,12 @@ describe("GET /api/payments/pass", () => {
     process.env.ACCESS_PASS_PRICE_IDR = "59000";
     const res = await call("/api/payments/pass");
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ id: "access-pass-30d", days: 30, price: 59000, currency: "IDR" });
+    expect(await res.json()).toEqual({
+      id: "access-pass-30d",
+      days: 30,
+      price: 59000,
+      currency: "IDR",
+    });
     process.env.ACCESS_PASS_PRICE_IDR = "49000";
   });
 });
@@ -58,8 +63,9 @@ describe("POST /api/payments/checkout", () => {
     });
     const res = await checkout(alice.cookie);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { snapToken: string; orderId: string };
+    const body = (await res.json()) as { snapToken: string; redirectUrl: string; orderId: string };
     expect(body.snapToken).toBe("snap-token-123");
+    expect(body.redirectUrl).toBe("https://app.sandbox.midtrans.com/x");
     expect(body.orderId).toMatch(/^PYG-[A-Z0-9]+-[A-Z0-9]{8}$/);
 
     const order = await prisma.order.findUniqueOrThrow({ where: { orderId: body.orderId } });

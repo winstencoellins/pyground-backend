@@ -49,7 +49,7 @@ export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
           customer: { name: user.name, email: user.email },
           finishUrl: `${process.env.WEB_URL}/payment/result?orderId=${order.orderId}`,
         });
-        return { snapToken: snap.token, orderId: order.orderId };
+        return { snapToken: snap.token, redirectUrl: snap.redirectUrl, orderId: order.orderId };
       } catch (err) {
         await prisma.order.update({ where: { id: order.id }, data: { status: "FAILED" } });
         throw err;
@@ -82,6 +82,33 @@ export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
     {
       auth: true,
       params: t.Object({ orderId: t.String({ pattern: "^[A-Z0-9-]+$", maxLength: 50 }) }),
+    },
+  )
+  .post(
+    "/orders/:orderId/sync",
+    async ({ user, params }) => {
+      const order = await prisma.order.findUnique({ where: { orderId: params.orderId } });
+      if (!order || order.userId !== user.id) {
+        throw new ApiError(404, "ORDER_NOT_FOUND", "Order not found");
+      }
+      // The result page asks Midtrans directly instead of waiting for the webhook (which can lag, and
+      // needs a tunnel locally). Same confirmed-status path as the webhook, so it stays idempotent.
+      if (order.status !== "PAID" && order.status !== "REFUNDED") {
+        const status = await getTransactionStatus(order.orderId).catch((err) => {
+          console.warn(`[midtrans] sync ${order.orderId}: ${(err as Error).message}`);
+          return null; // Midtrans unreachable, or no transaction yet: report what we have
+        });
+        if (status) {
+          const { result } = await applyStatus(order.orderId, status);
+          if (result === "paid") void sendReceipt(order.orderId);
+        }
+      }
+      return orderView(await prisma.order.findUniqueOrThrow({ where: { id: order.id } }));
+    },
+    {
+      auth: true,
+      params: t.Object({ orderId: t.String({ pattern: "^[A-Z0-9-]+$", maxLength: 50 }) }),
+      beforeHandle: limit("order-sync", 30, 60_000),
     },
   )
   .post(

@@ -297,3 +297,46 @@ describe("status handling (always from Get Status, never from the notification b
     expect(await statusOf(orderId)).toBe("PENDING");
   });
 });
+
+describe("POST /api/payments/orders/:orderId/sync", () => {
+  async function ownOrder() {
+    const user = await createUser();
+    const orderId = `PYG-TEST-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    await prisma.order.create({ data: { userId: user.id, orderId, amount: 49000 } });
+    return { ...user, orderId };
+  }
+  const sync = (orderId: string, cookie?: string) =>
+    call(`/api/payments/orders/${orderId}/sync`, {
+      method: "POST",
+      headers: cookie ? { cookie } : {},
+    });
+
+  it("asks Midtrans and pays the owner's order (no webhook needed), once", async () => {
+    const o = await ownOrder();
+    settled(o.orderId);
+    const res = await sync(o.orderId, o.cookie);
+    expect(res.status).toBe(200);
+    expect(((await res.json()) as { status: string }).status).toBe("PAID");
+    const until = await accessOf(o.id);
+    expect(until).toBeGreaterThan(Date.now() + 29 * DAY);
+    await sync(o.orderId, o.cookie); // already PAID: no second extension, no Midtrans call
+    expect(await accessOf(o.id)).toBe(until);
+    expect(statusCalls).toBe(1);
+  });
+
+  it("no transaction yet / Midtrans down -> still PENDING, 200", async () => {
+    const o = await ownOrder(); // fake Get Status answers 404 for unknown orders
+    const res = await sync(o.orderId, o.cookie);
+    expect(res.status).toBe(200);
+    expect(((await res.json()) as { status: string }).status).toBe("PENDING");
+  });
+
+  it("someone else's order looks missing; signed out is 401", async () => {
+    const o = await ownOrder();
+    const other = await createUser();
+    settled(o.orderId);
+    expect((await sync(o.orderId, other.cookie)).status).toBe(404);
+    expect((await sync(o.orderId)).status).toBe(401);
+    expect(await statusOf(o.orderId)).toBe("PENDING");
+  });
+});

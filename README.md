@@ -59,8 +59,10 @@ const api = treaty<App>(process.env.API_URL!);
 ## Payments (Midtrans Snap)
 
 `POST /api/payments/checkout` creates a PENDING `Order` (price from `ACCESS_PASS_PRICE_IDR`) and returns
-`{ snapToken, orderId }`; pyground-web opens Snap with `MIDTRANS_CLIENT_KEY`. Snap redirects to
-`${WEB_URL}/payment/result?orderId=…`, which polls `GET /api/payments/orders/:orderId`.
+`{ snapToken, redirectUrl, orderId }`; pyground-web sends the learner to `redirectUrl` (Snap's hosted page, so the
+web app needs no client key or Midtrans script). Snap returns to `${WEB_URL}/payment/result?orderId=…`, which calls
+`POST /api/payments/orders/:orderId/sync`: owner-only, it asks Midtrans' Get Status API and applies the result through
+the same idempotent path as the webhook, so access turns on even if the webhook is late (or, locally, has no tunnel).
 Enabled methods: QRIS, GoPay, ShopeePay, BCA/BNI/BRI/Permata/CIMB/other VA, Mandiri Bill, credit card.
 Sandbox vs production is `MIDTRANS_IS_PRODUCTION` plus the matching keys.
 
