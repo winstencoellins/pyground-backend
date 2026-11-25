@@ -34,7 +34,7 @@ description: One sentence, localized.
 | --- | --- |
 | `<Playground initialCode={\`...\`} />` | Python run in the browser. Use a template literal for multi-line code. |
 | `<Playground expectError initialCode={\`...\`} />` | Code with a deliberate error for the learner to fix (skipped by the valid-Python test). `expectError` must come first. |
-| `<Quiz questions={[{ question, options: string[], answer: index, explanation }]} />` | Multiple choice. |
+| `<Quiz questions={[{ question, options: string[], answer: index, explanation }]} />` | Multiple choice. Add `code: \`...\`` to a question for "predict the output": the snippet shows above the options. |
 | `<Callout type="tip\|warning\|info">…</Callout>` | Markdown children. |
 | `<AnimatedDiagram name="…" caption="…" />` | `name` selects a diagram built in the web app. |
 | `<VideoEmbed url="https://www.youtube.com/embed/…" title="…" />` | |
