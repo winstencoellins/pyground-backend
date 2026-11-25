@@ -37,6 +37,5 @@ description: One sentence, localized.
 | `<Quiz questions={[{ question, options: string[], answer: index, explanation }]} />` | Multiple choice. Add `code: \`...\`` to a question for "predict the output": the snippet shows above the options. |
 | `<Callout type="tip\|warning\|info">…</Callout>` | Markdown children. |
 | `<AnimatedDiagram name="…" caption="…" />` | `name` selects a diagram built in the web app. |
-| `<VideoEmbed url="https://www.youtube.com/embed/…" title="…" />` | |
 | `<TerminalBlock command="…" output={\`...\`} />` | `output` optional. |
 | `<FileTree>{\`tree text\`}</FileTree>` | Plain text tree. |
