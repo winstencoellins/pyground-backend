@@ -91,6 +91,21 @@ Then pay through Snap with Midtrans' sandbox methods (test card `4811 1111 1111 
 expiry, OTP `112233`; VA/QRIS/e-wallets via simulator.sandbox.midtrans.com) and watch the API log
 `[midtrans] PYG-…: settlement -> paid`.
 
+## Marketer codes (freelance marketing)
+
+- A marketer is an ordinary user with a row in `marketers` (handle, per-marketer code secret, active flag,
+  bank details for payouts). No separate role, so marketers can study like everyone else.
+- Their code is `HANDLE-XXXXX`. `XXXXX` is derived from their secret and the Asia/Jakarta date
+  (`src/modules/marketing/codes.ts`), so it changes every day at 00:00 WIB with nothing stored or scheduled.
+  Yesterday's code still works until 06:00 WIB; codes from the last 30 days are reported as expired.
+  Replacing a marketer's secret revokes all their codes; deactivating them stops the codes too.
+- Rates are the same for every marketer: `MARKETING_DISCOUNT_PERCENT` (buyer, default 10) and
+  `MARKETING_COMMISSION_PERCENT` (marketer, of the amount paid, default 20). Amounts round down. Invalid
+  values stop the API from starting in production.
+- Orders keep the list price, discount, marketer, code as entered and the commission. Commission status:
+  `PENDING` → `PAYABLE` (7 days after payment) → `PAID` (in a `payouts` row, manual bank transfer), or
+  `VOID` on refund. Marketers, their orders and payouts use `onDelete: Restrict` so history is never lost.
+
 ## Emails (Resend + React Email)
 
 Templates live in `src/emails/` (copy for both languages in `i18n.ts`, shared layout with the

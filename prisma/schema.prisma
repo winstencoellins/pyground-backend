@@ -25,6 +25,15 @@ enum ReminderKind {
   EXPIRES_TODAY
 }
 
+/// A marketer's commission on one order: PENDING until 7 days after payment, then PAYABLE, PAID once
+/// transferred (payoutId), VOID if the order is refunded.
+enum CommissionStatus {
+  PENDING
+  PAYABLE
+  PAID
+  VOID
+}
+
 enum OrderStatus {
   PENDING
   PAID
@@ -55,6 +64,8 @@ model User {
   accessGrants   AccessGrant[]    @relation("GrantRecipient")
   grantsGiven    AccessGrant[]    @relation("GrantAdmin")
   reminderEmails ReminderEmail[]
+  marketer       Marketer?
+  payoutsMade    Payout[]         @relation("PayoutAdmin")
 
   @@map("users")
 }
@@ -123,8 +134,59 @@ model Order {
   createdAt             DateTime    @default(now()) @map("created_at")
   paidAt                DateTime?   @map("paid_at")
 
+  // Marketer code (null on orders without one). amount = listPrice - discountAmount.
+  listPrice        Int?              @map("list_price")
+  discountAmount   Int               @default(0) @map("discount_amount")
+  marketerId       String?           @map("marketer_id")
+  marketer         Marketer?         @relation(fields: [marketerId], references: [id], onDelete: Restrict)
+  marketerCode     String?           @map("marketer_code") // the code as entered, for support
+  commissionAmount Int?              @map("commission_amount")
+  commissionStatus CommissionStatus? @map("commission_status")
+  payoutId         String?           @map("payout_id")
+  payout           Payout?           @relation(fields: [payoutId], references: [id], onDelete: Restrict)
+
   @@index([userId])
+  @@index([marketerId, commissionStatus])
   @@map("orders")
+}
+
+/// A freelance marketer: an ordinary user with a handle. Their discount code is HANDLE-XXXXX, where XXXXX
+/// changes every Jakarta day (src/modules/marketing/codes.ts). Deleting a user who is a marketer with
+/// orders is refused (Restrict), so commission history is never lost.
+model Marketer {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  handle            String   @unique // uppercase A-Z0-9, 3-12 chars
+  codeSecret        String   @map("code_secret") // per-marketer HMAC key; replacing it revokes every code
+  active            Boolean  @default(true)
+  bankName          String?  @map("bank_name")
+  bankAccountNumber String?  @map("bank_account_number")
+  bankAccountName   String?  @map("bank_account_name")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  orders  Order[]
+  payouts Payout[]
+
+  @@map("marketers")
+}
+
+/// One manual bank transfer to a marketer, covering the PAYABLE commissions it was created with.
+model Payout {
+  id          String   @id @default(cuid())
+  marketerId  String   @map("marketer_id")
+  marketer    Marketer @relation(fields: [marketerId], references: [id], onDelete: Restrict)
+  amount      Int // Rupiah, the sum of its orders' commissionAmount
+  reference   String // bank transfer reference
+  paidAt      DateTime @default(now()) @map("paid_at")
+  createdById String   @map("created_by_id")
+  createdBy   User     @relation("PayoutAdmin", fields: [createdById], references: [id], onDelete: Restrict)
+
+  orders Order[]
+
+  @@index([marketerId])
+  @@map("payouts")
 }
 
 model LessonProgress {

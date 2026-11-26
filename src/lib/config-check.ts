@@ -1,3 +1,5 @@
+import { commissionPercent, discountPercent } from "../modules/marketing/settings";
+
 /**
  * Production startup check: refuse to boot with config that would be unsafe or silently broken.
  * Returns { errors, warnings }; src/index.ts exits on errors. Localhost WEB_URL is allowed for DEV.
@@ -31,6 +33,14 @@ export function checkProductionConfig(env: Record<string, string | undefined> = 
   const hops = Number(env.TRUSTED_PROXY_HOPS ?? 1);
   if (!Number.isInteger(hops) || hops < 1 || hops > 5)
     errors.push("TRUSTED_PROXY_HOPS must be an integer from 1 to 5");
+
+  for (const rate of [discountPercent, commissionPercent]) {
+    try {
+      rate(env);
+    } catch (e) {
+      errors.push((e as Error).message);
+    }
+  }
 
   if (!env.RESEND_API_KEY)
     warnings.push("RESEND_API_KEY is not set: no emails are sent (users can't verify)");

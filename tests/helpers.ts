@@ -40,5 +40,10 @@ export async function cleanupUsers() {
   const where = { email: { startsWith: "test-" } };
   // AccessGrant.grantedBy is onDelete: Restrict (audit trail), so grants by test admins go first.
   await prisma.accessGrant.deleteMany({ where: { grantedBy: where } });
+  // Marketer history is Restrict too: orders credited to test marketers, payouts, then the marketers.
+  const marketers = { marketer: { user: where } };
+  await prisma.order.deleteMany({ where: marketers });
+  await prisma.payout.deleteMany({ where: { OR: [marketers, { createdBy: where }] } });
+  await prisma.marketer.deleteMany({ where: { user: where } });
   await prisma.user.deleteMany({ where });
 }
