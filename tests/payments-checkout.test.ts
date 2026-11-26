@@ -8,15 +8,23 @@ let alice: { id: string; cookie: string; email: string };
 let bob: { id: string; cookie: string };
 const sent: { url: string; init: RequestInit }[] = [];
 
-/** Only Midtrans calls are faked; everything else goes to the real fetch. */
-function fakeMidtrans(status: number, body: unknown) {
+/**
+ * Only Midtrans calls are faked; everything else goes to the real fetch. Snap gets `body`; Get Status gets
+ * `statusBody` (default: like the real API for a Snap page where no payment method was chosen).
+ */
+function fakeMidtrans(
+  status: number,
+  body: unknown,
+  statusBody: unknown = { status_code: "404", status_message: "Transaction doesn't exist." },
+) {
   globalThis.fetch = mock(async (input: string | URL | Request, init?: RequestInit) => {
     const url = String(input instanceof Request ? input.url : input);
     if (!url.includes("midtrans.com")) return realFetch(input, init);
     sent.push({ url, init: init ?? {} });
-    return Response.json(body, { status });
+    return url.endsWith("/status") ? Response.json(statusBody) : Response.json(body, { status });
   }) as unknown as typeof fetch;
 }
+const snapCalls = () => sent.filter((s) => s.url.includes("/snap/"));
 
 beforeAll(async () => {
   spyOn(console, "info").mockImplementation(() => {});
@@ -91,7 +99,7 @@ describe("POST /api/payments/checkout", () => {
   it("uses the production endpoint when MIDTRANS_IS_PRODUCTION=true", async () => {
     process.env.MIDTRANS_IS_PRODUCTION = "true";
     fakeMidtrans(201, { token: "t", redirect_url: "https://app.midtrans.com/x" });
-    await checkout(alice.cookie);
+    await checkout((await createUser()).cookie); // a user with no open order, so a new Snap is created
     expect(sent[0]!.url).toBe("https://app.midtrans.com/snap/v1/transactions");
     process.env.MIDTRANS_IS_PRODUCTION = "false";
   });
@@ -161,7 +169,9 @@ describe("orders", () => {
       "createdAt",
       "orderId",
       "paidAt",
+      "payUntil",
       "paymentType",
+      "paymentUrl",
       "status",
     ]);
   });
@@ -179,5 +189,104 @@ describe("orders", () => {
     });
     expect(theirs.status).toBe(404);
     expect(((await theirs.json()) as ErrorBody).error.code).toBe("ORDER_NOT_FOUND");
+  });
+});
+
+describe("continuing an unfinished payment", () => {
+  const snap = {
+    token: "snap-1",
+    redirect_url: "https://app.sandbox.midtrans.com/snap/v4/redirection/abc",
+  };
+  type Order = { orderId: string; status: string; paymentUrl: string | null; payUntil: string };
+  const order = async (cookie: string, orderId: string) =>
+    (await (
+      await call(`/api/payments/orders/${orderId}`, { headers: { cookie } })
+    ).json()) as Order;
+
+  it("a pending order exposes its Snap page and deadline; Buy again resumes it", async () => {
+    const u = await createUser();
+    fakeMidtrans(201, snap);
+    const first = (await (await checkout(u.cookie)).json()) as {
+      orderId: string;
+      redirectUrl: string;
+    };
+    const o = await order(u.cookie, first.orderId);
+    expect(o.paymentUrl).toBe(snap.redirect_url);
+    const left = new Date(o.payUntil).getTime() - Date.now();
+    expect(left).toBeGreaterThan(23.9 * 3_600_000);
+    expect(left).toBeLessThanOrEqual(24 * 3_600_000);
+
+    sent.length = 0;
+    const again = (await (await checkout(u.cookie)).json()) as {
+      orderId: string;
+      redirectUrl: string;
+    };
+    expect(again).toMatchObject({
+      orderId: first.orderId,
+      redirectUrl: snap.redirect_url,
+      snapToken: "snap-1",
+    });
+    expect(snapCalls()).toHaveLength(0); // no new Snap transaction
+    expect(await prisma.order.count({ where: { userId: u.id } })).toBe(1);
+  });
+
+  it("a payment method already chosen (pending at Midtrans) is resumed too", async () => {
+    const u = await createUser();
+    fakeMidtrans(201, snap);
+    const first = (await (await checkout(u.cookie)).json()) as { orderId: string };
+    fakeMidtrans(201, snap, { transaction_status: "pending", gross_amount: "49000.00" });
+    expect(((await (await checkout(u.cookie)).json()) as { orderId: string }).orderId).toBe(
+      first.orderId,
+    );
+  });
+
+  it("an order Midtrans has meanwhile expired is closed and a new one is made", async () => {
+    const u = await createUser();
+    fakeMidtrans(201, snap);
+    const first = (await (await checkout(u.cookie)).json()) as { orderId: string };
+    fakeMidtrans(
+      201,
+      { ...snap, token: "snap-2" },
+      { transaction_status: "expire", gross_amount: "49000.00" },
+    );
+    const second = (await (await checkout(u.cookie)).json()) as {
+      orderId: string;
+      snapToken: string;
+    };
+    expect(second.orderId).not.toBe(first.orderId);
+    expect(second.snapToken).toBe("snap-2");
+    const old = await order(u.cookie, first.orderId);
+    expect(old.status).toBe("EXPIRED");
+    expect(old.paymentUrl).toBeNull();
+  });
+
+  it("not resumed when under an hour is left, the price changed, or Midtrans can't confirm", async () => {
+    const u = await createUser();
+    fakeMidtrans(201, snap);
+    const first = (await (await checkout(u.cookie)).json()) as { orderId: string };
+
+    process.env.ACCESS_PASS_PRICE_IDR = "59000";
+    const pricier = (await (await checkout(u.cookie)).json()) as { orderId: string };
+    expect(pricier.orderId).not.toBe(first.orderId);
+    process.env.ACCESS_PASS_PRICE_IDR = "49000";
+    await prisma.order.update({ where: { orderId: pricier.orderId }, data: { status: "FAILED" } });
+
+    await prisma.order.update({
+      where: { orderId: first.orderId },
+      data: { createdAt: new Date(Date.now() - 23.5 * 3_600_000) },
+    });
+    const late = (await (await checkout(u.cookie)).json()) as { orderId: string };
+    expect(late.orderId).not.toBe(first.orderId);
+    expect((await order(u.cookie, first.orderId)).paymentUrl).toBe(snap.redirect_url); // still payable
+
+    globalThis.fetch = mock(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input instanceof Request ? input.url : input);
+      if (url.endsWith("/status")) return new Response("down", { status: 503 });
+      if (url.includes("midtrans.com"))
+        return Response.json({ ...snap, token: "snap-3" }, { status: 201 });
+      return realFetch(input, init);
+    }) as unknown as typeof fetch;
+    const unconfirmed = (await (await checkout(u.cookie)).json()) as { orderId: string };
+    expect(unconfirmed.orderId).not.toBe(late.orderId);
   });
 });

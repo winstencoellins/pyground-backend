@@ -5,7 +5,9 @@ import { limit } from "../../lib/rate-limit";
 import { sessionPlugin } from "../../plugins/session";
 import { applyStatus, sendReceipt, verifySignature } from "./fulfill";
 import { createSnapTransaction, getTransactionStatus, serverKey } from "./midtrans";
-import { accessPass } from "./products";
+import { accessPass, PAYMENT_WINDOW_HOURS } from "./products";
+
+const HOUR = 3_600_000;
 
 const orderView = (o: {
   orderId: string;
@@ -14,18 +16,53 @@ const orderView = (o: {
   paymentType: string | null;
   createdAt: Date;
   paidAt: Date | null;
-}) => ({
-  orderId: o.orderId,
-  amount: o.amount,
-  status: o.status as "PENDING" | "PAID" | "FAILED" | "EXPIRED" | "REFUNDED",
-  paymentType: o.paymentType,
-  createdAt: o.createdAt,
-  paidAt: o.paidAt,
-});
+  snapRedirectUrl: string | null;
+}) => {
+  const payUntil = new Date(o.createdAt.getTime() + PAYMENT_WINDOW_HOURS * HOUR);
+  return {
+    orderId: o.orderId,
+    amount: o.amount,
+    status: o.status as "PENDING" | "PAID" | "FAILED" | "EXPIRED" | "REFUNDED",
+    paymentType: o.paymentType,
+    createdAt: o.createdAt,
+    paidAt: o.paidAt,
+    /** When the Snap page stops accepting payment. */
+    payUntil,
+    /** Midtrans' Snap page, to finish paying; only while the order is PENDING and the window is open. */
+    paymentUrl: o.status === "PENDING" && payUntil > new Date() ? o.snapRedirectUrl : null,
+  };
+};
 
 // PYG-<base36 time>-<random>: unique, sortable, well under Midtrans' 50-char order_id limit.
 const newOrderId = () =>
   `PYG-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+
+/**
+ * The user's unfinished order, if its Snap page can still be paid, so Buy resumes it instead of making a
+ * duplicate. Midtrans is asked first: an order that was meanwhile paid, expired or failed is updated and
+ * not reused. Needs an hour left on the clock, and the current price.
+ */
+async function resumableOrder(userId: string, price: number) {
+  const order = await prisma.order.findFirst({
+    where: {
+      userId,
+      status: "PENDING",
+      amount: price,
+      snapRedirectUrl: { not: null },
+      createdAt: { gt: new Date(Date.now() - (PAYMENT_WINDOW_HOURS - 1) * HOUR) },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!order?.snapToken || !order.snapRedirectUrl) return null;
+  const status = await getTransactionStatus(order.orderId).catch(() => null);
+  if (!status) return null; // can't confirm it is still open: start a fresh one
+  if (status.status_code === "404" || status.transaction_status === "pending") {
+    return { ...order, snapToken: order.snapToken, snapRedirectUrl: order.snapRedirectUrl };
+  }
+  const { result } = await applyStatus(order.orderId, status);
+  if (result === "paid") void sendReceipt(order.orderId);
+  return null;
+}
 
 export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
   .use(sessionPlugin)
@@ -38,6 +75,13 @@ export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
     "/checkout",
     async ({ user }) => {
       const product = accessPass();
+      const open = await resumableOrder(user.id, product.price);
+      if (open)
+        return {
+          snapToken: open.snapToken,
+          redirectUrl: open.snapRedirectUrl,
+          orderId: open.orderId,
+        };
       const order = await prisma.order.create({
         data: { userId: user.id, orderId: newOrderId(), amount: product.price },
       });
@@ -48,6 +92,10 @@ export const paymentRoutes = new Elysia({ prefix: "/api/payments" })
           item: product,
           customer: { name: user.name, email: user.email },
           finishUrl: `${process.env.WEB_URL}/payment/result?orderId=${order.orderId}`,
+        });
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { snapToken: snap.token, snapRedirectUrl: snap.redirectUrl },
         });
         return { snapToken: snap.token, redirectUrl: snap.redirectUrl, orderId: order.orderId };
       } catch (err) {
