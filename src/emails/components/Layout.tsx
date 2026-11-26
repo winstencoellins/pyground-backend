@@ -2,7 +2,7 @@ import { Body, Container, Head, Hr, Html, Preview, Section, Text } from "@react-
 import type { ReactNode } from "react";
 import { copy, type EmailLocale } from "../i18n";
 
-export const colors = { primary: "#3776AB", accent: "#FFD43B", text: "#1f2937", muted: "#6b7280" };
+export const colors = { primary: "#0f766e", accent: "#bef264", text: "#0f172a", muted: "#556070" };
 
 export function Layout(props: {
   locale: EmailLocale;
