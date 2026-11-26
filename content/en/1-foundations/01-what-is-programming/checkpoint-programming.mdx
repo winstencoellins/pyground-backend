@@ -1,0 +1,76 @@
+---
+title: Skill Check
+slug: checkpoint-programming
+stage: 1
+module: "What Is Programming"
+order: 3
+isFree: true
+estimatedMinutes: 10
+description: "Solve 2 problems without help to test what you know about what is programming."
+---
+
+# Skill Check: What Is Programming
+
+Time to use everything you've learned in this module, **on your own**. No steps, no hints, and the editor starts empty. Read each problem carefully, make a plan, then write your program.
+
+- Your program is checked automatically. Press **Check answer** as often as you like.
+- Only the first example is shown. If there are hidden tests, think about other cases and try them yourself with **Run**.
+- The sample answer unlocks once every test passes, so you can compare it with your approach.
+
+Stuck? Go back to the earlier lessons. That isn't cheating; real programmers do it all the time.
+
+<Exercise
+  type="apply"
+  title="Introduction card"
+  tests={[
+    { output: "==============\nNama : Sari\nKota : Medan\nHobi : Membaca\n==============" },
+  ]}
+  solution={`print("==============")
+print("Nama : Sari")
+print("Kota : Medan")
+print("Hobi : Membaca")
+print("==============")`}
+  reflect={"One space off and the test fails. Why is a computer that strict when a person wouldn't care about one space?"}
+>
+
+Print this introduction card **exactly**, including the space before each colon and the number of `=` signs:
+
+```
+==============
+Nama : Sari
+Kota : Medan
+Hobi : Membaca
+==============
+```
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Star mountain"
+  tests={[
+    { output: "*\n**\n***\n****\n***\n**\n*" },
+  ]}
+  solution={`print("*")
+print("**")
+print("***")
+print("****")
+print("***")
+print("**")
+print("*")`}
+  reflect={"Imagine the mountain were 100 stars tall: 199 `print` lines would be painful. In Stage 2 you'll learn loops, which do it in 3 lines."}
+>
+
+Print this mountain of stars. The peak is 4 stars wide, then it goes back down:
+
+```
+*
+**
+***
+****
+***
+**
+*
+```
+
+</Exercise>

@@ -1,0 +1,89 @@
+---
+title: Skill Check
+slug: checkpoint-strings
+stage: 1
+module: "Strings"
+order: 4
+isFree: true
+estimatedMinutes: 15
+description: "Solve 3 problems without help to test what you know about strings."
+---
+
+# Skill Check: Strings
+
+Time to use everything you've learned in this module, **on your own**. No steps, no hints, and the editor starts empty. Read each problem carefully, make a plan, then write your program.
+
+- Your program is checked automatically. Press **Check answer** as often as you like.
+- Only the first example is shown. If there are hidden tests, think about other cases and try them yourself with **Run**.
+- The sample answer unlocks once every test passes, so you can compare it with your approach.
+
+Stuck? Go back to the earlier lessons. That isn't cheating; real programmers do it all the time.
+
+<Exercise
+  type="apply"
+  title="Automatic username"
+  tests={[
+    { input: ["Budi Santoso"], output: "budi.santoso" },
+    { input: ["  SITI rahma  "], output: "siti.rahma" },
+    { input: ["Ana Lee"], output: "ana.lee" },
+  ]}
+  solution={`nama = input("Nama lengkap: ")
+
+username = nama.strip().lower().replace(" ", ".")
+print(username)`}
+  reflect={"What if two students are both called `Budi Santoso`? What could you add so their usernames stay different?"}
+>
+
+A school app builds usernames from full names: all lowercase, with the space between names replaced by a dot. Example: `Budi Santoso` becomes `budi.santoso`.
+
+Careful: people often type names in random upper/lower case, or with extra spaces at the start and end.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Name initials"
+  tests={[
+    { input: ["budi santoso"], output: "B.S." },
+    { input: ["  Siti Rahma  "], output: "S.R." },
+    { input: ["ANA lee"], output: "A.L." },
+  ]}
+  solution={`nama = input("Nama: ").strip()
+
+spasi = nama.find(" ")
+inisial = nama[0] + "." + nama[spasi + 1] + "."
+print(inisial.upper())`}
+  reflect={"This only handles two words. What happens if someone types a three-word name, like `Siti Nur Aisyah`?"}
+>
+
+Ask for a name made of **two words**, then print its initials in capitals with dots. Example: `budi santoso` becomes `B.S.`.
+
+The first word can be any length, so you have to find where the second word starts yourself.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Sentence stats"
+  tests={[
+    { input: ["Saya suka nasi goreng"], output: "Jumlah kata: 4\nHuruf a: 4" },
+    { input: ["  Aku Anak Indonesia  "], output: "Jumlah kata: 3\nHuruf a: 4" },
+    { input: ["Halo"], output: "Jumlah kata: 1\nHuruf a: 1" },
+  ]}
+  solution={`kalimat = input("Kalimat: ").strip()
+
+print(f"Jumlah kata: {kalimat.count(' ') + 1}")
+print(f"Huruf a: {kalimat.lower().count('a')}")`}
+  reflect={"You counted words by counting spaces. When could that go wrong?"}
+>
+
+Ask for a sentence (words are separated by **one** space), then print:
+
+```
+Jumlah kata: 4
+Huruf a: 4
+```
+
+`Huruf a` counts both lowercase `a` **and** capital `A`.
+
+</Exercise>

@@ -1,0 +1,91 @@
+---
+title: Uji Kemampuan
+slug: checkpoint-input
+stage: 1
+module: "Input dan Operator"
+order: 3
+isFree: true
+estimatedMinutes: 15
+description: "Kerjakan 3 soal tanpa bantuan untuk menguji pemahamanmu tentang Input dan Operator."
+---
+
+# Uji Kemampuan: Input dan Operator
+
+Saatnya memakai semua yang sudah kamu pelajari di modul ini, **tanpa bantuan**. Tidak ada langkah, tidak ada petunjuk, dan editornya kosong. Baca soalnya baik-baik, rencanakan dulu, lalu tulis programmu sendiri.
+
+- Programmu dicek otomatis. Tekan **Cek jawaban** sesering yang kamu mau.
+- Hanya contoh pertama yang ditampilkan. Kalau ada tes tersembunyi, pikirkan kasus lain dan uji sendiri dengan **Jalankan**.
+- Contoh jawaban baru terbuka setelah semua tes lulus, supaya kamu bisa membandingkannya dengan caramu.
+
+Kalau buntu, buka lagi pelajaran sebelumnya. Itu bukan curang. Programmer sungguhan juga begitu.
+
+<Exercise
+  type="apply"
+  title="Lama perjalanan"
+  tests={[
+    { input: ["125"], output: "2 jam 5 menit" },
+    { input: ["60"], output: "1 jam 0 menit" },
+    { input: ["45"], output: "0 jam 45 menit" },
+    { input: ["600"], output: "10 jam 0 menit" },
+  ]}
+  solution={`menit = int(input("Lama perjalanan (menit): "))
+
+jam = menit // 60
+sisa = menit % 60
+print(jam, "jam", sisa, "menit")`}
+  reflect={"Bagaimana kalau kamu juga ingin menampilkan hari, misalnya untuk perjalanan kapal selama `3000` menit?"}
+>
+
+Aplikasi peta menghitung lama perjalanan dalam menit. Minta jumlah menit, lalu cetak dalam jam dan menit. Contoh: `125` menjadi `2 jam 5 menit`.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Bus study tour"
+  tests={[
+    { input: ["80"], output: "Butuh 2 bus" },
+    { input: ["81"], output: "Butuh 3 bus" },
+    { input: ["40"], output: "Butuh 1 bus" },
+    { input: ["1"], output: "Butuh 1 bus" },
+    { input: ["119"], output: "Butuh 3 bus" },
+  ]}
+  solution={`siswa = int(input("Jumlah siswa: "))
+
+bus = (siswa + 39) // 40
+print("Butuh", bus, "bus")`}
+  reflect={"`81 // 40` hasilnya `2`, padahal butuh 3 bus. Trik apa yang kamu pakai? Coba jelaskan kenapa trik itu selalu benar."}
+>
+
+Sekolah menyewa bus untuk study tour. Satu bus muat **40 siswa**, dan tidak boleh ada siswa yang tertinggal. Minta jumlah siswa, lalu cetak berapa bus yang dibutuhkan, misalnya `Butuh 2 bus`.
+
+Kamu belum belajar `if`. Selesaikan hanya dengan operator aritmatika.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Kasir diskon"
+  tests={[
+    { input: ["200000", "25"], output: "Potongan: Rp50000\nBayar: Rp150000" },
+    { input: ["9999", "10"], output: "Potongan: Rp999\nBayar: Rp9000" },
+    { input: ["50000", "0"], output: "Potongan: Rp0\nBayar: Rp50000" },
+    { input: ["75000", "100"], output: "Potongan: Rp75000\nBayar: Rp0" },
+  ]}
+  solution={`harga = int(input("Harga: "))
+persen = int(input("Diskon (%): "))
+
+potongan = harga * persen // 100
+print("Potongan: Rp" + str(potongan))
+print("Bayar: Rp" + str(harga - potongan))`}
+  reflect={"Untuk harga `9999` dan diskon `10%`, potongan sebenarnya `999.9`. Toko memilih membulatkan ke bawah. Menurutmu, kenapa toko lebih suka begitu?"}
+>
+
+Minta harga barang, lalu persen diskonnya (dua input, dalam urutan itu). Potongan dihitung `harga × persen ÷ 100` lalu **dibulatkan ke bawah** ke rupiah terdekat. Cetak dua baris:
+
+```
+Potongan: Rp50000
+Bayar: Rp150000
+```
+
+</Exercise>

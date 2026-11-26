@@ -1,0 +1,89 @@
+---
+title: Uji Kemampuan
+slug: checkpoint-strings
+stage: 1
+module: "String"
+order: 4
+isFree: true
+estimatedMinutes: 15
+description: "Kerjakan 3 soal tanpa bantuan untuk menguji pemahamanmu tentang String."
+---
+
+# Uji Kemampuan: String
+
+Saatnya memakai semua yang sudah kamu pelajari di modul ini, **tanpa bantuan**. Tidak ada langkah, tidak ada petunjuk, dan editornya kosong. Baca soalnya baik-baik, rencanakan dulu, lalu tulis programmu sendiri.
+
+- Programmu dicek otomatis. Tekan **Cek jawaban** sesering yang kamu mau.
+- Hanya contoh pertama yang ditampilkan. Kalau ada tes tersembunyi, pikirkan kasus lain dan uji sendiri dengan **Jalankan**.
+- Contoh jawaban baru terbuka setelah semua tes lulus, supaya kamu bisa membandingkannya dengan caramu.
+
+Kalau buntu, buka lagi pelajaran sebelumnya. Itu bukan curang. Programmer sungguhan juga begitu.
+
+<Exercise
+  type="apply"
+  title="Username otomatis"
+  tests={[
+    { input: ["Budi Santoso"], output: "budi.santoso" },
+    { input: ["  SITI rahma  "], output: "siti.rahma" },
+    { input: ["Ana Lee"], output: "ana.lee" },
+  ]}
+  solution={`nama = input("Nama lengkap: ")
+
+username = nama.strip().lower().replace(" ", ".")
+print(username)`}
+  reflect={"Bagaimana kalau ada dua siswa bernama `Budi Santoso`? Apa yang bisa ditambahkan agar username-nya tetap berbeda?"}
+>
+
+Aplikasi sekolah membuat username dari nama lengkap: semua huruf kecil, dan spasi di antara nama diganti titik. Contoh: `Budi Santoso` menjadi `budi.santoso`.
+
+Hati-hati, orang sering mengetik nama dengan huruf besar-kecil acak atau spasi berlebih di awal dan akhir.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Inisial nama"
+  tests={[
+    { input: ["budi santoso"], output: "B.S." },
+    { input: ["  Siti Rahma  "], output: "S.R." },
+    { input: ["ANA lee"], output: "A.L." },
+  ]}
+  solution={`nama = input("Nama: ").strip()
+
+spasi = nama.find(" ")
+inisial = nama[0] + "." + nama[spasi + 1] + "."
+print(inisial.upper())`}
+  reflect={"Program ini hanya untuk dua kata. Apa yang terjadi kalau seseorang mengetik namanya dengan tiga kata, misalnya `Siti Nur Aisyah`?"}
+>
+
+Minta nama yang terdiri dari **dua kata**, lalu cetak inisialnya dalam huruf besar dengan titik. Contoh: `budi santoso` menjadi `B.S.`.
+
+Panjang kata pertama berbeda-beda, jadi kamu harus mencari sendiri di mana kata kedua dimulai.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Statistik kalimat"
+  tests={[
+    { input: ["Saya suka nasi goreng"], output: "Jumlah kata: 4\nHuruf a: 4" },
+    { input: ["  Aku Anak Indonesia  "], output: "Jumlah kata: 3\nHuruf a: 4" },
+    { input: ["Halo"], output: "Jumlah kata: 1\nHuruf a: 1" },
+  ]}
+  solution={`kalimat = input("Kalimat: ").strip()
+
+print(f"Jumlah kata: {kalimat.count(' ') + 1}")
+print(f"Huruf a: {kalimat.lower().count('a')}")`}
+  reflect={"Kamu menghitung kata dari jumlah spasi. Kapan cara ini bisa salah?"}
+>
+
+Minta sebuah kalimat (antar kata dipisah **satu** spasi), lalu cetak:
+
+```
+Jumlah kata: 4
+Huruf a: 4
+```
+
+`Huruf a` menghitung huruf `a` kecil **dan** `A` besar.
+
+</Exercise>

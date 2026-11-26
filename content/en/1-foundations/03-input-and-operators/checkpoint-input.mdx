@@ -1,0 +1,91 @@
+---
+title: Skill Check
+slug: checkpoint-input
+stage: 1
+module: "Input and Operators"
+order: 3
+isFree: true
+estimatedMinutes: 15
+description: "Solve 3 problems without help to test what you know about input and operators."
+---
+
+# Skill Check: Input and Operators
+
+Time to use everything you've learned in this module, **on your own**. No steps, no hints, and the editor starts empty. Read each problem carefully, make a plan, then write your program.
+
+- Your program is checked automatically. Press **Check answer** as often as you like.
+- Only the first example is shown. If there are hidden tests, think about other cases and try them yourself with **Run**.
+- The sample answer unlocks once every test passes, so you can compare it with your approach.
+
+Stuck? Go back to the earlier lessons. That isn't cheating; real programmers do it all the time.
+
+<Exercise
+  type="apply"
+  title="Travel time"
+  tests={[
+    { input: ["125"], output: "2 jam 5 menit" },
+    { input: ["60"], output: "1 jam 0 menit" },
+    { input: ["45"], output: "0 jam 45 menit" },
+    { input: ["600"], output: "10 jam 0 menit" },
+  ]}
+  solution={`menit = int(input("Lama perjalanan (menit): "))
+
+jam = menit // 60
+sisa = menit % 60
+print(jam, "jam", sisa, "menit")`}
+  reflect={"What if you also wanted days, say for a `3000`-minute ferry trip?"}
+>
+
+A map app measures travel time in minutes. Ask for the number of minutes, then print it as hours and minutes. Example: `125` becomes `2 jam 5 menit`.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Study tour buses"
+  tests={[
+    { input: ["80"], output: "Butuh 2 bus" },
+    { input: ["81"], output: "Butuh 3 bus" },
+    { input: ["40"], output: "Butuh 1 bus" },
+    { input: ["1"], output: "Butuh 1 bus" },
+    { input: ["119"], output: "Butuh 3 bus" },
+  ]}
+  solution={`siswa = int(input("Jumlah siswa: "))
+
+bus = (siswa + 39) // 40
+print("Butuh", bus, "bus")`}
+  reflect={"`81 // 40` is `2`, but 3 buses are needed. What trick did you use? Can you explain why it always works?"}
+>
+
+A school is renting buses for a study tour. One bus fits **40 students**, and nobody can be left behind. Ask for the number of students, then print how many buses are needed, e.g. `Butuh 2 bus`.
+
+You haven't learned `if` yet. Solve it with arithmetic operators only.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Discount till"
+  tests={[
+    { input: ["200000", "25"], output: "Potongan: Rp50000\nBayar: Rp150000" },
+    { input: ["9999", "10"], output: "Potongan: Rp999\nBayar: Rp9000" },
+    { input: ["50000", "0"], output: "Potongan: Rp0\nBayar: Rp50000" },
+    { input: ["75000", "100"], output: "Potongan: Rp75000\nBayar: Rp0" },
+  ]}
+  solution={`harga = int(input("Harga: "))
+persen = int(input("Diskon (%): "))
+
+potongan = harga * persen // 100
+print("Potongan: Rp" + str(potongan))
+print("Bayar: Rp" + str(harga - potongan))`}
+  reflect={"For a price of `9999` and a `10%` discount, the real discount is `999.9`. The shop rounds it down. Why do you think shops prefer that?"}
+>
+
+Ask for the price, then the discount percentage (two inputs, in that order). The discount is `price × percent ÷ 100`, **rounded down** to a whole rupiah. Print two lines:
+
+```
+Potongan: Rp50000
+Bayar: Rp150000
+```
+
+</Exercise>

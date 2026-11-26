@@ -1,0 +1,124 @@
+---
+title: Uji Kemampuan
+slug: checkpoint-conditionals
+stage: 1
+module: "Percabangan"
+order: 4
+isFree: true
+estimatedMinutes: 20
+description: "Kerjakan 3 soal tanpa bantuan untuk menguji pemahamanmu tentang Percabangan."
+---
+
+# Uji Kemampuan: Percabangan
+
+Saatnya memakai semua yang sudah kamu pelajari di modul ini, **tanpa bantuan**. Tidak ada langkah, tidak ada petunjuk, dan editornya kosong. Baca soalnya baik-baik, rencanakan dulu, lalu tulis programmu sendiri.
+
+- Programmu dicek otomatis. Tekan **Cek jawaban** sesering yang kamu mau.
+- Hanya contoh pertama yang ditampilkan. Kalau ada tes tersembunyi, pikirkan kasus lain dan uji sendiri dengan **Jalankan**.
+- Contoh jawaban baru terbuka setelah semua tes lulus, supaya kamu bisa membandingkannya dengan caramu.
+
+Kalau buntu, buka lagi pelajaran sebelumnya. Itu bukan curang. Programmer sungguhan juga begitu.
+
+<Exercise
+  type="apply"
+  title="Tahun kabisat"
+  tests={[
+    { input: ["2024"], output: "2024 tahun kabisat" },
+    { input: ["2023"], output: "2023 bukan tahun kabisat" },
+    { input: ["1900"], output: "1900 bukan tahun kabisat" },
+    { input: ["2000"], output: "2000 tahun kabisat" },
+  ]}
+  solution={`tahun = int(input("Tahun: "))
+
+if (tahun % 4 == 0 and tahun % 100 != 0) or tahun % 400 == 0:
+    print(tahun, "tahun kabisat")
+else:
+    print(tahun, "bukan tahun kabisat")`}
+  reflect={"Coba tulis aturan yang sama dengan `if`/`elif` bertingkat, tanpa `and`/`or`. Mana yang lebih mudah dibaca menurutmu?"}
+>
+
+Tahun kabisat punya 29 Februari. Aturannya:
+
+- habis dibagi 4 → kabisat,
+- **kecuali** habis dibagi 100 → bukan kabisat,
+- **kecuali lagi** habis dibagi 400 → kabisat.
+
+Minta sebuah tahun, lalu cetak misalnya `2024 tahun kabisat` atau `2023 bukan tahun kabisat`.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Rapor nilai huruf"
+  tests={[
+    { input: ["85"], output: "Nilai: A" },
+    { input: ["84"], output: "Nilai: B" },
+    { input: ["70"], output: "Nilai: B" },
+    { input: ["55"], output: "Nilai: C" },
+    { input: ["39"], output: "Nilai: E" },
+    { input: ["101"], output: "Nilai tidak valid" },
+    { input: ["-5"], output: "Nilai tidak valid" },
+    { input: ["0"], output: "Nilai: E" },
+  ]}
+  solution={`nilai = int(input("Nilai: "))
+
+if nilai < 0 or nilai > 100:
+    print("Nilai tidak valid")
+elif nilai >= 85:
+    print("Nilai: A")
+elif nilai >= 70:
+    print("Nilai: B")
+elif nilai >= 55:
+    print("Nilai: C")
+elif nilai >= 40:
+    print("Nilai: D")
+else:
+    print("Nilai: E")`}
+  reflect={"Di mana kamu menaruh pengecekan `Nilai tidak valid`: di awal atau di akhir? Apa yang terjadi kalau urutannya dibalik?"}
+>
+
+Ubah nilai angka (0 sampai 100) menjadi nilai huruf:
+
+| Nilai | Huruf |
+| --- | --- |
+| 85 ke atas | A |
+| 70 sampai 84 | B |
+| 55 sampai 69 | C |
+| 40 sampai 54 | D |
+| di bawah 40 | E |
+
+Cetak misalnya `Nilai: A`. Guru kadang salah ketik, jadi kalau angkanya di luar 0 sampai 100, cetak `Nilai tidak valid`.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Jenis segitiga"
+  tests={[
+    { input: ["3", "3", "3"], output: "Sama sisi" },
+    { input: ["5", "5", "8"], output: "Sama kaki" },
+    { input: ["8", "5", "5"], output: "Sama kaki" },
+    { input: ["3", "4", "5"], output: "Sembarang" },
+    { input: ["1", "2", "3"], output: "Bukan segitiga" },
+    { input: ["1", "1", "5"], output: "Bukan segitiga" },
+  ]}
+  solution={`a = int(input("Sisi a: "))
+b = int(input("Sisi b: "))
+c = int(input("Sisi c: "))
+
+if a + b <= c or a + c <= b or b + c <= a:
+    print("Bukan segitiga")
+elif a == b and b == c:
+    print("Sama sisi")
+elif a == b or b == c or a == c:
+    print("Sama kaki")
+else:
+    print("Sembarang")`}
+  reflect={"Sisi `1`, `1`, `5` punya dua sisi yang sama, tapi tetap bukan segitiga. Bagaimana urutan `if`/`elif` di programmu menangani kasus itu?"}
+>
+
+Minta panjang tiga sisi (tiga input), lalu cetak jenis segitiganya: `Sama sisi` (ketiga sisi sama), `Sama kaki` (tepat dua sisi sama), atau `Sembarang`.
+
+Tapi tidak semua tiga angka bisa jadi segitiga. Coba gambar segitiga dengan sisi 1, 2, dan 10. Kalau tidak bisa, cetak `Bukan segitiga`.
+
+</Exercise>

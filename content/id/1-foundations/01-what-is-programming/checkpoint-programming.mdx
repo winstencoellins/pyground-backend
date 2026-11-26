@@ -1,0 +1,76 @@
+---
+title: Uji Kemampuan
+slug: checkpoint-programming
+stage: 1
+module: "Apa Itu Pemrograman"
+order: 3
+isFree: true
+estimatedMinutes: 10
+description: "Kerjakan 2 soal tanpa bantuan untuk menguji pemahamanmu tentang Apa Itu Pemrograman."
+---
+
+# Uji Kemampuan: Apa Itu Pemrograman
+
+Saatnya memakai semua yang sudah kamu pelajari di modul ini, **tanpa bantuan**. Tidak ada langkah, tidak ada petunjuk, dan editornya kosong. Baca soalnya baik-baik, rencanakan dulu, lalu tulis programmu sendiri.
+
+- Programmu dicek otomatis. Tekan **Cek jawaban** sesering yang kamu mau.
+- Hanya contoh pertama yang ditampilkan. Kalau ada tes tersembunyi, pikirkan kasus lain dan uji sendiri dengan **Jalankan**.
+- Contoh jawaban baru terbuka setelah semua tes lulus, supaya kamu bisa membandingkannya dengan caramu.
+
+Kalau buntu, buka lagi pelajaran sebelumnya. Itu bukan curang. Programmer sungguhan juga begitu.
+
+<Exercise
+  type="apply"
+  title="Kartu perkenalan"
+  tests={[
+    { output: "==============\nNama : Sari\nKota : Medan\nHobi : Membaca\n==============" },
+  ]}
+  solution={`print("==============")
+print("Nama : Sari")
+print("Kota : Medan")
+print("Hobi : Membaca")
+print("==============")`}
+  reflect={"Kalau satu spasi saja berbeda, tesnya gagal. Kenapa komputer seteliti itu, padahal manusia tidak peduli soal satu spasi?"}
+>
+
+Cetak kartu perkenalan ini **persis sama**, termasuk spasi sebelum titik dua dan jumlah tanda `=`:
+
+```
+==============
+Nama : Sari
+Kota : Medan
+Hobi : Membaca
+==============
+```
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Gunung bintang"
+  tests={[
+    { output: "*\n**\n***\n****\n***\n**\n*" },
+  ]}
+  solution={`print("*")
+print("**")
+print("***")
+print("****")
+print("***")
+print("**")
+print("*")`}
+  reflect={"Bayangkan gunungnya setinggi 100 bintang. Menulis 199 baris `print` tentu melelahkan. Nanti di Tahap 2 kamu belajar perulangan, yang bisa membuatnya dengan 3 baris saja."}
+>
+
+Cetak gunung dari bintang ini. Puncaknya 4 bintang, lalu turun lagi:
+
+```
+*
+**
+***
+****
+***
+**
+*
+```
+
+</Exercise>

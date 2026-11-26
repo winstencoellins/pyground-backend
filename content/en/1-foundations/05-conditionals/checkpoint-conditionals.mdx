@@ -1,0 +1,124 @@
+---
+title: Skill Check
+slug: checkpoint-conditionals
+stage: 1
+module: "Conditionals"
+order: 4
+isFree: true
+estimatedMinutes: 20
+description: "Solve 3 problems without help to test what you know about conditionals."
+---
+
+# Skill Check: Conditionals
+
+Time to use everything you've learned in this module, **on your own**. No steps, no hints, and the editor starts empty. Read each problem carefully, make a plan, then write your program.
+
+- Your program is checked automatically. Press **Check answer** as often as you like.
+- Only the first example is shown. If there are hidden tests, think about other cases and try them yourself with **Run**.
+- The sample answer unlocks once every test passes, so you can compare it with your approach.
+
+Stuck? Go back to the earlier lessons. That isn't cheating; real programmers do it all the time.
+
+<Exercise
+  type="apply"
+  title="Leap year"
+  tests={[
+    { input: ["2024"], output: "2024 tahun kabisat" },
+    { input: ["2023"], output: "2023 bukan tahun kabisat" },
+    { input: ["1900"], output: "1900 bukan tahun kabisat" },
+    { input: ["2000"], output: "2000 tahun kabisat" },
+  ]}
+  solution={`tahun = int(input("Tahun: "))
+
+if (tahun % 4 == 0 and tahun % 100 != 0) or tahun % 400 == 0:
+    print(tahun, "tahun kabisat")
+else:
+    print(tahun, "bukan tahun kabisat")`}
+  reflect={"Try writing the same rule with nested `if`/`elif` and no `and`/`or`. Which do you find easier to read?"}
+>
+
+Leap years have a 29 February. The rule:
+
+- divisible by 4 → leap year,
+- **except** divisible by 100 → not a leap year,
+- **except again** divisible by 400 → leap year.
+
+Ask for a year, then print e.g. `2024 tahun kabisat` or `2023 bukan tahun kabisat`.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Report card grades"
+  tests={[
+    { input: ["85"], output: "Nilai: A" },
+    { input: ["84"], output: "Nilai: B" },
+    { input: ["70"], output: "Nilai: B" },
+    { input: ["55"], output: "Nilai: C" },
+    { input: ["39"], output: "Nilai: E" },
+    { input: ["101"], output: "Nilai tidak valid" },
+    { input: ["-5"], output: "Nilai tidak valid" },
+    { input: ["0"], output: "Nilai: E" },
+  ]}
+  solution={`nilai = int(input("Nilai: "))
+
+if nilai < 0 or nilai > 100:
+    print("Nilai tidak valid")
+elif nilai >= 85:
+    print("Nilai: A")
+elif nilai >= 70:
+    print("Nilai: B")
+elif nilai >= 55:
+    print("Nilai: C")
+elif nilai >= 40:
+    print("Nilai: D")
+else:
+    print("Nilai: E")`}
+  reflect={"Where did you put the `Nilai tidak valid` check: first or last? What happens if you swap the order?"}
+>
+
+Turn a score (0 to 100) into a letter grade:
+
+| Score | Grade |
+| --- | --- |
+| 85 and up | A |
+| 70 to 84 | B |
+| 55 to 69 | C |
+| 40 to 54 | D |
+| below 40 | E |
+
+Print e.g. `Nilai: A`. Teachers sometimes mistype, so if the score is outside 0 to 100, print `Nilai tidak valid`.
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Kind of triangle"
+  tests={[
+    { input: ["3", "3", "3"], output: "Sama sisi" },
+    { input: ["5", "5", "8"], output: "Sama kaki" },
+    { input: ["8", "5", "5"], output: "Sama kaki" },
+    { input: ["3", "4", "5"], output: "Sembarang" },
+    { input: ["1", "2", "3"], output: "Bukan segitiga" },
+    { input: ["1", "1", "5"], output: "Bukan segitiga" },
+  ]}
+  solution={`a = int(input("Sisi a: "))
+b = int(input("Sisi b: "))
+c = int(input("Sisi c: "))
+
+if a + b <= c or a + c <= b or b + c <= a:
+    print("Bukan segitiga")
+elif a == b and b == c:
+    print("Sama sisi")
+elif a == b or b == c or a == c:
+    print("Sama kaki")
+else:
+    print("Sembarang")`}
+  reflect={"Sides `1`, `1`, `5` have two equal sides but are still not a triangle. How does the order of your `if`/`elif` handle that?"}
+>
+
+Ask for three side lengths (three inputs), then print the kind of triangle: `Sama sisi` (all three equal), `Sama kaki` (exactly two equal) or `Sembarang` (none equal).
+
+But not every three numbers make a triangle. Try drawing one with sides 1, 2 and 10. If it can't be done, print `Bukan segitiga`.
+
+</Exercise>

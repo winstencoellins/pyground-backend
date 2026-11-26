@@ -24,17 +24,22 @@ describe("real content", () => {
     expect(catalog.ordered.map((l) => l.slug)).toEqual([
       "what-is-programming",
       "comments-and-errors",
+      "checkpoint-programming",
       "variables",
       "data-types",
       "type-conversion",
+      "checkpoint-variables",
       "arithmetic-operators",
       "user-input",
+      "checkpoint-input",
       "string-basics",
       "string-methods",
       "f-strings",
+      "checkpoint-strings",
       "comparison-and-logic",
       "if-else",
       "elif",
+      "checkpoint-conditionals",
       "cashier-project",
       "for-loops",
       "while-loops",
@@ -84,7 +89,7 @@ describe("real content", () => {
       "expense-tracker-project",
       "how-the-web-works",
     ]);
-    expect(catalog.byLocale.en.size).toBe(61);
+    expect(catalog.byLocale.en.size).toBe(66);
   });
 
   it("every <Playground initialCode> is valid Python", () => {
@@ -116,7 +121,7 @@ for name, code in json.load(sys.stdin):
 });
 
 type Exercise = {
-  type: "guided" | "challenge";
+  type: "guided" | "challenge" | "apply";
   title: string;
   steps?: string[];
   starter?: string;
@@ -172,16 +177,36 @@ describe("hands-on exercises", () => {
   it("every free lesson has a guided exercise and a solo challenge, in both locales", () => {
     for (const locale of ["id", "en"] as const) {
       for (const lesson of getCatalog().byLocale[locale].values()) {
-        if (lesson.stage !== 1) continue;
+        if (lesson.stage !== 1 || lesson.slug.startsWith("checkpoint-")) continue;
         const types = exercises(lesson.source).map((e) => e.type);
         expect(`${locale}/${lesson.slug}: ${types.sort().join(",")}`).toMatch(/challenge.*guided/);
       }
     }
   });
 
+  it("every free module except the mini project ends with a checkpoint of unguided problems", () => {
+    for (const locale of ["id", "en"] as const) {
+      const lessons = [...getCatalog().byLocale[locale].values()].filter((l) => l.stage === 1);
+      const modules = new Set(
+        lessons.map((l) => l.moduleDir).filter((m) => !m.includes("mini-project")),
+      );
+      for (const moduleDir of modules) {
+        const inModule = lessons.filter((l) => l.moduleDir === moduleDir);
+        const last = inModule.reduce((a, b) => (b.order > a.order ? b : a));
+        const types = exercises(last.source).map((e) => e.type);
+        expect([
+          `${locale}/${moduleDir}`,
+          last.slug.startsWith("checkpoint-"),
+          types.length >= 2,
+        ]).toEqual([`${locale}/${moduleDir}`, true, true]);
+        expect(types.every((t) => t === "apply")).toBe(true);
+      }
+    }
+  });
+
   it("exercises are well-formed", () => {
     for (const [name, ex] of all) {
-      expect([name, ex.type]).toEqual([name, expect.stringMatching(/^(guided|challenge)$/)]);
+      expect([name, ex.type]).toEqual([name, expect.stringMatching(/^(guided|challenge|apply)$/)]);
       expect([
         name,
         ex.title.length > 0,
@@ -189,9 +214,17 @@ describe("hands-on exercises", () => {
         ex.tests.length > 0,
       ]).toEqual([name, true, true, true]);
       if (ex.type === "guided") expect([name, (ex.steps?.length ?? 0) > 0]).toEqual([name, true]);
-      // A challenge shows one example and hides the rest. Before input() is taught a program has nothing to
-      // vary, so those (fix-the-bug) challenges have a single test.
-      else
+      // apply = no help at all: empty editor, no steps, no hints.
+      else if (ex.type === "apply")
+        expect([name, ex.steps, ex.hints, ex.starter]).toEqual([
+          name,
+          undefined,
+          undefined,
+          undefined,
+        ]);
+      // Challenge and apply show one example and hide the rest. Before input() is taught a program has nothing
+      // to vary, so those have a single test.
+      if (ex.type !== "guided")
         expect([name, ex.tests.length >= 2 || !ex.solution.includes("input(")]).toEqual([
           name,
           true,

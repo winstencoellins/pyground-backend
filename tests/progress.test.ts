@@ -71,12 +71,12 @@ describe("GET /api/progress", () => {
     const body = (await res.json()) as Progress;
     expect(body.completed.map((c) => c.slug).sort()).toEqual(["for-loops", "try-except"]);
     expect(body.stages).toEqual([
-      { stage: 1, total: 14, completed: 0, percent: 0 },
+      { stage: 1, total: 19, completed: 0, percent: 0 },
       { stage: 2, total: 19, completed: 1, percent: 5 },
       { stage: 3, total: 27, completed: 1, percent: 4 },
       { stage: 4, total: 1, completed: 0, percent: 0 },
     ]);
-    expect(body.overall).toBe(3); // 2 of 61 lessons
+    expect(body.overall).toBe(3); // 2 of 66 lessons
     expect(body.streak).toEqual({ current: 1, longest: 1, activeToday: true });
   });
 

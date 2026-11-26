@@ -1,0 +1,79 @@
+---
+title: Skill Check
+slug: checkpoint-variables
+stage: 1
+module: "Variables and Data Types"
+order: 4
+isFree: true
+estimatedMinutes: 10
+description: "Solve 2 problems without help to test what you know about variables and data types."
+---
+
+# Skill Check: Variables and Data Types
+
+Time to use everything you've learned in this module, **on your own**. No steps, no hints, and the editor starts empty. Read each problem carefully, make a plan, then write your program.
+
+- Your program is checked automatically. Press **Check answer** as often as you like.
+- Only the first example is shown. If there are hidden tests, think about other cases and try them yourself with **Run**.
+- The sample answer unlocks once every test passes, so you can compare it with your approach.
+
+Stuck? Go back to the earlier lessons. That isn't cheating; real programmers do it all the time.
+
+<Exercise
+  type="apply"
+  title="Three-day piggy bank"
+  tests={[
+    { output: "Tabungan: 15000" },
+  ]}
+  solution={`senin = "5000"
+selasa = 7500
+rabu = 2500.0
+
+total = int(senin) + selasa + rabu
+print("Tabungan:", int(total))`}
+  reflect={"The three variables have different types: `str`, `int` and `float`. Why does `selasa + rabu` give a `float` even though `selasa` is an `int`?"}
+>
+
+Rina wrote down her savings in a messy way. Copy these three variables into your program:
+
+```python
+senin = "5000"
+selasa = 7500
+rabu = 2500.0
+```
+
+Then add them up **using those variables** and print exactly:
+
+```
+Tabungan: 15000
+```
+
+(not `15000.0`)
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Café price label"
+  tests={[
+    { output: "Kopi Susu: Rp18000\nStok: 25 gelas" },
+  ]}
+  solution={`nama = "Kopi Susu"
+harga = 18000
+stok = 25
+
+print(nama + ": Rp" + str(harga))
+print("Stok: " + str(stok) + " gelas")`}
+  reflect={"`print(\"Rp\", harga)` puts a space in between. Which ways did you find to get rid of it?"}
+>
+
+Create three variables: `nama` holding `"Kopi Susu"`, `harga` holding the number `18000`, and `stok` holding the number `25`. Use them to print:
+
+```
+Kopi Susu: Rp18000
+Stok: 25 gelas
+```
+
+Note: there is no space between `Rp` and the number.
+
+</Exercise>

@@ -1,0 +1,79 @@
+---
+title: Uji Kemampuan
+slug: checkpoint-variables
+stage: 1
+module: "Variabel dan Tipe Data"
+order: 4
+isFree: true
+estimatedMinutes: 10
+description: "Kerjakan 2 soal tanpa bantuan untuk menguji pemahamanmu tentang Variabel dan Tipe Data."
+---
+
+# Uji Kemampuan: Variabel dan Tipe Data
+
+Saatnya memakai semua yang sudah kamu pelajari di modul ini, **tanpa bantuan**. Tidak ada langkah, tidak ada petunjuk, dan editornya kosong. Baca soalnya baik-baik, rencanakan dulu, lalu tulis programmu sendiri.
+
+- Programmu dicek otomatis. Tekan **Cek jawaban** sesering yang kamu mau.
+- Hanya contoh pertama yang ditampilkan. Kalau ada tes tersembunyi, pikirkan kasus lain dan uji sendiri dengan **Jalankan**.
+- Contoh jawaban baru terbuka setelah semua tes lulus, supaya kamu bisa membandingkannya dengan caramu.
+
+Kalau buntu, buka lagi pelajaran sebelumnya. Itu bukan curang. Programmer sungguhan juga begitu.
+
+<Exercise
+  type="apply"
+  title="Celengan tiga hari"
+  tests={[
+    { output: "Tabungan: 15000" },
+  ]}
+  solution={`senin = "5000"
+selasa = 7500
+rabu = 2500.0
+
+total = int(senin) + selasa + rabu
+print("Tabungan:", int(total))`}
+  reflect={"Ketiga variabel punya tipe berbeda: `str`, `int`, dan `float`. Kenapa hasil `selasa + rabu` menjadi `float`, padahal `selasa` adalah `int`?"}
+>
+
+Rina mencatat tabungannya dengan cara yang berantakan. Salin tiga variabel ini ke programmu:
+
+```python
+senin = "5000"
+selasa = 7500
+rabu = 2500.0
+```
+
+Lalu hitung jumlahnya **dari variabel-variabel itu** dan cetak persis:
+
+```
+Tabungan: 15000
+```
+
+(bukan `15000.0`)
+
+</Exercise>
+
+<Exercise
+  type="apply"
+  title="Label harga kafe"
+  tests={[
+    { output: "Kopi Susu: Rp18000\nStok: 25 gelas" },
+  ]}
+  solution={`nama = "Kopi Susu"
+harga = 18000
+stok = 25
+
+print(nama + ": Rp" + str(harga))
+print("Stok: " + str(stok) + " gelas")`}
+  reflect={"`print(\"Rp\", harga)` memberi spasi di tengah. Cara apa saja yang kamu temukan untuk menghilangkannya?"}
+>
+
+Buat tiga variabel: `nama` berisi `"Kopi Susu"`, `harga` berisi angka `18000`, dan `stok` berisi angka `25`. Gunakan variabel-variabel itu untuk mencetak:
+
+```
+Kopi Susu: Rp18000
+Stok: 25 gelas
+```
+
+Perhatikan: tidak ada spasi antara `Rp` dan angkanya.
+
+</Exercise>
