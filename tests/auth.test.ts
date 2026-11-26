@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it, spyOn } from "bun:test";
 import { app } from "../src/app";
 import { prisma } from "../src/lib/prisma";
+import { call as fresh, cleanupUsers, createUser } from "./helpers";
 
 type ErrorBody = { error: { code: string; message: string } };
 const email = `test-auth-${crypto.randomUUID()}@example.com`;
@@ -29,6 +30,7 @@ const sessionCookie = (res: Response) =>
 
 afterAll(async () => {
   await prisma.user.deleteMany({ where: { email } });
+  await cleanupUsers();
 });
 
 describe("email + password auth", () => {
@@ -143,5 +145,66 @@ describe("auth emails in production", () => {
     expect(all).not.toContain("token=");
     expect(all).not.toContain("http");
     expect(all).not.toContain(prodEmail);
+  });
+});
+
+describe("profile: name and password", () => {
+  const post = (path: string, cookie: string, json: unknown) =>
+    fresh(`/api/auth/${path}`, { method: "POST", headers: { cookie }, json });
+
+  it("update-user trims the name; empty or over 80 characters -> 400 INVALID_NAME", async () => {
+    const u = await createUser();
+    expect((await post("update-user", u.cookie, { name: "  Siti Rahma  " })).status).toBe(200);
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: u.id } })).name).toBe("Siti Rahma");
+    for (const name of ["   ", "x".repeat(81)]) {
+      const res = await post("update-user", u.cookie, { name });
+      expect(res.status).toBe(400);
+      expect(((await res.json()) as ErrorBody).error.code).toBe("INVALID_NAME");
+    }
+    expect((await prisma.user.findUniqueOrThrow({ where: { id: u.id } })).name).toBe("Siti Rahma");
+  });
+
+  it("update-user can't touch role, accessUntil or email", async () => {
+    const u = await createUser();
+    await post("update-user", u.cookie, {
+      role: "ADMIN",
+      accessUntil: new Date(2100, 0),
+      email: "x@example.com",
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id: u.id } });
+    expect([user.role, user.accessUntil, user.email]).toEqual(["STUDENT", null, u.email]);
+  });
+
+  it("sign-up with an over-long name -> 400 INVALID_NAME", async () => {
+    const res = await fresh("/api/auth/sign-up/email", {
+      method: "POST",
+      json: {
+        email: `test-long-${crypto.randomUUID()}@example.com`,
+        password: "test-password-123",
+        name: "y".repeat(81),
+      },
+    });
+    expect(res.status).toBe(400);
+    expect(((await res.json()) as ErrorBody).error.code).toBe("INVALID_NAME");
+  });
+
+  it("change-password needs the current password; the new one works afterwards", async () => {
+    const u = await createUser();
+    const wrong = await post("change-password", u.cookie, {
+      currentPassword: "not-my-password",
+      newPassword: "brand-new-pass-1",
+    });
+    expect(wrong.status).toBe(400);
+    expect(((await wrong.json()) as ErrorBody).error.code).toBe("INVALID_PASSWORD");
+    const ok = await post("change-password", u.cookie, {
+      currentPassword: "test-password-123",
+      newPassword: "brand-new-pass-1",
+      revokeOtherSessions: true,
+    });
+    expect(ok.status).toBe(200);
+    const signIn = (password: string) =>
+      fresh("/api/auth/sign-in/email", { method: "POST", json: { email: u.email, password } });
+    expect((await signIn("test-password-123")).status).toBe(401);
+    expect((await signIn("brand-new-pass-1")).status).toBe(200);
   });
 });

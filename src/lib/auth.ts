@@ -1,5 +1,6 @@
 import { betterAuth, type User } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError } from "better-auth/api";
 import { authEmail } from "../emails";
 import { sendEmail } from "../emails/send";
 import { prisma } from "./prisma";
@@ -13,6 +14,20 @@ const cookieDomain = process.env.COOKIE_DOMAIN; // e.g. ".pyground.id" once on a
 // Awaited but never throws (sendEmail swallows failures), so auth flows don't break if email is down.
 const deliver = (kind: "verification" | "passwordReset", user: AuthUser, url: string) =>
   sendEmail(authEmail(kind, user, url)).then(() => undefined);
+
+export const MAX_NAME = 80;
+
+/** Display names are trimmed, 1-80 characters (shown in the header, emails and the admin list). */
+function cleanName(value: unknown) {
+  const name = String(value ?? "").trim();
+  if (!name || name.length > MAX_NAME) {
+    throw new APIError("BAD_REQUEST", {
+      code: "INVALID_NAME",
+      message: `Name must be 1-${MAX_NAME} characters`,
+    });
+  }
+  return name;
+}
 
 /** Sign-up and update-user may send "id"/"en" (any case); store the enum, default ID. */
 const normalizeLocale = (value: unknown) => (String(value).toUpperCase() === "EN" ? "EN" : "ID");
@@ -47,13 +62,18 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user) => ({ data: { ...user, locale: normalizeLocale(user.locale) } }),
+        before: async (user) => ({
+          data: { ...user, name: cleanName(user.name), locale: normalizeLocale(user.locale) },
+        }),
       },
       update: {
-        before: async (data) =>
-          "locale" in data
-            ? { data: { ...data, locale: normalizeLocale(data.locale) } }
-            : undefined,
+        before: async (data) => ({
+          data: {
+            ...data,
+            ...("name" in data && { name: cleanName(data.name) }),
+            ...("locale" in data && { locale: normalizeLocale(data.locale) }),
+          },
+        }),
       },
     },
   },
