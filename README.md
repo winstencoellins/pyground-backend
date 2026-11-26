@@ -121,17 +121,24 @@ Sending never throws, so auth and payments keep working if Resend is down.
 
 ## Cron jobs
 
-Both run as separate Railway cron services from the same image (schedules are UTC):
+All run as separate Railway cron services from the same image (schedules are UTC):
 
-| Service          | Command                  | Schedule                      |
-| ---------------- | ------------------------ | ----------------------------- |
-| Expiry reminders | `bun run cron:reminders` | `0 1 * * *` (08:00 WIB)       |
-| Database backup  | `bun run cron:backup`    | e.g. `0 20 * * *` (03:00 WIB) |
+| Service          | Command                      | Schedule                      |
+| ---------------- | ---------------------------- | ----------------------------- |
+| Expiry reminders | `bun run cron:reminders`     | `0 1 * * *` (08:00 WIB)       |
+| Database backup  | `bun run cron:backup`        | e.g. `0 20 * * *` (03:00 WIB) |
+| Expire orders    | `bun run cron:expire-orders` | `15 * * * *` (hourly)         |
 
 **Reminders** email STUDENTs with a verified email whose pass ends in 3 days or today (Asia/Jakarta
 calendar), in their language. Each `(user, kind, accessUntil)` is recorded in `reminder_emails`, so
 re-runs never double-send and a renewal re-arms them. Undelivered emails (Resend down or no key) are
 released for the next run and make the job exit non-zero.
+
+**Expire orders** settles `PENDING` orders older than the payment window (24 h, sent to Snap as
+`expiry`, plus 1 h of slack). Each is checked with Midtrans first: paid -> `PAID` + access + receipt (a
+missed notification), no transaction (Snap opened, no payment method chosen) -> `EXPIRED`, still pending
+-> left for Midtrans' own expire notification. Exits non-zero if Midtrans was unreachable; the next run
+retries.
 
 **Backups** run `pg_dump --format=custom` (credentials passed as `PG*` env vars, never argv) and upload
 `pyground/YYYY/MM/pyground-YYYYMMDD-HHMMSSZ.dump` to the bucket. `pg_dump` must match the server's
@@ -159,6 +166,7 @@ docker compose --profile app up -d --build --wait    # migrate (pre-deploy) -> a
 docker compose --profile app run --rm api bun run db:seed   # admin from SEED_ADMIN_* (no sample data: NODE_ENV=production)
 docker compose --profile app run --rm reminders      # cron: expiry reminders
 docker compose --profile app run --rm backup         # cron: needs BACKUP_S3_* in .env
+docker compose --profile app run --rm expire-orders  # cron: settles stale PENDING orders
 docker compose --profile app down                    # stop (data stays in the volume)
 ```
 
@@ -166,21 +174,24 @@ docker compose --profile app down                    # stop (data stays in the v
 
 One Railway project with environments `staging` and `production`. Each environment has:
 
-| Service                   | Source                    | Config file (Settings → Config-as-code)                                                                                       |
-| ------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Postgres                  | Railway Postgres template | —                                                                                                                             |
-| `pyground-api`            | this repo                 | `railway.json`: Dockerfile build, pre-deploy `bunx --bun prisma migrate deploy` (never `migrate dev`), health check `/health` |
-| `pyground-cron-reminders` | this repo                 | `railway.cron-reminders.json`: `bun run cron:reminders` at `0 1 * * *` (08:00 WIB)                                            |
-| `pyground-cron-backup`    | this repo                 | `railway.cron-backup.json`: `bun run cron:backup` at `0 20 * * *` (03:00 WIB)                                                 |
-| `pyground-web`            | pyground-frontend repo    | proxies `/api/*` to `pyground-api` over the private network                                                                   |
+| Service                       | Source                    | Config file (Settings → Config-as-code)                                                                                       |
+| ----------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Postgres                      | Railway Postgres template | —                                                                                                                             |
+| `pyground-api`                | this repo                 | `railway.json`: Dockerfile build, pre-deploy `bunx --bun prisma migrate deploy` (never `migrate dev`), health check `/health` |
+| `pyground-cron-reminders`     | this repo                 | `railway.cron-reminders.json`: `bun run cron:reminders` at `0 1 * * *` (08:00 WIB)                                            |
+| `pyground-cron-backup`        | this repo                 | `railway.cron-backup.json`: `bun run cron:backup` at `0 20 * * *` (03:00 WIB)                                                 |
+| `pyground-cron-expire-orders` | this repo                 | `railway.cron-expire-orders.json`: `bun run cron:expire-orders` at `15 * * * *` (hourly)                                      |
+| `pyground-web`                | pyground-frontend repo    | proxies `/api/*` to `pyground-api` over the private network                                                                   |
 
 **Variables** (set per environment; see `.env.example` for all of them):
 
-- All three backend services: `DATABASE_URL=${{Postgres.DATABASE_URL}}` (private network), `WEB_URL`,
+- All backend services: `DATABASE_URL=${{Postgres.DATABASE_URL}}` (private network), `WEB_URL`,
   `BETTER_AUTH_SECRET` (`openssl rand -base64 32`, different per environment), `RESEND_API_KEY`, `EMAIL_FROM`.
 - `pyground-api`: `MIDTRANS_SERVER_KEY`, `MIDTRANS_IS_PRODUCTION`, `ACCESS_PASS_PRICE_IDR`,
   `TRUSTED_PROXY_HOPS`, optional `COOKIE_DOMAIN`. Railway sets `PORT`; the API listens on `::`.
 - `pyground-cron-backup`: `BACKUP_S3_*`.
+- `pyground-cron-expire-orders`: `MIDTRANS_SERVER_KEY`, `MIDTRANS_IS_PRODUCTION`, `ACCESS_PASS_PRICE_IDR`
+  (same values as `pyground-api`).
 - `DATABASE_PUBLIC_URL` is only for running migrations or restores from your machine:
   `DATABASE_URL="$DATABASE_PUBLIC_URL" bun run db:deploy`.
 

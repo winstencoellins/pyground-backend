@@ -69,6 +69,16 @@ services:
     depends_on:
       migrate: { condition: service_completed_successfully }
 
+  expire-orders:
+    profiles: [app]
+    image: pyground-api:dev
+    init: true
+    command: ["bun", "run", "cron:expire-orders"]
+    env_file: .env
+    environment: *dev-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
   backup:
     profiles: [app]
     image: pyground-api:dev

@@ -1,16 +1,19 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
 import { createHash } from "node:crypto";
 import { prisma } from "../src/lib/prisma";
+import { expireOrders } from "../src/cron/expire-orders";
 import { outcomeOf, verifySignature } from "../src/modules/payments/fulfill";
 import { call, cleanupUsers, createUser, type ErrorBody } from "./helpers";
 
 const KEY = "SB-Mid-server-WEBHOOK-TEST";
 const DAY = 86_400_000;
+const HOUR = 3_600_000;
 const realFetch = globalThis.fetch;
 const env = { ...process.env };
 /** What the fake Get Status API returns, per order_id. */
 const statuses = new Map<string, Record<string, string>>();
 let statusCalls = 0;
+let midtransDown = false;
 
 beforeAll(() => {
   spyOn(console, "info").mockImplementation(() => {});
@@ -22,13 +25,16 @@ beforeAll(() => {
     const m = /api\.sandbox\.midtrans\.com\/v2\/([^/]+)\/status$/.exec(url);
     if (!m) return realFetch(input, init);
     statusCalls++;
+    if (midtransDown) return new Response("unavailable", { status: 503 });
     const s = statuses.get(decodeURIComponent(m[1]!));
-    return s ? Response.json(s) : Response.json({ status_code: "404" }, { status: 404 });
+    // Like the real API: no transaction (Snap opened, no method chosen) is HTTP 200 with status_code 404.
+    return Response.json(s ?? { status_code: "404", status_message: "Transaction doesn't exist." });
   }) as unknown as typeof fetch;
 });
 afterEach(() => {
   statuses.clear();
   statusCalls = 0;
+  midtransDown = false;
 });
 afterAll(async () => {
   globalThis.fetch = realFetch;
@@ -56,10 +62,10 @@ function notify(orderId: string, opts: { gross?: string; statusCode?: string; ke
   });
 }
 
-async function newOrder(accessUntil: Date | null = null) {
+async function newOrder(accessUntil: Date | null = null, createdAt = new Date()) {
   const user = await createUser({ accessUntil });
   const orderId = `PYG-TEST-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
-  await prisma.order.create({ data: { userId: user.id, orderId, amount: 49000 } });
+  await prisma.order.create({ data: { userId: user.id, orderId, amount: 49000, createdAt } });
   return { userId: user.id, orderId };
 }
 const settled = (orderId: string, extra: Record<string, string> = {}) =>
@@ -292,7 +298,8 @@ describe("status handling (always from Get Status, never from the notification b
   });
 
   it("Get Status unreachable -> 500 so Midtrans retries", async () => {
-    const { orderId } = await newOrder(null); // no status registered -> fake API returns 404
+    const { orderId } = await newOrder(null);
+    midtransDown = true;
     expect((await notify(orderId)).status).toBe(500);
     expect(await statusOf(orderId)).toBe("PENDING");
   });
@@ -325,10 +332,25 @@ describe("POST /api/payments/orders/:orderId/sync", () => {
   });
 
   it("no transaction yet / Midtrans down -> still PENDING, 200", async () => {
-    const o = await ownOrder(); // fake Get Status answers 404 for unknown orders
+    const o = await ownOrder(); // fake Get Status: no transaction for unknown orders
     const res = await sync(o.orderId, o.cookie);
     expect(res.status).toBe(200);
     expect(((await res.json()) as { status: string }).status).toBe("PENDING");
+    midtransDown = true;
+    expect(((await (await sync(o.orderId, o.cookie)).json()) as { status: string }).status).toBe(
+      "PENDING",
+    );
+  });
+
+  it("no transaction after the 24h payment window -> EXPIRED", async () => {
+    const o = await ownOrder();
+    await prisma.order.update({
+      where: { orderId: o.orderId },
+      data: { createdAt: new Date(Date.now() - 26 * HOUR) },
+    });
+    const res = await sync(o.orderId, o.cookie);
+    expect(((await res.json()) as { status: string }).status).toBe("EXPIRED");
+    expect(await accessOf(o.id).catch(() => null)).toBeNull(); // no access granted
   });
 
   it("someone else's order looks missing; signed out is 401", async () => {
@@ -337,6 +359,44 @@ describe("POST /api/payments/orders/:orderId/sync", () => {
     settled(o.orderId);
     expect((await sync(o.orderId, other.cookie)).status).toBe(404);
     expect((await sync(o.orderId)).status).toBe(401);
+    expect(await statusOf(o.orderId)).toBe("PENDING");
+  });
+});
+
+describe("expire-orders cron (abandoned or missed payments)", () => {
+  const old = () => new Date(Date.now() - 26 * HOUR);
+
+  it("settles only PENDING orders past the payment window, checking Midtrans for each", async () => {
+    const abandoned = await newOrder(null, old()); // Snap opened, no method chosen
+    const missedPayment = await newOrder(null, old()); // paid, but the notification never arrived
+    settled(missedPayment.orderId);
+    const stillPending = await newOrder(null, old()); // VA chosen; Midtrans will send expire itself
+    statuses.set(stillPending.orderId, {
+      transaction_status: "pending",
+      gross_amount: "49000.00",
+    });
+    const fresh = await newOrder(null); // inside the window: not touched, not even asked about
+    const ids = [abandoned, missedPayment, stillPending, fresh].map((o) => o.userId);
+
+    const counts = await expireOrders(new Date(), { userId: { in: ids } });
+    expect(counts).toEqual({ "set-expired": 1, paid: 1, "set-pending": 1 });
+    expect(statusCalls).toBe(3);
+    expect(await statusOf(abandoned.orderId)).toBe("EXPIRED");
+    expect(await statusOf(missedPayment.orderId)).toBe("PAID");
+    expect(await accessOf(missedPayment.userId)).toBeGreaterThan(Date.now() + 29 * DAY);
+    expect(await statusOf(stillPending.orderId)).toBe("PENDING");
+    expect(await statusOf(fresh.orderId)).toBe("PENDING");
+
+    // Re-running only revisits the one Midtrans still calls pending.
+    statusCalls = 0;
+    expect(await expireOrders(new Date(), { userId: { in: ids } })).toEqual({ "set-pending": 1 });
+    expect(statusCalls).toBe(1);
+  });
+
+  it("Midtrans down -> orders stay PENDING and the run reports them", async () => {
+    const o = await newOrder(null, old());
+    midtransDown = true;
+    expect(await expireOrders(new Date(), { userId: o.userId })).toEqual({ unreachable: 1 });
     expect(await statusOf(o.orderId)).toBe("PENDING");
   });
 });

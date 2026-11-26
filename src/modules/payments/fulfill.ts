@@ -3,7 +3,9 @@ import type { Prisma } from "../../generated/prisma/client";
 import { receiptEmail } from "../../emails";
 import { sendEmail } from "../../emails/send";
 import { prisma } from "../../lib/prisma";
-import { accessPass } from "./products";
+import { accessPass, PAYMENT_WINDOW_HOURS } from "./products";
+
+const HOUR = 3_600_000;
 
 /** signature_key = SHA512(order_id + status_code + gross_amount + server_key), hex. */
 export function verifySignature(
@@ -18,6 +20,7 @@ export function verifySignature(
 }
 
 export type MidtransStatus = {
+  status_code?: string;
   order_id?: string;
   transaction_status?: string;
   fraud_status?: string;
@@ -63,6 +66,19 @@ export function outcomeOf(s: MidtransStatus): Outcome {
 export async function applyStatus(orderId: string, status: MidtransStatus) {
   const order = await prisma.order.findUnique({ where: { orderId } });
   if (!order) return { result: "unknown-order" as const };
+
+  // Snap was opened but no payment method chosen, so Midtrans never created a transaction. Once the
+  // payment window (plus an hour of slack for clock skew) has closed it never will.
+  if (status.status_code === "404") {
+    if (Date.now() - order.createdAt.getTime() < (PAYMENT_WINDOW_HOURS + 1) * HOUR) {
+      return { result: "ignored" as const };
+    }
+    const expired = await prisma.order.updateMany({
+      where: { id: order.id, status: "PENDING" },
+      data: { status: "EXPIRED" },
+    });
+    return { result: expired.count ? ("set-expired" as const) : ("unchanged" as const) };
+  }
 
   const outcome = outcomeOf(status);
   if (outcome === "IGNORE") return { result: "ignored" as const };

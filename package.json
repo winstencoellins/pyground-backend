@@ -17,6 +17,7 @@
     "db:seed": "prisma db seed",
     "types:build": "bun types-package/build.ts",
     "cron:reminders": "bun src/cron/send-reminders.ts",
+    "cron:expire-orders": "bun src/cron/expire-orders.ts",
     "cron:backup": "bun src/cron/backup.ts"
   },
   "dependencies": {

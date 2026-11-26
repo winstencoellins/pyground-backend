@@ -82,6 +82,7 @@ describe("POST /api/payments/checkout", () => {
     expect(payload.enabled_payments).toEqual(
       expect.arrayContaining(["other_qris", "gopay", "shopeepay", "bca_va", "credit_card"]),
     );
+    expect(payload.expiry).toEqual({ unit: "hours", duration: 24 });
     expect(payload.callbacks.finish).toBe(
       `${process.env.WEB_URL}/payment/result?orderId=${body.orderId}`,
     );

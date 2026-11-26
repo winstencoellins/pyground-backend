@@ -1,5 +1,8 @@
 // What can be bought. Today: a one-off 30-day pass. A Midtrans Subscription plan (task #44) would be
 // another entry here with its own checkout path; fulfilment (extend accessUntil) stays the same.
+/** How long a Snap payment link (and any VA/QRIS chosen in it) stays payable. */
+export const PAYMENT_WINDOW_HOURS = 24;
+
 export type Product = { id: string; name: string; days: number; price: number };
 
 export function accessPass(): Product {

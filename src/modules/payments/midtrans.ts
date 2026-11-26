@@ -1,5 +1,6 @@
 import { ApiError } from "../../lib/errors";
 import type { MidtransStatus } from "./fulfill";
+import { PAYMENT_WINDOW_HOURS } from "./products";
 
 // Snap shows only these. QRIS is "other_qris"; "echannel" is Mandiri Bill.
 export const ENABLED_PAYMENTS = [
@@ -64,6 +65,8 @@ export async function createSnapTransaction(
       enabled_payments: ENABLED_PAYMENTS,
       credit_card: { secure: true },
       callbacks: { finish: req.finishUrl },
+      // An explicit deadline, so "older than the window and never paid" reliably means dead.
+      expiry: { unit: "hours", duration: PAYMENT_WINDOW_HOURS },
     }),
   }).catch(() => null);
   const body = (await res?.json().catch(() => null)) as {
@@ -81,7 +84,10 @@ export async function createSnapTransaction(
   return { token: body.token, redirectUrl: body.redirect_url };
 }
 
-/** Midtrans Get Status API (used by the webhook to confirm a notification, task #24). */
+/**
+ * Midtrans Get Status API (used by the webhook to confirm a notification, task #24). An order whose Snap
+ * page was opened but no payment method chosen has no transaction: HTTP 200 with `status_code: "404"`.
+ */
 export async function getTransactionStatus(orderId: string): Promise<MidtransStatus> {
   const { apiUrl, headers } = config();
   const res = await fetch(`${apiUrl}/v2/${encodeURIComponent(orderId)}/status`, {
